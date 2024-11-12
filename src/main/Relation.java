@@ -58,7 +58,6 @@ public class Relation {
 
             // Parcourt la liste des attributs et écrit chaque valeur dans le buffer
             for (int i = 0; i < lgRecord; i++) {
-                System.out.println(posValue);  // Affiche la position actuelle (utile pour le débogage)
                 // Traitement du type de données pour chaque attribut
                 switch (getType(i)) {
                     case INT:
@@ -78,15 +77,21 @@ public class Relation {
 
                         for (int j = 0; j < str.length(); j++) {
                             buffer.putChar(posValue, str.charAt(j)); // Écrit caractère par caractère
+
                             posValue += Character.BYTES;
                             nbCharWrite += 2;  // Incrémente le nombre de caractères écrits
                         }
-                        posValue += getLength(i) - nbCharWrite;  // Calcul du prochain offset
+                        // Si c'est un char on alloue la prochaine val a la fin de la taille de la colonne
+                        if(getType(i) == DataType.CHAR)
+                            posValue += (getLength(i)*2) - nbCharWrite;  // Calcul du prochain offset *2 car 1 char = 2octets!!!
+                        // Sinon la prochaine val peut commencer juste apres la fin de l'écriture de la valeur
+                        else
+                            posValue += (str.length()*2) - nbCharWrite;  // Calcul du prochain offset *2 car 1 char = 2octets!!!
+
                         break;
 
                     case DATE:
-                        Date date = (Date) record.getValue(i);
-
+                        Date date = (Date)record.getValue(i);
                         // Écriture des valeurs jour, mois, année pour un type DATE
                         buffer.putInt(posValue, date.getDay());
                         posValue += Integer.BYTES;
@@ -99,7 +104,6 @@ public class Relation {
                     default:
                         throw new IllegalArgumentException("Type non pris en charge pour l'écriture.");
                 }
-
                 // Mise à jour de l'offset pour la prochaine valeur
                 buffer.putInt(pos, posValue);
                 pos += Integer.BYTES;  // Mise à jour de la position d'écriture
@@ -142,18 +146,20 @@ public class Relation {
 
                     case CHAR:
                     case VARCHAR:
+                        int endOfString = buffer.getInt((pos + (i+1)*Integer.BYTES));
                         StringBuilder str = new StringBuilder();
                         char c;
-                        int nbCharRead = 0;
 
-                        // Parcours du buffer jusqu'au caractère nul
-                        while ((c = buffer.getChar(posValue)) != '\0') {
-                            posValue += Character.BYTES;  // Avance de 2 octets
+                        // Parcours du buffer jusqu'a la fin de la chaine
+                        while (endOfString > posValue) {
+                            System.out.println(posValue);
+                            c = buffer.getChar(posValue);
                             str.append(c);
-                            nbCharRead += 2;
+                            posValue += Character.BYTES;  // Avance de 2 octets
                         }
-                        record.addValue(str.toString(), getType(i));
-                        posValue += getLength(i) - nbCharRead;  // Mise à jour de la position
+                        record.addValue(str.toString().trim(), getType(i));
+                        posValue = endOfString;  // Mise à jour de la position
+
                         break;
 
                     case DATE:
@@ -289,7 +295,7 @@ public class Relation {
     }
 
     /**
-     * Insère un enregistrement dans la base de données. Si une page de données
+     * Insère un enregistrement dans la able. Si une page de données
      * avec suffisamment d'espace est trouvée, l'enregistrement est inséré dans celle-ci.
      * Sinon, une nouvelle page est ajoutée à la base de données.
      *
@@ -373,6 +379,9 @@ public class Relation {
      * @param elmts Un objet Pair représentant l'attribut (nom, type de données).
      */
     public void addAttribut(Pair<String, Data> elmts) {
+        if(elmts == null)
+            throw new IllegalArgumentException("Erreur le nom d'un attribut ne peut pas etre null");
+
         attribut.add(elmts);
     }
 
@@ -422,11 +431,19 @@ public class Relation {
      * @throws IllegalArgumentException Si le nom de la relation est null ou vide.
      */
     public void setRelationName(String relationName) {
+        // Vérification si le nom est vide
         if (relationName == null || relationName.isEmpty())
             throw new IllegalArgumentException("Le nom de la relation ne peut pas être vide.");
 
+        relationName = relationName.toUpperCase();  // Met le nom en maj
+
+        // Vérification si le nom de la relation contient uniquement des lettres majuscules (A-Z)
+        if (!relationName.matches("^[A-Z]+$"))
+            throw new IllegalArgumentException("Le nom de la relation doit contenir uniquement des lettres majuscules (A-Z).");
+    
+        // Assignation du nom de la relation
         this.relationName = relationName;
-    }
+    }    
 
     /**
      * Récupère la liste des attributs de la relation.

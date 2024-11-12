@@ -45,13 +45,13 @@ public class TestDBConfig{
         configValues.put("bm_policy", BM_POLICY); // Politique de remplacement du BufferManager
         dbConfig = new DBConfig(configValues); // Création d'une instance de DBConfig avec les valeurs de configuration
     }
-    /*
+
     @After
     public void tearDown(){
         // Nettoyer les fichiers de test apres chaque méthode de test
         new File(OUTPUT_CONFIG_FILE).delete(); // Suppression du fichier de sortie
     }
-    */
+
     @Test
     public void testLoadConfig(){
         try (FileWriter writer = new FileWriter(TEST_CONFIG_FILE)){ // Création d'un FileWriter pour écrire dans le fichier

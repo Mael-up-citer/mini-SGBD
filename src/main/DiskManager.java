@@ -172,7 +172,7 @@ public class DiskManager {
      * 
      * @throws Exception Si une erreur survient lors du chargement de l'état.
      */
-    public void LoadState() throws Exception {
+    public void loadState() throws Exception {
         String cheminFichier = DBConfig.dbpath + "dm.save"; // Chemin du fichier de sauvegarde
 
         try (RandomAccessFile raf = new RandomAccessFile(cheminFichier, "rw")) {

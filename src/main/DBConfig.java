@@ -217,7 +217,7 @@ public class DBConfig {
      * 
      * @return true si le chemin est valide, false sinon.
      */
-    public boolean testDbpath(){
+    public static boolean testDbpath(){
         boolean flag = true; // Flag pour tester si le chemin est valide
 
         // Vérifie si le chemin est vide

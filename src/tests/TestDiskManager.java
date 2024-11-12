@@ -165,7 +165,7 @@ public class TestDiskManager{
         dskM.SaveState(); // Sauvegarder l'état
         // Charger l'état depuis le fichier
         try{
-            dskM.LoadState(); // Charger l'état
+            dskM.loadState(); // Charger l'état
         } catch(Exception e){
             System.out.println(e); // Afficher l'exception si elle se produit
         }
