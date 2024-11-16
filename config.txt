@@ -1,5 +1,5 @@
 dbpath = "./"
-pagesize = 16
-dm_maxfilesize = 160
-bm_buffercount = 10
+pagesize = 1024
+dm_maxfilesize = 16384
+bm_buffercount = 1000
 bm_policy = "MRU"

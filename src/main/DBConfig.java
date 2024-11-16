@@ -20,6 +20,7 @@ public class DBConfig {
     public static int bm_buffercount; // Nombre de buffers gérés par le BufferManager
     public static String bm_policy; // Politique de remplacement des buffers
 
+
     /**
      * Constructeur pour initialiser la configuration avec un Map de valeurs.
      * 

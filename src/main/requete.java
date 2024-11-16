@@ -27,12 +27,12 @@ public class requete {
         // Exécuter chaque sous-requête et la remplacer par son résultat dans la requête principale
         for (int i = subqueries.size() - 1; i >= 0; i--) {
             String subquery = subqueries.get(i);
-            String result = processSELECTCommand(subquery);
-            query = query.replace(subquery, result);
+            //String result = processSELECTCommand(subquery);
+            //query = query.replace(subquery, result);
             System.out.println("Après remplacement de la sous-requête : " + query);
         }
 
         // Après le traitement des sous-requêtes, associer la requête principale à une méthode via réflexion
-        assocQuery(query);
+        //assocQuery(query);
     }
 }

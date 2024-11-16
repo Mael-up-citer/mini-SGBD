@@ -49,17 +49,15 @@ public class MyRecord{
      */
     private Object validateTupleAttribute(Object value, DataType type, int index) {
         // Vérifie que l'index ne dépasse pas le nombre d'attributs définis dans la relation.
-        if (index >= relation.getAttribut().size()) {
+        if (index >= relation.getAttribut().size())
             throw new IllegalArgumentException("Le nombre de valeurs dépasse le nombre d'attributs dans la relation.");
-        }
 
         // Récupère le type attendu pour l'attribut à l'index donné.
         DataType expectedType = relation.getType(index);
 
         // Vérifie si le type de donnée spécifié correspond au type attendu.
-        if (expectedType != type) {
+        if (expectedType != type)
             throw new IllegalArgumentException("Le type de la valeur ne correspond pas à celui de l'attribut.");
-        }
 
         // Récupère la longueur maximale autorisée pour les chaînes si applicable.
         int maxLength = relation.getLength(index);
@@ -70,38 +68,37 @@ public class MyRecord{
             case CHAR:
             case VARCHAR:
                 // Vérifie que la valeur est une instance de String.
-                if (!(value instanceof String)) {
+                if (!(value instanceof String))
                     throw new IllegalArgumentException("La valeur doit être une chaîne pour le type CHAR ou VARCHAR.");
-                }
 
                 // Convertit la valeur en chaîne pour vérifier sa longueur.
                 String strValue = (String) value;
 
                 // Vérifie que la longueur de la chaîne ne dépasse pas la longueur maximale.
-                if (strValue.length() > maxLength) {
+                if (strValue.length() > maxLength)
                     throw new IllegalArgumentException("La chaîne dépasse la taille maximale autorisée pour l'attribut.");
-                }
+
                 break;
 
             case INT:
                 // Vérifie que la valeur est une instance d'Integer.
-                if (!(value instanceof Integer)) {
+                if (!(value instanceof Integer))
                     throw new IllegalArgumentException("La valeur doit être un entier pour le type INT.");
-                }
+
                 break;
 
             case REAL:
                 // Vérifie que la valeur est une instance de Float ou Double.
-                if (!(value instanceof Float) && !(value instanceof Double)) {
+                if (!(value instanceof Float) && !(value instanceof Double))
                     throw new IllegalArgumentException("La valeur doit être un nombre réel pour le type REAL.");
-                }
+
                 break;
 
             case DATE:
                 // Vérifie que la valeur est une instance de Date.
-                if (!(value instanceof Date)) {
+                if (!(value instanceof Date))
                     throw new IllegalArgumentException("La valeur doit être une date pour le type DATE.");
-                }
+
                 break;
 
             default:
@@ -134,12 +131,24 @@ public class MyRecord{
     }
 
     /**
-     * Retourne la taille du tuple (le nombre d'éléments dans le tuple).
      * 
      * @return Le nombre d'éléments dans le tuple.
      */
     public int getSize(){
         return tuple.size();
+    }
+
+    /**
+     * 
+     * @return La taille du tuple en octet.
+     */
+    public int getSizeOctet(){
+        int sum = 0;
+
+        for(int i = 0; i < tuple.size(); i++)
+            sum += relation.getLength(i);
+
+        return sum;
     }
 
     /**
