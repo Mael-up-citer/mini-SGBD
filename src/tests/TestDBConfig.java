@@ -28,9 +28,9 @@ public class TestDBConfig{
     // Constantes pour les valeurs de configuration
     private static final String DB_PATH = "src/tests/db/"; // Chemin vers la base de données
     private static final String PAGE_SIZE = "4096"; // Taille de la page en octets
-    private static final String DM_MAX_FILE_SIZE = "10485760"; // Taille maximale du fichier en octets
-    private static final String BM_BUFFER_COUNT = "10"; // Nombre de buffers gérés par le BufferManager
-    private static final String BM_POLICY = "LRU"; // Politique de remplacement du BufferManager
+    private static final String DM_MAX_FILE_SIZE = "16384"; // Taille maximale du fichier en octets
+    private static final String BM_BUFFER_COUNT = "16"; // Nombre de buffers gérés par le BufferManager
+    private static final String BM_POLICY = "MRU"; // Politique de remplacement du BufferManager
 
     private DBConfig dbConfig; // Variable d'instance pour stocker l'objet DBConfig
 
@@ -81,8 +81,8 @@ public class TestDBConfig{
         // Vérifie que les valeurs sont correctement assignées
         assertEquals(DB_PATH, dbConfig.dbpath); // Vérifie le chemin de la base de données
         assertEquals(4096, dbConfig.pagesize); // Vérifie la taille de la page
-        assertEquals(10485760, dbConfig.dm_maxfilesize); // Vérifie la taille maximale du fichier
-        assertEquals(10, dbConfig.bm_buffercount); // Vérifie le nombre de buffers
+        assertEquals(16384, dbConfig.dm_maxfilesize); // Vérifie la taille maximale du fichier
+        assertEquals(16, dbConfig.bm_buffercount); // Vérifie le nombre de buffers
         assertEquals(BM_POLICY, dbConfig.bm_policy); // Vérifie la politique de remplacement
     }
 

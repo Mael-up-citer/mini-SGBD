@@ -52,7 +52,7 @@ public class DiskManager {
      */
     public PageId AllocPage() throws Exception {
         PageId id = new PageId();
-        
+
         // Si des pages sont disponibles dans freePage, on les récupère
         if (freePage.size() != 0)
             id = freePage.remove(freePage.size() - 1); // Retirer la dernière page libre

@@ -37,12 +37,12 @@ public class Data{
      * @throws IllegalArgumentException Si le type de données n'est pas CHAR ou VARCHAR.
      */
     public Data(DataType t, int lg){
-        type = t;
-
         if((t == DataType.CHAR) || (t == DataType.VARCHAR))
             length = lg;
         else
             throw new IllegalArgumentException("Cette méthode est applicable qu'au type CHAR et VARCHAR");
+
+        type = t;
     }
 
     /**

@@ -2,59 +2,60 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 /**
- * Classe représentant un nœud dans un arbre AVL.
- * Chaque nœud contient un identifiant de page (PageId), un pointeur vers un buffer, 
+ * Classe représentant un noeud dans un arbre AVL.
+ * Chaque noeud contient un identifiant de page (PageId), un pointeur vers un buffer, 
  * un indicateur de modification (dirtyFlag) et un compteur de référence (pin_count).
  */
 class AVLNode{
-    PageId id;  // Identifiant de la page associée au nœud
+    PageId id;  // Identifiant de la page associée au noeud
     AVLNode left;   // Pointeur vers le fils gauche
     AVLNode right;  // Pointeur vers le fils droit
-    int height; // Hauteur du nœud dans l'arbre
+    int height; // Hauteur du noeud dans l'arbre
     ByteBuffer buffer; // Pointeur vers un ByteBuffer pour la page
     boolean dirtyFlag = false; // Indicateur pour savoir si la page a été modifiée
-    int pin_count = 1; // Nombre d'utilisations en cours de la page
+    int pin_count; // Nombre d'utilisations en cours de la page
     Liste pointeurListe;    // Pointeur vers l'adresse dans la JunkFile
 
     /**
-     * Constructeur pour un nœud AVL.
+     * Constructeur pour un noeud AVL.
      * 
-     * @param id L'identifiant de la page associée au nœud
+     * @param id L'identifiant de la page associée au noeud
      * @param buffer Le buffer associé à cette page
      */
     AVLNode(PageId id, ByteBuffer buffer){
         this.id = id; // Assigner l'identifiant de la page
         this.buffer = buffer; // Assigner le ByteBuffer
-        height = 0; // Initialiser la hauteur du nœud à 0
+        height = 0; // Initialiser la hauteur du noeud à 0
+        pin_count = 1; // Nombre d'utilisations en cours de la page
     }
 }
 
 /**
- * Classe représentant un arbre AVL pour gérer un ensemble de nœuds.
- * Cet arbre assure que les nœuds sont équilibrés pour permettre des recherches rapides.
+ * Classe représentant un arbre AVL pour gérer un ensemble de noeuds.
+ * Cet arbre assure que les noeuds sont équilibrés pour permettre des recherches rapides.
  */
 public class AVL{
     private AVLNode root = null; // Racine de l'arbre AVL, initialement vide
 
     /**
-     * Recherche d'un nœud dans l'arbre AVL en fonction de l'identifiant de la page.
+     * Recherche d'un noeud dans l'arbre AVL en fonction de l'identifiant de la page.
      * 
      * @param id L'identifiant de la page à rechercher
-     * @return Le nœud trouvé ou null si non trouvé
+     * @return Le noeud trouvé ou null si non trouvé
      */
     public AVLNode search(PageId id){
         return searchNode(root, id);
     }
 
     /**
-     * Recherche récursive d'un nœud en fonction de l'identifiant de la page.
+     * Recherche récursive d'un noeud en fonction de l'identifiant de la page.
      * 
-     * @param node Le nœud actuel de l'arbre à partir duquel commencer la recherche
+     * @param node Le noeud actuel de l'arbre à partir duquel commencer la recherche
      * @param id L'identifiant de la page à rechercher
-     * @return Le nœud trouvé ou null si non trouvé
+     * @return Le noeud trouvé ou null si non trouvé
      */
     private AVLNode searchNode(AVLNode node, PageId id){
-        // Si le nœud est nul, la page n'a pas été trouvée
+        // Si le noeud est nul, la page n'a pas été trouvée
         if(node == null)
             return null;
         
@@ -75,27 +76,27 @@ public class AVL{
     }
 
     /**
-     * Insère un nouveau nœud dans l'arbre AVL.
+     * Insère un nouveau noeud dans l'arbre AVL.
      * 
-     * @param node Le nœud à insérer
+     * @param node Le noeud à insérer
      */
     public void insert(AVLNode node){
         root = insertNode(root, node);
     }
 
     /**
-     * Insertion récursive d'un nœud dans l'arbre AVL, en maintenant l'équilibre.
+     * Insertion récursive d'un noeud dans l'arbre AVL, en maintenant l'équilibre.
      * 
-     * @param root Le nœud actuel de l'arbre dans lequel insérer le nouveau nœud
-     * @param node Le nœud à insérer
-     * @return Le nœud racine de l'arbre après insertion
+     * @param root Le noeud actuel de l'arbre dans lequel insérer le nouveau noeud
+     * @param node Le noeud à insérer
+     * @return Le noeud racine de l'arbre après insertion
      */
     private AVLNode insertNode(AVLNode root, AVLNode node){
-        // Si l'arbre est vide, insérer le nœud
+        // Si l'arbre est vide, insérer le noeud
         if(root == null)
             return node;
 
-        // Recherche du bon emplacement pour le nœud
+        // Recherche du bon emplacement pour le noeud
         if(node.id.FileIdx < root.id.FileIdx)
             root.left = insertNode(root.left, node); // Insérer à gauche
         else if(node.id.FileIdx > root.id.FileIdx)
@@ -108,7 +109,7 @@ public class AVL{
                 root.right = insertNode(root.right, node); // Insérer à droite
         }
 
-        // Mise à jour de la hauteur du nœud actuel
+        // Mise à jour de la hauteur du noeud actuel
         root.height = Math.max(getHeight(root.left), getHeight(root.right)) + 1;
 
         // Rééquilibrer l'arbre après insertion si nécessaire
@@ -116,52 +117,53 @@ public class AVL{
     }
 
     /**
-     * Supprime un nœud de l'arbre AVL en fonction de l'identifiant de la page.
-     * Retourne le buffer associé au nœud supprimé.
+     * Supprime un noeud de l'arbre AVL en fonction de l'identifiant de la page.
+     * Retourne le noeud supprimé, qui contient également le buffer associé à la page.
      * 
      * @param id L'identifiant de la page à supprimer
-     * @return Le ByteBuffer associé à la page supprimée
+     * @return Le noeud supprimé, contenant le ByteBuffer associé
      */
-    ByteBuffer delete(PageId id){
-        ByteBuffer[] buffer = new ByteBuffer[1]; // Encapsule le buffer du noeud a supprimer
-        buffer[0] = null;
+    AVLNode delete(PageId id) {
+        // Le noeud supprimé sera retourné par la méthode deleteNode
+        AVLNode[] deletedNode = new AVLNode[1];  // Tableau pour encapsuler le noeud supprimé
+        deletedNode[0] = null;
 
-        root = deleteNode(root, id, buffer);    // Met a jour l'arbre
+        // Met à jour l'arbre AVL et récupère le noeud supprimé
+        root = deleteNode(root, id, deletedNode);
 
-        return buffer[0];   // Retourne le buffer pour le reutiliser
+        return deletedNode[0];  // Retourne le noeud supprimé
     }
 
     /**
-     * Suppression récursive d'un nœud dans l'arbre AVL et récupération de son buffer.
+     * Suppression récursive d'un noeud dans l'arbre AVL et récupération du noeud supprimé.
      * 
-     * @param node Le nœud actuel de l'arbre
+     * @param node Le noeud actuel de l'arbre
      * @param id L'identifiant de la page à supprimer
-     * @param buffer Tableau encapsulant le buffer à retourner
-     * @return Le nœud de l'arbre après suppression
+     * @param deletedNode Tableau encapsulant le noeud supprimé
+     * @return Le noeud de l'arbre après suppression
      */
-    private AVLNode deleteNode(AVLNode node, PageId id, ByteBuffer[] buffer){
+    private AVLNode deleteNode(AVLNode node, PageId id, AVLNode[] deletedNode) {
         // Phase de recherche
-        if(node == null)
+        if (node == null)
             return null; // Si le noeud est nul, retourner nul
 
         // Comparer le FileIdx pour la recherche
         if (id.FileIdx < node.id.FileIdx)
-            node.left = deleteNode(node.left, id, buffer);
+            node.left = deleteNode(node.left, id, deletedNode);
         else if (id.FileIdx > node.id.FileIdx)
-            node.right = deleteNode(node.right, id, buffer);
+            node.right = deleteNode(node.right, id, deletedNode);
         else {
-            // Si FileIdx est egal, comparer PageIdx
+            // Si FileIdx est égal, comparer PageIdx
             if (id.PageIdx < node.id.PageIdx)
-                node.left = deleteNode(node.left, id, buffer);
+                node.left = deleteNode(node.left, id, deletedNode);
             else if (id.PageIdx > node.id.PageIdx)
-                node.right = deleteNode(node.right, id, buffer);
+                node.right = deleteNode(node.right, id, deletedNode);
             else {
-                //CHECK ME
-                // Le noeud d'origine a supprimer est trouve
-                if(buffer[0] == null)
-                    buffer[0] = node.buffer; // Capturer le buffer initial a supprimer
+                // Le noeud à supprimer a été trouvé
+                if (deletedNode[0] == null)
+                    deletedNode[0] = node; // Capture le noeud supprimé (et son buffer associé)
 
-                // Si le noeud a un seul enfant ou pas d'enfant
+                // Si le noeud a un seul enfant ou aucun enfant
                 if (node.left == null)
                     return node.right;
                 else if (node.right == null)
@@ -169,15 +171,16 @@ public class AVL{
 
                 // Noeud avec deux enfants, obtenir le minimum dans le sous-arbre droit
                 AVLNode temp = minValueNode(node.right);
-                node.id = temp.id; // Copier les valeurs de l'enfant
+                node.id = temp.id; // Copier les valeurs du successeur
                 node.buffer = temp.buffer; // Copier le buffer du successeur
-                node.right = deleteNode(node.right, temp.id, buffer);
+                node.right = deleteNode(node.right, temp.id, deletedNode); // Suppression récursive du successeur
             }
         }
 
-        // Mettre a jour la hauteur de l'ancetre
+        // Met à jour la hauteur du noeud actuel
         node.height = Math.max(getHeight(node.left), getHeight(node.right)) + 1;
 
+        // Retourne le noeud équilibré
         return balanceNode(node);
     }
 
@@ -198,7 +201,7 @@ public class AVL{
      * Parcours récursif de l'arbre AVL pour vider les buffers modifiés.
      * 
      * @param dskm Le gestionnaire de disque pour écrire les pages modifiées
-     * @param node Le nœud actuel de l'arbre
+     * @param node Le noeud actuel de l'arbre
      * @param emptyBuffer Liste des buffers vides pour les réutiliser
      * @throws Exception Si une erreur survient lors de l'écriture des pages
      */
@@ -221,14 +224,14 @@ public class AVL{
     /* Méthodes utilitaires pour maintenir l'équilibre de l'arbre */
 
     /**
-     * Vérifie si un nœud est déséquilibré et effectue la rotation nécessaire pour rééquilibrer l'arbre.
+     * Vérifie si un noeud est déséquilibré et effectue la rotation nécessaire pour rééquilibrer l'arbre.
      * 
-     * @param node Le nœud à rééquilibrer
-     * @return Le nœud rééquilibré
+     * @param node Le noeud à rééquilibrer
+     * @return Le noeud rééquilibré
      */
     private AVLNode balanceNode(AVLNode node){
         if(node == null)
-            return node; // Aucun besoin de rééquilibrer un nœud nul
+            return node; // Aucun besoin de rééquilibrer un noeud nul
 
         int balanceFactor = getBalance(node); // Calcul du facteur d'équilibre
 
@@ -258,19 +261,19 @@ public class AVL{
     }
 
     /**
-     * Retourne la hauteur d'un nœud.
+     * Retourne la hauteur d'un noeud.
      * 
-     * @param node Le nœud dont on veut la hauteur
-     * @return La hauteur du nœud
+     * @param node Le noeud dont on veut la hauteur
+     * @return La hauteur du noeud
      */
     public int getHeight(AVLNode node){
-        return node == null ? 0 : node.height; // Retourner 0 si le nœud est nul
+        return node == null ? 0 : node.height; // Retourner 0 si le noeud est nul
     }
 
     /**
-     * Retourne le facteur d'équilibre d'un nœud.
+     * Retourne le facteur d'équilibre d'un noeud.
      * 
-     * @param node Le nœud dont on veut le facteur d'équilibre
+     * @param node Le noeud dont on veut le facteur d'équilibre
      * @return Le facteur d'équilibre
      */
     private int getBalance(AVLNode node){
@@ -278,10 +281,10 @@ public class AVL{
     }
 
     /**
-     * Effectue une rotation droite sur un nœud.
+     * Effectue une rotation droite sur un noeud.
      * 
-     * @param y Le nœud à faire tourner
-     * @return Le nouveau nœud racine après la rotation
+     * @param y Le noeud à faire tourner
+     * @return Le nouveau noeud racine après la rotation
      */
     private AVLNode rightRotate(AVLNode y){
         AVLNode x = y.left;
@@ -295,14 +298,14 @@ public class AVL{
         y.height = Math.max(getHeight(y.left), getHeight(y.right)) + 1;
         x.height = Math.max(getHeight(x.left), getHeight(x.right)) + 1;
 
-        return x; // Retourner le nouveau nœud racine
+        return x; // Retourner le nouveau noeud racine
     }
 
     /**
-     * Effectue une rotation gauche sur un nœud.
+     * Effectue une rotation gauche sur un noeud.
      * 
-     * @param x Le nœud à faire tourner
-     * @return Le nouveau nœud racine après la rotation
+     * @param x Le noeud à faire tourner
+     * @return Le nouveau noeud racine après la rotation
      */
     private AVLNode leftRotate(AVLNode x){
         AVLNode y = x.right;
@@ -316,23 +319,23 @@ public class AVL{
         x.height = Math.max(getHeight(x.left), getHeight(x.right)) + 1;
         y.height = Math.max(getHeight(y.left), getHeight(y.right)) + 1;
 
-        return y; // Retourner le nouveau nœud racine
+        return y; // Retourner le nouveau noeud racine
     }
 
     /**
-     * Trouve le nœud avec la valeur minimale dans l'arbre.
+     * Trouve le noeud avec la valeur minimale dans l'arbre.
      * 
-     * @return Le nœud avec la valeur minimale
+     * @return Le noeud avec la valeur minimale
      */
     public AVLNode minValueNode(){
         return minValueNode(root); // Chercher le minimum à partir de la racine
     }
     
     /**
-     * Trouve le nœud avec la valeur minimale dans un sous-arbre.
+     * Trouve le noeud avec la valeur minimale dans un sous-arbre.
      * 
-     * @param node Le nœud à partir duquel commencer la recherche
-     * @return Le nœud avec la valeur minimale
+     * @param node Le noeud à partir duquel commencer la recherche
+     * @return Le noeud avec la valeur minimale
      */
     private AVLNode minValueNode(AVLNode node){
         AVLNode current = node;
@@ -340,6 +343,6 @@ public class AVL{
         while(current.left != null)
             current = current.left;
 
-        return current; // Retourner le nœud minimum
+        return current; // Retourner le noeud minimum
     }
 }

@@ -27,4 +27,9 @@ public class PageId{
         FileIdx = fidx;
         PageIdx = pidx;
     }
+
+    @Override
+    public String toString() {
+        return FileIdx+"    "+PageIdx;
+    }
 }

@@ -45,7 +45,7 @@ public class TestAVL{
         // Vérification que le buffer retourné lors de la suppression est celui du premier noeud supprimé
         for(int i = 0; i < 50; i++){
             // Vérifie que le buffer retourné lors de la suppression correspond bien à celui du nœud supprimé
-            ByteBuffer bufferReturned = arbre.delete(new PageId(0, i * 2)); // Supprimer un autre noeud
+            ByteBuffer bufferReturned = arbre.delete(new PageId(0, i * 2)).buffer; // Supprimer un autre noeud
 
             assertEquals(deletedBuffers[i], bufferReturned, "Le buffer retourné pour le noeud " + i * 2 + " doit être le même que celui capturé.");
         }
@@ -73,7 +73,7 @@ public class TestAVL{
         assertNull(node, "La recherche dans un arbre vide devrait retourner null.");
         
         // Vérification de la suppression dans un arbre vide
-        ByteBuffer buffer = arbre.delete(new PageId(0, 2));
+        ByteBuffer buffer = arbre.delete(new PageId(0, 2)).buffer;
         assertNull(buffer, "La suppression dans un arbre vide devrait retourner null.");
     }    
 

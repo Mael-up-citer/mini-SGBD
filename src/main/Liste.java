@@ -3,6 +3,11 @@ public class Liste{
     Liste suivant;
     PageId id;
 
+    Liste(){
+        suivant = null;
+        precedent = null;
+    }
+
     Liste(PageId id){
         this.id = id;
     }

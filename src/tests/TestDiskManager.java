@@ -28,6 +28,7 @@ public class TestDiskManager{
     private void tearDown() throws IOException{
         // Nettoyer après les tests en supprimant les fichiers générés
         Files.deleteIfExists(Paths.get(DBConfig.dbpath + "dm.save"));
+
         for (int i = 0; i < 10; i++) // Nettoyer tous les fichiers de test
             Files.deleteIfExists(Paths.get(DBConfig.dbpath + "BinData/F" + i + ".rsdb"));
     }

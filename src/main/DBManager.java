@@ -1,60 +1,312 @@
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+/**
+ * Classe représentant un gestionnaire de Base de données.
+ * Le DBManager gère une liste de Bases de Donées, réalise ou redirige les actions demandées par l'utilisateur sur une ou plusieurs base de données.
+ * Il stocke une base de Données courante sur laquelle travaille l'utilisateur.
+ */
 public class DBManager {
+	private HashMap<String, HashMap<String, Relation>> listeDatabase;
+	private HashMap<String, Relation> current;
+	private DBConfig dbc;
+	private DiskManager dskm;
+	private BufferManager bm;
+	
+	/**
+	 * Constructeur de la classe DBManager
+	 * @param dbc une instance de la classe DBConfig
+	 */
+	public DBManager(DBConfig dbc, DiskManager dskm, BufferManager bm) {
+		this.listeDatabase = new HashMap<>();
+		this.dbc = dbc;
+		this.dskm = dskm;
+		this.bm = bm;
+	}
 
-    // Méthode pour charger l'état des bases de données (probablement à partir du disque)
-    public void loadState() {
-        // Code pour charger l'état des bases de données (par exemple, lire depuis un fichier ou une source persistante)
-        System.out.println("Chargement de l'état des bases de données...");
-    }
-
-    // Méthode pour créer une base de données
+    /**
+     * Crée une Base de données dans le gestionnaire
+     * 
+     * @param databaseName nom de la Base de Données à créer
+     */
     public void CreateDatabase(String databaseName) {
-        // Code pour créer une nouvelle base de données
+    	// Crée une nouvelle Database et l'ajoute dans la liste des database crées
+        listeDatabase.put(databaseName, new HashMap<>());
+        // Informe l'utilisateur de la réussite de l'opération
         System.out.println("Création de la base de données : " + databaseName);
     }
 
-    // Méthode pour définir la base de données actuelle
-    public void SetCurrentDatabase(String databaseName) {
-        // Code pour définir la base de données active (la base de données dans laquelle on va travailler)
+    /**
+     * Stocke la Base de Données demandées en tant que Base de données courante
+     * 
+     * @param databaseName nom de la Base de Données courante
+     */
+    public void SetCurrentDatabase(String databaseName) throws IllegalArgumentException {
+    	if(!listeDatabase.containsKey(databaseName)) {
+    		throw new IllegalArgumentException("La base de donnée " + databaseName + " n'existe pas");
+    	}
+    	// Charge la database demandée dans current
+        this.current = listeDatabase.get(databaseName);
+        // Informe l'utilisateur de la réussite de l'opération
         System.out.println("Base de données actuelle définie sur : " + databaseName);
     }
-
-    // Méthode pour lister toutes les bases de données disponibles
-    public void ListDatabases() {
-        // Code pour afficher une liste de toutes les bases de données
-        System.out.println("Liste des bases de données :");
-        // Exemple fictif de bases de données
-        System.out.println("base1, base2, base3");
+    
+    /**
+     * Récupère la Base de Données courante
+     * 
+     * @return la Base de Données courante
+     */
+    public HashMap<String, Relation> getCurrentDatabase(){
+    	return current;
     }
 
-    // Méthode pour supprimer une base de données
-    public void RemoveDatabase(String databaseName) {
-        // Code pour supprimer la base de données spécifiée
+    /**
+     * Ajoute une table dans la Base de Données courante
+     * 
+     * @param tab Table à ajouter
+     */
+    public void AddTableToCurrentDatabase(Relation tab) throws IllegalArgumentException{
+    	if(current == null) {
+    		throw new IllegalArgumentException("La Base de Données de travail n'a pas été définie");
+    	}
+    	// Ajoute la table à la BDD current
+        current.put(tab.getRelationName(), tab);
+        // Informe l'utilisateur de la réussite de l'opération
+        System.out.println("Table " + tab.getRelationName() + " ajoutée à la base de données actuelle.");
+    }
+    
+    /**
+     * Renvoi la table demandée de la BDD courante
+     * 
+     * @param nomTable nom de la table à aller chercher
+     * @return la table demandée
+     */
+    public Relation GetTableFromCurrentDatabase(String nomTable) throws IllegalArgumentException {
+    	if(current == null) {
+    		throw new IllegalArgumentException("La Base de Données de travail n'a pas été définie");
+    	}
+    	if(!current.containsKey(nomTable)) {
+    		throw new IllegalArgumentException("La table " + nomTable + "n'existe pas");
+    	}
+    	// Demande la table en question à current
+    	return current.get(nomTable);
+    }
+
+    /**
+     * Supprime une table de la BDD courante
+     * 
+     * @param nomTable nom de la table à supprimer
+     */
+    public void RemoveTableFromCurrentDatabase(String nomTable) throws IllegalArgumentException {
+    	if(current == null) {
+    		throw new IllegalArgumentException("La Base de Données de travail n'a pas été définie");
+    	}
+    	if(!current.containsKey("nomTable")){
+    		throw new IllegalArgumentException("La table " + nomTable + "n'existe pas");
+    	}
+    	// Supprime la table de current
+        current.remove(nomTable);
+        //Informe l'utilisateur de la réussite de l'opération
+        System.out.println("Table " + nomTable + " supprimée de la base de données actuelle.");
+    }
+    
+    /**
+     * Supprime une Base de Données
+     * 
+     * @param databaseName nom de la Base de Données à supprimer
+     */
+    public void RemoveDatabase(String databaseName) throws IllegalArgumentException {
+    	if(!listeDatabase.containsKey(databaseName)) {
+    		throw new IllegalArgumentException("La base de donnée " + databaseName + " n'existe pas");
+    	}
+        // Supprime la BDD de la liste de BDD existantes
+        listeDatabase.remove(databaseName);
+        // Informe l'utilisateur de la réussite de l'opération
         System.out.println("Suppression de la base de données : " + databaseName);
     }
-
-    // Méthode pour ajouter une table à la base de données actuelle
-    public void AddTableToCurrentDatabase(String tableName) {
-        // Code pour ajouter une table à la base de données actuelle
-        System.out.println("Table " + tableName + " ajoutée à la base de données actuelle.");
+    
+    /**
+     * Supprime toutes les tables de la Base de Données courante
+     */
+    public void RemoveTablesFromCurrentDatabase() throws IllegalArgumentException {
+    	if(current == null) {
+    		throw new IllegalArgumentException("La Base de Données de travail n'a pas été définie");
+    	}
+    	// Vide la BDD courante
+    	current.clear();
+    }
+    
+    /**
+     * Supprime toutes les Bases de Données existantes
+     */
+    public void RemoveDatabases(){
+    	// Vide le stockage courant
+    	current = null;
+    	// Vide la liste des Base de Données
+    	listeDatabase.clear();
     }
 
-    // Méthode pour supprimer une table de la base de données actuelle
-    public void RemoveTableFromCurrentDatabase(String tableName) {
-        // Code pour supprimer une table de la base de données actuelle
-        System.out.println("Table " + tableName + " supprimée de la base de données actuelle.");
+    /**
+     * Affiche la liste des Bases de Données existantes
+     */
+    public void ListDatabases() {
+    	System.out.println("Les Bases de Données enregistrées sont :");
+    	// Parcourt la liste des BDD et affiche ses clés
+    	// Les clés de la liste sont les noms des BDD
+        for(String i : listeDatabase.keySet()) {
+        	System.out.println(i);
+        }
+    }
+    
+    /**
+     * Affiche la liste des tables de la Base de Données courante
+     */
+    public void ListTablesInCurrentDatabase() throws IllegalArgumentException {
+    	if(current == null) {
+    		throw new IllegalArgumentException("La Base de Données de travail n'a pas été définie");
+    	}
+    	System.out.println("Les tables de cette base de données sont :");
+		// Parcourt la liste de tables et affiche ses clés, ce sont les noms des tables
+        for(String i : current.keySet()) {
+        	System.out.println(i);
+        }
     }
 
-    // Méthode pour lister les tables de la base de données actuelle
-    public void ListTablesInCurrentDatabase() {
-        // Code pour lister les tables dans la base de données actuelle
-        System.out.println("Liste des tables dans la base de données actuelle :");
-        // Exemple fictif de tables
-        System.out.println("table1, table2, table3");
-    }
-
-    // Méthode pour sauvegarder l'état des bases de données (probablement vers un fichier ou une source persistante)
+    /**
+     * Sauvegarde l'état du DBManager dans un fichier
+     */
     public void saveState() {
-        // Code pour sauvegarder l'état des bases de données
-        System.out.println("Sauvegarde de l'état des bases de données...");
+    	try (FileOutputStream fos = new FileOutputStream(DBConfig.dbpath + "/databases.save"); FileChannel channel = fos.getChannel()){
+
+    		StringBuilder saveContent = new StringBuilder();  // Créer une chaîne pour contenir la configuration
+            ByteBuffer buffer;
+               
+            for(String bddName : listeDatabase.keySet()) {
+            	saveContent.append("BDD = ");
+                saveContent.append(bddName);
+                saveContent.append("\n");
+                HashMap <String, Relation> bdd = listeDatabase.get(bddName);
+                
+                for(String tableNom : bdd.keySet()) {
+                	saveContent.append("Table = ");
+                	saveContent.append(tableNom);
+                	saveContent.append("; ");
+                	Relation rel = bdd.get(tableNom);
+                	PageId relHPId = rel.getHeaderPageId();
+                	saveContent.append(relHPId.FileIdx);
+                	saveContent.append("; ");
+                	saveContent.append(relHPId.PageIdx);
+                	saveContent.append("\n");
+
+                	for(int i = 0; i < rel.getNbAttribut(); i++) {
+                		saveContent.append("Colonne = ");
+                		saveContent.append(rel.getNameAttribut(i));
+                		saveContent.append("; ");
+                		saveContent.append(rel.getType(i));
+                		saveContent.append("; ");
+                		saveContent.append(rel.getLength(i));
+                		saveContent.append("\n");
+                	}
+               }
+            }
+    		// Convertir le contenu de la configuration en bytes et l'écrire dans le fichier
+            buffer = ByteBuffer.wrap(saveContent.toString().getBytes());
+            channel.write(buffer);
+               
+    	} catch (IOException e){
+    		System.err.println("Erreur lors de l'écriture dans le fichier : " + e.getMessage());
+        }
     }
+    
+    /**
+     * Charge l'état du DBManager depuis le fichier de sauvegarde
+     */
+    public void loadState() throws IOException{
+    	HashMap<String, Relation> DatabaseEnCours = null;
+    	Relation RelationEnCours = null;
+        String save = readSave();
+        if(save == null) {
+        	throw new IOException("La sauvegarde est vide");
+        }else {
+        	String[] lines = save.split("\n");
+        	for(String line : lines) {
+        		line = line.trim(); // Enlever les espaces en début et fin de ligne
+        		if(!line.isEmpty()){ // Vérifie que la ligne n'est pas vide
+        			String[] parts = line.split("=", 2); // Diviser la ligne en mot clé et valeur
+        			if(parts.length == 2){
+        				 String keyword = parts[0].trim(); // Extraire la clé
+        				 switch(keyword) {
+        				 case "BDD":
+        					 listeDatabase.put(parts[1].trim(), new HashMap<>());
+        					 DatabaseEnCours = listeDatabase.get(parts[1].trim());
+        					 RelationEnCours = null;
+        					 break;
+        					 
+        				 case "Table":
+        					 if(DatabaseEnCours == null) {
+        						 RemoveDatabases();
+        						 throw new IOException("La sauvegarde n'est pas complète");
+        					 }else {
+        						 String[] infos = parts[1].trim().split(";", 3);
+        						 String nomRel = infos[0].trim();
+        						 PageId headerPage = new PageId(Integer.parseInt(infos[1].trim()), Integer.parseInt(infos[2].trim()));
+        						 Relation rel = new Relation(nomRel, new ArrayList<>(), headerPage, dskm, bm);
+        						 DatabaseEnCours.put(nomRel, rel);
+        						 RelationEnCours = rel;
+        					 }
+        					 break;
+        					 
+        				 case "Colonne":
+        					 if(RelationEnCours == null) {
+        						 RemoveDatabases();
+        						 throw new IOException("La sauvegarde n'est pas complète");
+        					 }else {
+        						 String[] infos = parts[1].trim().split(";", 3);
+        						 DataType typeCol = DataType.valueOf(infos[1].trim());
+        						 Data dataCol;
+        						 if((typeCol == DataType.CHAR) || (typeCol == DataType.VARCHAR)) {
+        							 dataCol = new Data(typeCol, Integer.parseInt(infos[2].trim()));
+        						 }else {
+        							 dataCol = new Data(typeCol);
+        						 }
+        						 RelationEnCours.addAttribut(new Pair<>(infos[0].trim(), dataCol));
+        					 }
+        					 break;
+        				 default:
+        					 throw new IOException("La sauvegarde n'est pas complète");
+        				 }
+        			}
+        		}
+        	}
+        }
+    }
+    
+    /**
+     * Lis les bytes de la sauvegarde
+     * 
+     * @return Une chaîne de caractère contenant la sauvegarde
+     */
+    public String readSave() throws IOException{
+    	// Lire tout le contenu du fichier et le retourner sous forme de chaîne
+        return new String(Files.readAllBytes(Paths.get(DBConfig.dbpath + "/databases.save")));
+    }
+    
+    /**
+     * Récupère la liste des Bases de données de ce gestionnaire
+     * 
+     * @return la liste des Bases de données de ce gestionnaire
+     */
+    public HashMap<String, HashMap<String, Relation>> getListeDatabase(){
+    	return listeDatabase;
+    }
+
+	public boolean tableExiste(String str) {
+		return false;
+	}
 }

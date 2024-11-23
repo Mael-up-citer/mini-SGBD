@@ -13,24 +13,7 @@ public class SGBD {
     private DBManager dbM;               // Instance du gestionnaire de base de données
 
     // Table de dispatching pour associer les commandes à leurs méthodes
-    private static final Map<String, Consumer<String>> commandMap = new HashMap<>();
-
-    /**
-     * Méthode d'initialisation de la table de dispatching. 
-     * Elle associe chaque commande à une méthode de traitement correspondante.
-    */
-    public void initializeCommandMap() {
-        commandMap.put("CREATE DATABASE", this::processCREATEDATABASECommand);
-        commandMap.put("DROP DATABASE", this::processDROPDATABASECommand);
-        commandMap.put("LIST DATABASES", this::processLISTDATABASESCommand);
-        commandMap.put("SET DATABASE", this::processSETDATABASECommand);
-
-        commandMap.put("CREATE TABLE", this::processCREATETABLECommand);
-        commandMap.put("DRO PTABLE", this::processDROPTABLECommand);
-        commandMap.put("LIST TABLES", this::processLISTTABLESCommand);
-
-        commandMap.put("QUIT", this::processQUITCommand);
-    }
+    private static final Map<String, Consumer<String>> COMMANDMAP = new HashMap<>();
 
     /**
      * Constructeur qui initialise le SGBD avec la configuration de la base de données.
@@ -46,10 +29,29 @@ public class SGBD {
         } catch(Exception e){
         }
         bm = new BufferManager(dbc, dskM); // Initialisation du gestionnaire de buffers
-        dbM = new DBManager();             // Initialisation du gestionnaire de base de données
+        dbM = new DBManager(dbc, dskM, bm);  // Initialisation du gestionnaire de base de données
         dbM.loadState();                   // Chargement de l'état des bases de données
 
-        initializeCommandMap();
+        initializeCOMMANDMAP();
+    }
+
+    /**
+     * Méthode d'initialisation de la table de dispatching. 
+     * Elle associe chaque commande à une méthode de traitement correspondante.
+     */
+    public void initializeCOMMANDMAP() {
+        COMMANDMAP.put("CREATE DATABASE", this::processCREATEDATABASECommand);
+        COMMANDMAP.put("DROP DATABASE", this::processDROPDATABASECommand);
+        COMMANDMAP.put("DROP DATABASES", unused -> processDROPDATABASESCommand());
+        COMMANDMAP.put("LIST DATABASES", this::processLISTDATABASESCommand);
+        COMMANDMAP.put("SET DATABASE", this::processSETDATABASECommand);
+
+        COMMANDMAP.put("CREATE TABLE", this::processCREATETABLECommand);
+        COMMANDMAP.put("DROP TABLE", this::processDROPTABLECommand);
+        COMMANDMAP.put("DROP TABLES", unused -> processDROPTABLESCommand());
+        COMMANDMAP.put("LIST TABLES", this::processLISTTABLESCommand);
+
+        COMMANDMAP.put("QUIT", unused -> processQUITCommand());
     }
 
     /**
@@ -99,7 +101,7 @@ public class SGBD {
             // Boucle principale pour recevoir les requêtes SQL de l'utilisateur
             do {
                 System.out.print("SQL> ");    // Affichage de l'invite de commande
-                query = sc.nextLine().trim();   // Récupère la commande de l'utilisateur et la nettoie
+                query = sc.nextLine();   // Récupère la commande de l'utilisateur et la nettoie
 
                 // Vérifier la validité de la requête avant de la traiter
                 if (isValidSQL(query))
@@ -121,51 +123,51 @@ public class SGBD {
      * @param query La requête SQL à exécuter.
      */
     private void assocQuery(String query) {
-        query = query.trim().toUpperCase();    // Passe la chaîne de caractères en majuscules
-        String[] string = extractCommand(query);  // Extrait la commande et les arguments
-        String command = string[0];             // La commande (ex : "CREATEDATABASE")
-        String settings = string[1];            // Les arguments associés à la commande (ex : nom de la base)
+        query = query.trim().toUpperCase();    // Passe la chaîne de caractères en majuscules et enleve les espaces autour
+        boolean succes = false;
 
-        // Recherche dans la table de dispatching pour trouver la méthode correspondante
-        Consumer<String> handler = commandMap.get(command);
+        for(int i = 2; i <=3 ; i++){
+            String[] string = extractCommand(query, i);  // Extrait la commande et les arguments
 
-        // Si la commande est trouvée, l'exécuter ; sinon, afficher une erreur
-        if (handler != null)
-            handler.accept(settings);  // Appel de la méthode associée à la commande
-        else
-            System.out.println("Erreur : La commande '" + command + "' n'est pas prise en charge.");
+            String command = string[0];             // La commande
+            String settings = string[1];            // Les arguments associés à la commande
+
+            // Recherche dans la table de dispatching pour trouver la méthode correspondante
+            Consumer<String> handler = COMMANDMAP.get(command);
+
+            // Si la commande est trouvée, l'exécuter
+            if (handler != null){
+                succes = true;
+                handler.accept(settings);  // Appel de la méthode associée à la commande
+                break;
+            }
+        }
+        if(!succes)
+            System.out.println("la commande "+query+"   n'est pas supporté par le system");
     }
 
     /**
      * Extrait le type de commande et les arguments d'une requête SQL.
      *
-     * @param s La requête SQL complète.
+     * @param input La requête SQL complète.
      * @return Un tableau contenant le type de commande et les arguments.
     */
-    private String[] extractCommand(String s) {
-        // Diviser la chaîne par le premier espace rencontré pour séparer la commande et ses arguments
-        String[] parts = s.split("\\s+");
+    private String[] extractCommand(String input, int nbword) {
+        // Diviser la chaîne en mots, en gérant les espaces multiples
+        String[] words = input.split("\\s+");
 
-        switch (parts.length) {
-            case 3:
-                return new String[] { parts[0]+" "+parts[1], parts[2] };
-        
-            case 2:
-                return new String[] { parts[0]+" "+parts[1], "" };  // Retourner la commande et les arguments
+        // Créer les deux parties
+        String firstPart = String.join(" ", Arrays.copyOfRange(words, 0, nbword));
+        String secondPart = String.join(" ", Arrays.copyOfRange(words, nbword, words.length));
 
-            case 1:
-                return new String[] { parts[0], "" };  // Retourner la commande et les arguments
-
-            default:
-                return null;
-        }
+        return new String[] { firstPart, secondPart };
     }
 
     // Méthodes de traitement des commandes
 
     /**
      * Méthode pour traiter la commande CREATE DATABASE.
-    */
+     */
     private void processCREATEDATABASECommand(String param) {
         if (!isValidName(param)) {  // Vérifier la validité du nom de la base de données
             System.out.println("Erreur : Le nom de la base de données '" + param + "' est invalide.");
@@ -214,11 +216,94 @@ public class SGBD {
      * Méthode pour traiter la commande CREATE TABLE.
     */
     private void processCREATETABLECommand(String param) {
-        if (!isValidName(param)) {  // Vérifier la validité du nom de la table
-            System.out.println("Erreur : Le nom de la table '" + param + "' est invalide.");
+        String name = param.split("\\(", 2)[0].trim();
+
+        if (!isValidName(name)) {  // Vérifier la validité du nom de la table
+            System.out.println("Erreur : Le nom de la table '" + name + "' est invalide.");
             return;
         }
-        dbM.AddTableToCurrentDatabase(param);  // Ajouter la table à la base de données actuelle
+
+        // Vérifiz si le nom de la table existe pas deja dans la base
+        if (dbM.tableExiste(name)) {  // Vérifier la validité du nom de la table
+            System.out.println("Erreur : La table '" + name + "' existe déjà.");
+            return;
+        }
+
+        try{
+            System.out.println(param);
+            // Enlever le premier mot (nom de la table) et la parenthèse extérieure
+            // Trouver l'index du premier espace
+            int firstSpaceIndex = param.indexOf(' ');
+
+            // Vérifier si un espace a été trouvé (ce qui signifie qu'il y a un nom de table suivi d'un espace)
+            if (firstSpaceIndex != -1) {
+                param = param.substring(firstSpaceIndex + 1).trim();  // Enlever le nom de la table
+            }
+
+            // Étape 2: Enlever les parenthèses extérieures
+            if (param.startsWith("(") && param.endsWith(")")) {
+                param = param.substring(1, param.length() - 1).trim();  // Supprime les parenthèses extérieures
+            }
+            System.out.println(param);
+            // Crée une liste d'attribut qu'on initialise avec parseRelation qui a pour but de convertir une chaine de caractère en Pair<attribut, longueur>
+            ArrayList<Pair<String, Data>> attribut = parseRelation(param);
+            // Instancie la relation avec les variables précédente
+            Relation relation = new Relation(name, attribut, dskM.AllocPage(), dskM, bm);
+            dbM.AddTableToCurrentDatabase(relation);  // Ajouter la table à la base de données actuelle
+        } catch(Exception e){
+            System.out.println("erreur dans la création de la table "+param);
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Assure une conversion d'une chaine de forme: (nom:type,nom:type(size)) en une liste d'attribut d'une relation.
+     * @param arg la chaine à convertir.
+     * @return la liste des attribut extrait de arg.
+     * @throws Exception Si une erreur survient lors de la convertion.
+     * 
+     */
+    private ArrayList<Pair<String, Data>> parseRelation(String arg) throws Exception {        
+        // Initialise la liste d'attributs
+        ArrayList<Pair<String, Data>> attributs = new ArrayList<>();
+        
+        // Nettoie les espaces superflus
+        arg = arg.trim();
+        
+        // Sépare la chaîne principale par les virgules
+        String[] paires = arg.split("\\s*,\\s*");
+    
+        // Parcourt chaque sous-chaîne (attribut) et traite les informations
+        for (String paire : paires) {
+            paire = paire.trim(); // Enlever les espaces superflus autour de chaque attribut
+            
+            // Séparer en deux parties : nom et type
+            String[] parts = paire.split(":");
+    
+            if (parts.length != 2)
+                throw new Exception("Erreur de format dans la chaîne d'attribut : " + paire);
+    
+            String attName = parts[0].trim(); // Nom de l'attribut
+            String typePart = parts[1].trim(); // Type de l'attribut
+            
+            // Extraire le type (avant la parenthèse si elle existe)
+            DataType type = DataType.valueOf(typePart.split("\\(")[0].trim());
+    
+            // Si le type est CHAR ou VARCHAR, nous devons extraire la taille
+            if (type == DataType.CHAR || type == DataType.VARCHAR) {
+                // Chercher la taille entre les parenthèses
+                int length = Integer.parseInt(typePart.split("\\(")[1].split("\\)")[0].trim());
+    
+                // Ajouter l'attribut à la liste avec sa taille
+                attributs.add(new Pair<>(attName, new Data(type, length)));
+            } 
+            else
+                // Ajouter l'attribut à la liste sans taille
+                attributs.add(new Pair<>(attName, new Data(type)));
+        }
+    
+        // Retourner la liste d'attributs
+        return attributs;
     }
 
     /**
@@ -242,7 +327,7 @@ public class SGBD {
     /**
      * Méthode pour traiter la commande QUIT (quitter le programme).
     */
-    private void processQUITCommand(String param){
+    private void processQUITCommand(){
         try {
             dbM.saveState();    // Sauvegarder l'état de la base de données
             bm.flushBuffers();  // Vider les buffers
@@ -256,12 +341,20 @@ public class SGBD {
         }
     }
 
+    private void processDROPDATABASESCommand(){
+        dbM.RemoveDatabases();
+    }
+
+    private void processDROPTABLESCommand(){
+        dbM.RemoveTablesFromCurrentDatabase();
+    }
+
     /**
      * Vérifie la validité d'une requête SQL
      *
      * @param query La requête SQL à vérifier.
      * @return true si la requête est valide, false sinon.
-     */
+    */
     private boolean isValidSQL(String query) {
         if (query == null || query.isEmpty()) {
             System.out.println("Erreur : La requête ne doit pas être null.");
@@ -276,7 +369,11 @@ public class SGBD {
      * @param name Le nom à tester.
      * @return true si le nom est valide, sinon false.
      */
-    private boolean isValidName(String name) {
+    public static boolean isValidName(String name) {
+        // Vérifie que le nom contienne quelque chose
+        if (name == null || name.isEmpty())
+        return false;
+
         // Le nom ne doit pas commencer par un chiffre
         if (Character.isDigit(name.charAt(0)))
             return false;
@@ -297,4 +394,82 @@ public class SGBD {
 
         return !reservedWords.contains(name);  // Vérifie que le nom n'est pas un mot réservé
     }
+
+
+    /**
+     * Valide une valeur avant de l'ajouter au tuple.
+     * Effectue les vérifications suivantes :
+     * - Si l'index est valide en fonction du nombre d'attributs de la relation
+     * - Si le type spécifié correspond au type attendu pour cet attribut
+     * - Si l'objet de la valeur correspond au type de donnée attendu (ex : chaîne pour CHAR)
+     * - Si la taille des chaînes respecte la limite spécifiée pour CHAR et VARCHAR
+     *
+     * @param value La valeur à valider.
+     * @param type Le type de la valeur spécifié dans le tuple.
+     * @param index L'index de l'attribut dans la relation, pour déterminer le type attendu.
+     * @return La valeur validée, éventuellement modifiée (ex : chaîne complétée pour CHAR).
+     * @throws IllegalArgumentException Si la validation échoue.
+     */ /*
+    private Object validateTupleAttribute(Object value, DataType type, int index) {
+        // Vérifie que l'index ne dépasse pas le nombre d'attributs définis dans la relation.
+        if (index >= relation.getAttribut().size())
+            throw new IllegalArgumentException("Le nombre de valeurs dépasse le nombre d'attributs dans la relation.");
+
+        // Récupère le type attendu pour l'attribut à l'index donné.
+        DataType expectedType = relation.getType(index);
+
+        // Vérifie si le type de donnée spécifié correspond au type attendu.
+        if (expectedType != type)
+            throw new IllegalArgumentException("Le type de la valeur ne correspond pas à celui de l'attribut.");
+
+        // Récupère la longueur maximale autorisée pour les chaînes si applicable.
+        int maxLength = relation.getLength(index);
+
+        // Effectue une vérification basée sur le type de donnée pour s'assurer que
+        // l'objet valeur est du type attendu et respecte les contraintes spécifiques.
+        switch (type) {
+            case CHAR:
+            case VARCHAR:
+                // Vérifie que la valeur est une instance de String.
+                if (!(value instanceof String))
+                    throw new IllegalArgumentException("La valeur doit être une chaîne pour le type CHAR ou VARCHAR.");
+
+                // Convertit la valeur en chaîne pour vérifier sa longueur.
+                String strValue = (String) value;
+
+                // Vérifie que la longueur de la chaîne ne dépasse pas la longueur maximale.
+                if (strValue.length() > maxLength)
+                    throw new IllegalArgumentException("La chaîne dépasse la taille maximale autorisée pour l'attribut.");
+
+                break;
+
+            case INT:
+                // Vérifie que la valeur est une instance d'Integer.
+                if (!(value instanceof Integer))
+                    throw new IllegalArgumentException("La valeur doit être un entier pour le type INT.");
+
+                break;
+
+            case REAL:
+                // Vérifie que la valeur est une instance de Float ou Double.
+                if (!(value instanceof Float) && !(value instanceof Double))
+                    throw new IllegalArgumentException("La valeur doit être un nombre réel pour le type REAL.");
+
+                break;
+
+            case DATE:
+                // Vérifie que la valeur est une instance de Date.
+                if (!(value instanceof Date))
+                    throw new IllegalArgumentException("La valeur doit être une date pour le type DATE.");
+
+                break;
+
+            default:
+                // Lève une exception si le type de donnée n'est pas supporté.
+                throw new IllegalArgumentException("Type de donnée non supporté.");
+        }
+
+        // Retourne la valeur validée ou modifiée si nécessaire (ex : chaîne complétée pour CHAR).
+        return value;
+    }*/
 }

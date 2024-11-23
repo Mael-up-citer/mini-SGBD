@@ -1,123 +1,77 @@
+// Importation de la classe ArrayList, une structure de données de type liste dynamique, 
+// qui est utilisée comme base pour la classe MyRecord.
 import java.util.ArrayList;
 
 /**
- * La classe MyRecord représente un enregistrement contenant un tuple de valeurs et leurs types respectifs.
- * Chaque enregistrement est constitué d'une liste de paires, où chaque paire contient une valeur et son type.
+ * Classe MyRecord qui représente un enregistrement de paires (valeur, type).
+ * Elle hérite d'ArrayList et stocke des objets de type Pair<Object, DataType>.
  */
-public class MyRecord{
-    // Liste qui contient les paires de valeurs et de types
-    private ArrayList<Pair<Object, DataType>> tuple;
-    private Relation relation;  // Référence à la Relation pour connaître les contraintes
-
+public class MyRecord extends ArrayList<Pair<Object, DataType>> {
 
     /**
-     * Constructeur de la classe MyRecord.
-     * Initialise une liste vide de paires (valeur, type).
+     * Constructeur par défaut qui initialise une liste vide.
+     * Appelle le constructeur de la classe parent ArrayList.
      */
-    public MyRecord(Relation relation){
-        tuple = new ArrayList<>();
-        this.relation = relation;
+    public MyRecord() {
+        super(); // Initialise une liste vide dans la classe parent.
     }
 
     /**
-     * Ajoute une valeur et son type dans le tuple.
-     * 
-     * @param value La valeur à ajouter dans le tuple.
-     * @param type Le type de la valeur.
-     */
-    public void addValue(Object value, DataType type){
-        int index = tuple.size();  // Index basé sur la taille actuelle du tuple
-
-        // Vérification de la taille et du type
-        value = validateTupleAttribute(value, type, index);
-        tuple.add(new Pair<>(value, type));
-    }
-
-    /**
-     * Valide une valeur avant de l'ajouter au tuple.
-     * Effectue les vérifications suivantes :
-     * - Si l'index est valide en fonction du nombre d'attributs de la relation
-     * - Si le type spécifié correspond au type attendu pour cet attribut
-     * - Si l'objet de la valeur correspond au type de donnée attendu (ex : chaîne pour CHAR)
-     * - Si la taille des chaînes respecte la limite spécifiée pour CHAR et VARCHAR
+     * Surcharge de la méthode add pour ajouter une paire (valeur, type)
+     * après vérification de la cohérence entre la valeur et son type attendu.
      *
-     * @param value La valeur à valider.
-     * @param type Le type de la valeur spécifié dans le tuple.
-     * @param index L'index de l'attribut dans la relation, pour déterminer le type attendu.
-     * @return La valeur validée, éventuellement modifiée (ex : chaîne complétée pour CHAR).
-     * @throws IllegalArgumentException Si la validation échoue.
+     * @param value La paire (valeur, type) à ajouter.
+     * @throws IllegalArgumentException si la valeur ne correspond pas au type attendu.
+     * @return true si l'ajout est réussi, false sinon (hérité de ArrayList).
      */
-    private Object validateTupleAttribute(Object value, DataType type, int index) {
-        // Vérifie que l'index ne dépasse pas le nombre d'attributs définis dans la relation.
-        if (index >= relation.getAttribut().size())
-            throw new IllegalArgumentException("Le nombre de valeurs dépasse le nombre d'attributs dans la relation.");
+    public boolean add(Object value, DataType type) throws IllegalArgumentException {
+        // Vérifie la cohérence entre la valeur et le type en appelant isTypeConsistent.
+        if (!isTypeConsistent(value, type)) {
+            // Lève une exception en cas de non-correspondance entre le type attendu et la valeur fournie.
+            throw new IllegalArgumentException("Type mismatch: expected " + type 
+                                               + " but was " + value.getClass().getSimpleName());
+        }
+        // Si la vérification est réussie, ajoute la paire à la liste en utilisant la méthode de la classe parent.
+        return super.add(new Pair<>(value, type));
+    }
 
-        // Récupère le type attendu pour l'attribut à l'index donné.
-        DataType expectedType = relation.getType(index);
-
-        // Vérifie si le type de donnée spécifié correspond au type attendu.
-        if (expectedType != type)
-            throw new IllegalArgumentException("Le type de la valeur ne correspond pas à celui de l'attribut.");
-
-        // Récupère la longueur maximale autorisée pour les chaînes si applicable.
-        int maxLength = relation.getLength(index);
-
-        // Effectue une vérification basée sur le type de donnée pour s'assurer que
-        // l'objet valeur est du type attendu et respecte les contraintes spécifiques.
+    /**
+     * Méthode privée qui vérifie si la valeur est cohérente avec le type attendu.
+     *
+     * @param value La valeur à vérifier.
+     * @param type  Le type attendu (DataType).
+     * @return true si la valeur correspond au type, false sinon.
+     */
+    private boolean isTypeConsistent(Object value, DataType type) {
+        // Vérifie le type de la valeur en fonction du type attendu.
         switch (type) {
+            case INT:
+                // Vérifie si la valeur est de type Integer.
+                return value instanceof Integer;
+            case REAL:
+                // Vérifie si la valeur est de type Float ou Double (compatibilité pour les nombres réels).
+                return value instanceof Float || value instanceof Double;
             case CHAR:
             case VARCHAR:
-                // Vérifie que la valeur est une instance de String.
-                if (!(value instanceof String))
-                    throw new IllegalArgumentException("La valeur doit être une chaîne pour le type CHAR ou VARCHAR.");
-
-                // Convertit la valeur en chaîne pour vérifier sa longueur.
-                String strValue = (String) value;
-
-                // Vérifie que la longueur de la chaîne ne dépasse pas la longueur maximale.
-                if (strValue.length() > maxLength)
-                    throw new IllegalArgumentException("La chaîne dépasse la taille maximale autorisée pour l'attribut.");
-
-                break;
-
-            case INT:
-                // Vérifie que la valeur est une instance d'Integer.
-                if (!(value instanceof Integer))
-                    throw new IllegalArgumentException("La valeur doit être un entier pour le type INT.");
-
-                break;
-
-            case REAL:
-                // Vérifie que la valeur est une instance de Float ou Double.
-                if (!(value instanceof Float) && !(value instanceof Double))
-                    throw new IllegalArgumentException("La valeur doit être un nombre réel pour le type REAL.");
-
-                break;
-
+                // Vérifie si la valeur est une chaîne de caractères (String).
+                return value instanceof String;
             case DATE:
-                // Vérifie que la valeur est une instance de Date.
-                if (!(value instanceof Date))
-                    throw new IllegalArgumentException("La valeur doit être une date pour le type DATE.");
-
-                break;
-
+                // Vérifie si la valeur est de type Date.
+                return value instanceof Date;
             default:
-                // Lève une exception si le type de donnée n'est pas supporté.
-                throw new IllegalArgumentException("Type de donnée non supporté.");
+                // Retourne false pour les types non reconnus.
+                return false;
         }
-
-        // Retourne la valeur validée ou modifiée si nécessaire (ex : chaîne complétée pour CHAR).
-        return value;
     }
 
     /**
      * Retourne la valeur à l'index donné dans le tuple.
-     * 
+     *
      * @param index L'index de la valeur à récupérer.
      * @return La valeur à l'index donné.
      */
     public Object getValue(int index){
-        return tuple.get(index).getFirst();
+        return this.get(index).getFirst();
     }
 
     /**
@@ -127,35 +81,45 @@ public class MyRecord{
      * @return Le type de la valeur à l'index donné.
      */
     public DataType getType(int index){
-        return tuple.get(index).getSecond();
-    }
-
-    /**
-     * 
-     * @return Le nombre d'éléments dans le tuple.
-     */
-    public int getSize(){
-        return tuple.size();
+        return this.get(index).getSecond();
     }
 
     /**
      * 
      * @return La taille du tuple en octet.
      */
-    public int getSizeOctet(){
-        int sum = 0;
+    public int getSizeOctet(Relation relation){
+        int sum = 0;    // Initialise la variable sum à 0
 
-        for(int i = 0; i < tuple.size(); i++)
-            sum += relation.getLength(i);
-
+        // Parcour chaque entrée du tuple
+        for(int i = 0; i < this.size(); i++){
+            // Si c'est un varchar on prend la taille dans le record
+            if(this.getType(i) == DataType.VARCHAR){
+                String tmp = (String)this.getValue(i);
+                sum += tmp.length()*2;  // Taille fois 2 car 1char = 2octets
+            }
+            // Sinno on regarde dans la relation
+            else{
+                // Si c'est un char on regarde dans la relation
+                if(this.getType(i) == DataType.CHAR)
+                    sum += relation.getLength(i)*2; // Taille fois 2 car 1char = 2octets
+                else
+                    sum += relation.getLength(i);   // Sinon on a juste a prendre la taille
+            }
+        }
         return sum;
     }
 
     /**
-     * Affiche toutes les valeurs et leurs types dans le tuple.
+     * @return le tuple sous forme de chaine
      */
-    public void display(){
-        for(int i = 0; i < tuple.size(); i++)
-            System.out.println("Value = "+getValue(i)+"     Type = "+getType(i));
+    @Override
+    public String toString(){
+        StringBuilder res = new StringBuilder();
+        // Parcour le record
+        for(int i = 0; i < this.size(); i++)
+            res.append("Value = "+getValue(i)+"     Type = "+getType(i)+"\n");
+
+        return res.toString();
     }
 }
