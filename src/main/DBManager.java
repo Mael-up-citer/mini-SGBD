@@ -296,7 +296,7 @@ public class DBManager {
     	// Lire tout le contenu du fichier et le retourner sous forme de chaîne
         return new String(Files.readAllBytes(Paths.get(DBConfig.dbpath + "/databases.save")));
     }
-    
+
     /**
      * Récupère la liste des Bases de données de ce gestionnaire
      * 
@@ -306,7 +306,22 @@ public class DBManager {
     	return listeDatabase;
     }
 
-	public boolean tableExiste(String str) {
-		return false;
+	/**
+	 * Vérifie si une table existe dans la base de données courante.
+	 * 
+	 * Cette méthode vérifie si une table, identifiée par son nom, existe dans la base de données courante.
+	 * Elle retourne un booléen indiquant si la table existe ou non.
+	 * 
+	 * @param str Le nom de la table à vérifier.
+	 * @return true si la table existe dans la base de données courante, sinon false.
+	 * @throws IllegalArgumentException Si la base de données courante n'a pas été définie.
+	 */
+	public boolean tableExiste(String str) throws IllegalArgumentException{
+		if (current == null)
+			// Si aucune base de données courante n'a été définie, retourner false
+			throw new IllegalArgumentException("La Base de Données de travail n'a pas été définie");
+
+		// Vérifie si la table existe dans la base de données courante
+		return current.containsKey(str);
 	}
 }

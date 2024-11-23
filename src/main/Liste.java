@@ -22,7 +22,7 @@ public class Liste{
     }
 
     public Liste remove(){
-        // Si l'élément est le premier de la liste (pas de prédécesseur)
+        // Si l'élément est le premier de la liste
         if(this.precedent == null){
             if(this.suivant != null){
                 // L'élément suivant devient le nouveau début
@@ -33,8 +33,7 @@ public class Liste{
                 // La liste est vide après la suppression
                 return null;  // Il n'y a plus d'élément
         }
-    
-        // Si l'élément est le dernier de la liste (pas de suivant)
+        // Si l'élément est le dernier de la liste
         if(this.suivant == null){
             this.precedent.suivant = null;  // Le prédécesseur du dernier élément devient null
             return this.precedent;  // Retourner le nouvel élément de fin

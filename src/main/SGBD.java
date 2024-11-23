@@ -26,12 +26,11 @@ public class SGBD {
         dskM = DiskManager.getInstance();  // Initialisation du gestionnaire de disque
         try{
             dskM.loadState();   // Chargement de l'état du disque
+            bm = new BufferManager(dbc, dskM); // Initialisation du gestionnaire de buffers
+            dbM = new DBManager(dbc, dskM, bm);  // Initialisation du gestionnaire de base de données
+            dbM.loadState();
         } catch(Exception e){
-        }
-        bm = new BufferManager(dbc, dskM); // Initialisation du gestionnaire de buffers
-        dbM = new DBManager(dbc, dskM, bm);  // Initialisation du gestionnaire de base de données
-        dbM.loadState();                   // Chargement de l'état des bases de données
-
+        }                   // Chargement de l'état des bases de données
         initializeCOMMANDMAP();
     }
 
@@ -122,7 +121,7 @@ public class SGBD {
      *
      * @param query La requête SQL à exécuter.
      */
-    private void assocQuery(String query) {
+    public void assocQuery(String query) {
         query = query.trim().toUpperCase();    // Passe la chaîne de caractères en majuscules et enleve les espaces autour
         boolean succes = false;
 
@@ -250,6 +249,7 @@ public class SGBD {
             // Instancie la relation avec les variables précédente
             Relation relation = new Relation(name, attribut, dskM.AllocPage(), dskM, bm);
             dbM.AddTableToCurrentDatabase(relation);  // Ajouter la table à la base de données actuelle
+
         } catch(Exception e){
             System.out.println("erreur dans la création de la table "+param);
             e.printStackTrace();
@@ -342,11 +342,19 @@ public class SGBD {
     }
 
     private void processDROPDATABASESCommand(){
-        dbM.RemoveDatabases();
+        try {
+            dbM.RemoveDatabases();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void processDROPTABLESCommand(){
-        dbM.RemoveTablesFromCurrentDatabase();
+        try {
+            dbM.RemoveTablesFromCurrentDatabase();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -410,7 +418,7 @@ public class SGBD {
      * @return La valeur validée, éventuellement modifiée (ex : chaîne complétée pour CHAR).
      * @throws IllegalArgumentException Si la validation échoue.
      */ /*
-    private Object validateTupleAttribute(Object value, DataType type, int index) {
+    private Object validateTupleAttribute(Object value, DataType type, int index, Relation relation) {
         // Vérifie que l'index ne dépasse pas le nombre d'attributs définis dans la relation.
         if (index >= relation.getAttribut().size())
             throw new IllegalArgumentException("Le nombre de valeurs dépasse le nombre d'attributs dans la relation.");
@@ -468,8 +476,8 @@ public class SGBD {
                 // Lève une exception si le type de donnée n'est pas supporté.
                 throw new IllegalArgumentException("Type de donnée non supporté.");
         }
-
         // Retourne la valeur validée ou modifiée si nécessaire (ex : chaîne complétée pour CHAR).
         return value;
-    }*/
+    }
+    */
 }
