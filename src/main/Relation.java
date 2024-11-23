@@ -355,9 +355,14 @@ public class Relation {
             // Libère la dernière header page avec indication de modification
             bm.freePage(nextPage, true);
 
+            System.out.println("avant le get dernier int ecris = "+bm.getPage(headerPageId).getInt(DBConfig.pagesize - 4));
+            bm.freePage(headerPageId, false);
+
             // Ecrit l'offset directory de la nouvelle data Page
             buffer = bm.getPage(new PageId(id.FileIdx, id.PageIdx));    // Charge la nouvelle dataPage
-            System.out.println("fin dernier int ecris = "+bm.getPage(headerPageId).getInt(DBConfig.pagesize - 4));
+
+            System.out.println("avant le get dernier int ecris = "+bm.getPage(headerPageId).getInt(DBConfig.pagesize - 4));
+            bm.freePage(headerPageId, false);
 
             buffer.putInt(DBConfig.pagesize - 4, 0);    // Ecrit le début de l'espace disponible
             buffer.putInt(DBConfig.pagesize - 8, 0);    // Ecrit le nombre de slot dedans

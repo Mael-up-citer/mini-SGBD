@@ -16,7 +16,3 @@ javac -d bin -sourcepath src/tests -cp "bin:lib/junit-platform-console-standalon
 
 # Exécution des tests en utilisant la commande correcte sans utiliser 'execute'
 java -jar lib/junit-platform-console-standalone-1.11.3.jar execute --classpath bin $option
-
-# Supprime les binaire
-cd bin
-rm *

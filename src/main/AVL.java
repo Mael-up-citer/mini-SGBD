@@ -28,6 +28,19 @@ class AVLNode{
         height = 0; // Initialiser la hauteur du noeud à 0
         pin_count = 1; // Nombre d'utilisations en cours de la page
     }
+
+        /**
+     * Constructeur pour un noeud AVL.
+     * 
+     * @param id L'identifiant de la page associée au noeud
+     * @param buffer Le buffer associé à cette page
+     */
+    AVLNode(PageId id, ByteBuffer buffer, boolean dirtyFlag){
+        this.id = id; // Assigner l'identifiant de la page
+        this.buffer = buffer; // Assigner le ByteBuffer
+        this.dirtyFlag = dirtyFlag; // Assigner le dirtyFlag
+        height = 0; // Initialiser la hauteur du noeud à 0
+    }
 }
 
 /**
@@ -159,9 +172,9 @@ public class AVL{
             else if (id.PageIdx > node.id.PageIdx)
                 node.right = deleteNode(node.right, id, deletedNode);
             else {
-                // Le noeud à supprimer a été trouvé
+                // Le noeud à supprimer a été trouvé !
                 if (deletedNode[0] == null)
-                    deletedNode[0] = node; // Capture le noeud supprimé (et son buffer associé)
+                    deletedNode[0] = new AVLNode(node.id, node.buffer, node.dirtyFlag); // Capture le noeud supprimé (et son buffer associé)
 
                 // Si le noeud a un seul enfant ou aucun enfant
                 if (node.left == null)

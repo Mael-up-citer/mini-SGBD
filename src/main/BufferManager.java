@@ -126,7 +126,7 @@ public class BufferManager{
     private void makeSpace() throws Exception{
         ByteBuffer buffer = null; // Pointeur vers le buffer
         PageId id = null; // Identifiant de la page à éjecter
-        AVLNode noeud;
+        AVLNode noeud = null;
 
         switch (DBConfig.bm_policy){
             case "LRU":
@@ -134,15 +134,17 @@ public class BufferManager{
                 noeud = cadre.delete(id);  // Enlève la frame associée dans le bufferPool
                 last = last.remove();  // Supprime le dernier élément
                 break;
-
             case "MRU":
                 id = junkFile.id;
                 noeud = cadre.delete(id); // Enlève la frame associée dans le bufferPool
                 junkFile = junkFile.remove();  // Supprime le premier élément
                 break;
             default:
-                throw new Exception("La politique de remplacement "+DBConfig.bm_policy+" n'a pas d'implémentation");
+                throw new Exception("La politique de remplacement '"+DBConfig.bm_policy+"' n'a pas d'implémentation");
         }
+        if(noeud == null)
+            System.out.println("Erreurrrrr");
+
         buffer = noeud.buffer;
         // Si la page a été modifié
         if(noeud.dirtyFlag)
