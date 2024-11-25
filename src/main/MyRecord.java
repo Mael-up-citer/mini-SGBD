@@ -50,7 +50,7 @@ public class MyRecord extends ArrayList<Pair<Object, DataType>> {
                 return value instanceof Integer;
             case REAL:
                 // Vérifie si la valeur est de type Float ou Double (compatibilité pour les nombres réels).
-                return value instanceof Float || value instanceof Double;
+                return value instanceof Float;
             case CHAR:
             case VARCHAR:
                 // Vérifie si la valeur est une chaîne de caractères (String).

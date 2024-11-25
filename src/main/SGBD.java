@@ -26,11 +26,13 @@ public class SGBD {
         dskM = DiskManager.getInstance();  // Initialisation du gestionnaire de disque
         try{
             dskM.loadState();   // Chargement de l'état du disque
+        } catch(Exception e){
+        }
+        finally{
             bm = new BufferManager(dbc, dskM); // Initialisation du gestionnaire de buffers
             dbM = new DBManager(dbc, dskM, bm);  // Initialisation du gestionnaire de base de données
-            dbM.loadState();
-        } catch(Exception e){
-        }                   // Chargement de l'état des bases de données
+            dbM.loadState();    // Chargement de l'état des bases de données
+        }
         initializeCOMMANDMAP();
     }
 
@@ -49,6 +51,8 @@ public class SGBD {
         COMMANDMAP.put("DROP TABLE", this::processDROPTABLECommand);
         COMMANDMAP.put("DROP TABLES", unused -> processDROPTABLESCommand());
         COMMANDMAP.put("LIST TABLES", this::processLISTTABLESCommand);
+
+        COMMANDMAP.put("SELECT", this::processSELECTCommand);
 
         COMMANDMAP.put("QUIT", unused -> processQUITCommand());
     }
@@ -168,7 +172,8 @@ public class SGBD {
      * Méthode pour traiter la commande CREATE DATABASE.
      */
     private void processCREATEDATABASECommand(String param) {
-        if (!isValidName(param)) {  // Vérifier la validité du nom de la base de données
+        // Vérifier la validité du nom de la base de données
+        if (!isValidName(param)) {
             System.out.println("Erreur : Le nom de la base de données '" + param + "' est invalide.");
             return;
         }
@@ -195,7 +200,7 @@ public class SGBD {
 
     /**
      * Méthode pour traiter la commande LIST DATABASES.
-    */
+     */
     private void processLISTDATABASESCommand(String param) {
         dbM.ListDatabases();  // Lister les bases de données
     }
@@ -229,21 +234,18 @@ public class SGBD {
         }
 
         try{
-            System.out.println(param);
             // Enlever le premier mot (nom de la table) et la parenthèse extérieure
             // Trouver l'index du premier espace
             int firstSpaceIndex = param.indexOf(' ');
 
             // Vérifier si un espace a été trouvé (ce qui signifie qu'il y a un nom de table suivi d'un espace)
-            if (firstSpaceIndex != -1) {
+            if (firstSpaceIndex != -1)
                 param = param.substring(firstSpaceIndex + 1).trim();  // Enlever le nom de la table
-            }
 
             // Étape 2: Enlever les parenthèses extérieures
-            if (param.startsWith("(") && param.endsWith(")")) {
+            if (param.startsWith("(") && param.endsWith(")"))
                 param = param.substring(1, param.length() - 1).trim();  // Supprime les parenthèses extérieures
-            }
-            System.out.println(param);
+
             // Crée une liste d'attribut qu'on initialise avec parseRelation qui a pour but de convertir une chaine de caractère en Pair<attribut, longueur>
             ArrayList<Pair<String, Data>> attribut = parseRelation(param);
             // Instancie la relation avec les variables précédente
@@ -355,6 +357,13 @@ public class SGBD {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Méthode pour traiter la commande CREATE TABLE.
+     */
+    private void processSELECTCommand(String param) {
+        param.toUpperCase();
     }
 
     /**
@@ -480,4 +489,9 @@ public class SGBD {
         return value;
     }
     */
+
+    public DBManager getDBManager() {
+        return dbM;
+    }
+
 }

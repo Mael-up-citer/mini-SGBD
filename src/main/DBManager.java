@@ -35,7 +35,11 @@ public class DBManager {
      * 
      * @param databaseName nom de la Base de Données à créer
      */
-    public void CreateDatabase(String databaseName) {
+    public void CreateDatabase(String databaseName) throws IllegalArgumentException{
+		// Vérifie que le bd n'existe pas deja
+		if (listeDatabase.containsKey(databaseName))
+			throw new IllegalArgumentException("Duplicate data base "+databaseName);
+
     	// Crée une nouvelle Database et l'ajoute dans la liste des database crées
         listeDatabase.put(databaseName, new HashMap<>());
         // Informe l'utilisateur de la réussite de l'opération
@@ -48,22 +52,14 @@ public class DBManager {
      * @param databaseName nom de la Base de Données courante
      */
     public void SetCurrentDatabase(String databaseName) throws IllegalArgumentException {
-    	if(!listeDatabase.containsKey(databaseName)) {
+		// Vérifie que la base de donnée existe
+    	if(!listeDatabase.containsKey(databaseName))
     		throw new IllegalArgumentException("La base de donnée " + databaseName + " n'existe pas");
-    	}
+
     	// Charge la database demandée dans current
         this.current = listeDatabase.get(databaseName);
         // Informe l'utilisateur de la réussite de l'opération
         System.out.println("Base de données actuelle définie sur : " + databaseName);
-    }
-    
-    /**
-     * Récupère la Base de Données courante
-     * 
-     * @return la Base de Données courante
-     */
-    public HashMap<String, Relation> getCurrentDatabase(){
-    	return current;
     }
 
     /**
@@ -72,9 +68,9 @@ public class DBManager {
      * @param tab Table à ajouter
      */
     public void AddTableToCurrentDatabase(Relation tab) throws IllegalArgumentException{
-    	if(current == null) {
+    	if(current == null)
     		throw new IllegalArgumentException("La Base de Données de travail n'a pas été définie");
-    	}
+
     	// Ajoute la table à la BDD current
         current.put(tab.getRelationName(), tab);
         // Informe l'utilisateur de la réussite de l'opération
@@ -104,12 +100,12 @@ public class DBManager {
      * @param nomTable nom de la table à supprimer
      */
     public void RemoveTableFromCurrentDatabase(String nomTable) throws IllegalArgumentException {
-    	if(current == null) {
+    	if(current == null)
     		throw new IllegalArgumentException("La Base de Données de travail n'a pas été définie");
-    	}
-    	if(!current.containsKey("nomTable")){
+
+    	if(!current.containsKey("nomTable"))
     		throw new IllegalArgumentException("La table " + nomTable + "n'existe pas");
-    	}
+
     	// Supprime la table de current
         current.remove(nomTable);
         //Informe l'utilisateur de la réussite de l'opération
@@ -122,9 +118,9 @@ public class DBManager {
      * @param databaseName nom de la Base de Données à supprimer
      */
     public void RemoveDatabase(String databaseName) throws IllegalArgumentException {
-    	if(!listeDatabase.containsKey(databaseName)) {
+    	if(!listeDatabase.containsKey(databaseName))
     		throw new IllegalArgumentException("La base de donnée " + databaseName + " n'existe pas");
-    	}
+
         // Supprime la BDD de la liste de BDD existantes
         listeDatabase.remove(databaseName);
         // Informe l'utilisateur de la réussite de l'opération
@@ -135,9 +131,9 @@ public class DBManager {
      * Supprime toutes les tables de la Base de Données courante
      */
     public void RemoveTablesFromCurrentDatabase() throws IllegalArgumentException {
-    	if(current == null) {
+    	if(current == null)
     		throw new IllegalArgumentException("La Base de Données de travail n'a pas été définie");
-    	}
+
     	// Vide la BDD courante
     	current.clear();
     }
@@ -159,18 +155,18 @@ public class DBManager {
     	System.out.println("Les Bases de Données enregistrées sont :");
     	// Parcourt la liste des BDD et affiche ses clés
     	// Les clés de la liste sont les noms des BDD
-        for(String i : listeDatabase.keySet()) {
+        for(String i : listeDatabase.keySet())
         	System.out.println(i);
-        }
+
     }
     
     /**
      * Affiche la liste des tables de la Base de Données courante
      */
     public void ListTablesInCurrentDatabase() throws IllegalArgumentException {
-    	if(current == null) {
+    	if(current == null)
     		throw new IllegalArgumentException("La Base de Données de travail n'a pas été définie");
-    	}
+
     	System.out.println("Les tables de cette base de données sont :");
 		// Parcourt la liste de tables et affiche ses clés, ce sont les noms des tables
         for(String i : current.keySet()) {
@@ -231,9 +227,10 @@ public class DBManager {
     	HashMap<String, Relation> DatabaseEnCours = null;
     	Relation RelationEnCours = null;
         String save = readSave();
-        if(save == null) {
+
+        if(save == null)
         	throw new IOException("La sauvegarde est vide");
-        }else {
+        else {
         	String[] lines = save.split("\n");
         	for(String line : lines) {
         		line = line.trim(); // Enlever les espaces en début et fin de ligne
@@ -324,4 +321,13 @@ public class DBManager {
 		// Vérifie si la table existe dans la base de données courante
 		return current.containsKey(str);
 	}
+
+	/**
+     * Récupère la Base de Données courante
+     * 
+     * @return la Base de Données courante
+     */
+    public HashMap<String, Relation> getCurrentDatabase(){
+    	return current;
+    }
 }

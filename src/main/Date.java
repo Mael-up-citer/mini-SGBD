@@ -1,3 +1,6 @@
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
 /**
  * Classe représentant une date au format jour/mois/année.
  * Cette classe permet de manipuler des dates tout en validant leur format
@@ -20,12 +23,53 @@ public class Date implements Comparable<Date> {
     public Date(int day, int month, int year){
         // Vérifie si les paramètres représentent une date valide
         if(!isValidDate(day, month, year))
-            throw new IllegalArgumentException("Date non valide");  // Lève une exception si la date est invalide
+            throw new IllegalArgumentException(String.format("Date non valide : %02d/%02d/%04d", day, month, year));
 
         // Si la date est valide, les valeurs sont assignées
         this.day = day;
         this.month = month;
         this.year = year;
+    }
+
+    /**
+     * Convertit une chaîne représentant une date au format "JJ/MM/AAAA" en une instance de la classe Date.
+     * 
+     * @param str La chaîne de caractères représentant la date sous le format "JJ/MM/AAAA".
+     * @return Un objet {@link Date} représentant la date extraite de la chaîne.
+     * @throws IllegalArgumentException Si la chaîne ne respecte pas le format attendu ou si la date est invalide.
+     */
+    public static Date toDate(String str) {
+        // Vérifie si la chaîne est bien au format "JJ/MM/AAAA"
+        if (str == null || str.length() != 10 || str.charAt(2) != '/' || str.charAt(5) != '/')
+            throw new IllegalArgumentException("Le format de la date doit être JJ/MM/AAAA.");
+
+        // Extraire le jour, le mois et l'année à partir de la chaîne
+        int day = Integer.parseInt(str.substring(0, 2));   // Les 2 premiers caractères représentent le jour
+        int month = Integer.parseInt(str.substring(3, 5)); // Les caractères de l'indice 3 à 4 représentent le mois
+        int year = Integer.parseInt(str.substring(6, 10)); // Les caractères de l'indice 6 à 9 représentent l'année
+
+        // Retourne un objet Date après avoir validé la date
+        return new Date(day, month, year);
+    }
+
+    /**
+     * Retourne le timestamp Unix (nombre de secondes écoulées depuis le 1er janvier 1970)
+     * pour la date représentée par cet objet {@link Date}.
+     * 
+     * @return Le nombre de secondes écoulées depuis le 1er janvier 1970 jusqu'à cette date.
+     */
+    public long timestamp() {
+        // Créer une instance de LocalDate représentant le 1er janvier 1970
+        LocalDate epoch = LocalDate.of(1970, 1, 1);
+    
+        // Créer une instance de LocalDate représentant la date actuelle
+        LocalDate currentDate = LocalDate.of(this.year, this.month, this.day);
+    
+        // Calculer la différence en jours entre les deux dates
+        long daysBetween = ChronoUnit.DAYS.between(epoch, currentDate);
+    
+        // Convertir la différence en secondes (1 jour = 86400 secondes)
+        return daysBetween * 86400L; // Changement de int à long
     }
 
     /**
@@ -134,7 +178,7 @@ public class Date implements Comparable<Date> {
      */
     public void setDay(int day){
         if (!isValidDate(day, this.month, this.year))
-            throw new IllegalArgumentException("Jour non valide pour la date actuelle.");
+            throw new IllegalArgumentException(String.format("Jour %d non valide pour le mois %d/%d.", day, this.month, this.year));
 
         this.day = day;
     }
@@ -147,7 +191,7 @@ public class Date implements Comparable<Date> {
      */
     public void setMonth(int month){
         if (!isValidDate(this.day, month, this.year))
-            throw new IllegalArgumentException("Mois non valide pour la date actuelle.");
+            throw new IllegalArgumentException(String.format("Mois %d non valide pour le jour %d/%d.", month, this.day, this.year));
 
         this.month = month;
     }
@@ -158,6 +202,7 @@ public class Date implements Comparable<Date> {
      * @param year La nouvelle année de la date.
      */
     public void setYear(int year){
+        // Il n'est pas nécessaire de valider une année seule.
         this.year = year;
     }
 }

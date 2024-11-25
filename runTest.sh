@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 # Défini la variable du nom de la classe de test

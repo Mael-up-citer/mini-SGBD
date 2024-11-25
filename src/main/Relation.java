@@ -392,7 +392,7 @@ public class Relation {
         // PageId de la page suivante dans le chainage
         PageId nextPage = new PageId(headerPageId.FileIdx, headerPageId.PageIdx);
 
-        int offset = 4;     // Premiers 4 octets pour le compteur
+        int offset = 4;  // Premiers 4 octets pour le compteur
 
         try {
             // Charger la 1er Header Page en mémoire
@@ -687,9 +687,9 @@ public class Relation {
     }
 
     /**
-     * Récupère la liste des attributs de la relation.
-     *
-     * @return La liste des attributs de la relation.
+     * Récupère les attributs de la relation a l'index donné.
+     * @param un index de la liste
+     * @return Une Pair nom, type.
      */
     public Pair<String, Data> getAttribut(int index) throws IndexOutOfBoundsException{
         return attribut.get(index);
