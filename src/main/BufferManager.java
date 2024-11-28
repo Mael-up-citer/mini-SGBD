@@ -8,12 +8,12 @@ import java.util.ArrayList;
  * pages en mémoire et une liste de junkFile pour gérer les pages à libérer lorsque le pool est plein.
  */
 public class BufferManager{
-    DBConfig dbc;  // Configuration de la base de données
-    DiskManager dskM;  // Gestionnaire des disques
-    AVL cadre = new AVL();  // Pool de buffers (structure de l'arbre AVL)
-    Liste junkFile; // Liste des éléments à libérer (pages qui ne sont plus utilisées)
-    Liste last; // Pointeur vers le dernier élément
-    ArrayList<ByteBuffer> emptyBuffer = new ArrayList<ByteBuffer>();  // Liste des buffers vides disponibles
+    private DBConfig dbc;  // Configuration de la base de données
+    private DiskManager dskM;  // Gestionnaire des disques
+    private AVL cadre = new AVL();  // Pool de buffers (structure de l'arbre AVL)
+    private Liste junkFile; // Liste des éléments à libérer (pages qui ne sont plus utilisées)
+    private Liste last; // Pointeur vers le premier élément de la junkFile
+    private ArrayList<ByteBuffer> emptyBuffer = new ArrayList<ByteBuffer>();  // Liste des buffers vides disponibles
     private int nbAllocFrame = 0;   // Nombre de frame occupé dans l'AVL
 
     /**
@@ -41,15 +41,14 @@ public class BufferManager{
         // Si la page n'est pas dans le buffer pool
         if (node == null) {
         	// Si le cadre est plein, on doit libérer de l'espace selon la politique de remplacement
-            if (emptyBuffer.isEmpty())
+            if (emptyBuffer.isEmpty()) {
                 makeSpace();    // Libère de l'espace
-
+            }
         	// Recupere le dernier buffer vide
             ByteBuffer tmp = emptyBuffer.remove(emptyBuffer.size() - 1);
+            dskM.ReadPage(id, tmp);
             cadre.insert(new AVLNode(id, tmp)); // Insère le nouveau noeud dans l'arbre
-
             nbAllocFrame++;
-
             return tmp;
         }
         // Si le noeud est dans l'arbre
@@ -76,7 +75,6 @@ public class BufferManager{
 
         if (noeud == null)
             throw new RuntimeException("Aucun noeud ne correspond à "+id);
-
         noeud.dirtyFlag = (valdirty || noeud.dirtyFlag); // Déclare si la page a été modifiée et si elle a déjà été modifié on laisse à true
         noeud.pin_count--;   // Décrémenter le compteur d'utilisation
 
@@ -94,10 +92,15 @@ public class BufferManager{
     	//Si la liste est vide, on crée le premier maillon
     	if(junkFile == null) {
     		junkFile = new Liste(node.id);
+    		//Initialise le pointeur du noeud vers son maillon de chaîne
     		node.pointeurListe = junkFile;
+    		//Initialise le pointeur du début de la JunkFile
+    		last = junkFile;
     	}
-        else
+        else {
     		node.pointeurListe = junkFile.add(new Liste(node.id));   // Ajoute l'élément à enlever dans la junkFile
+    		last = node.pointeurListe;
+        }
     }
 
     /**
@@ -117,7 +120,12 @@ public class BufferManager{
      */
     private void suppJunk(Liste l) throws Exception{
     	cadre.search(l.id).pointeurListe = null;
-        l.remove();   // Retire l'élément de la JunkFile
+        junkFile = l.remove();   // Retire l'élément de la JunkFile
+        //Si l'élement est le premier de la liste
+    	if(l == last) {
+    		//Met le pointeur au maillon suivant
+    		last = junkFile;
+    	}
     }
 
     /**
@@ -129,12 +137,12 @@ public class BufferManager{
         AVLNode noeud = null;
 
         switch (DBConfig.bm_policy){
-            case "LRU":
+            case "MRU":
                 id = last.id;
                 noeud = cadre.delete(id);  // Enlève la frame associée dans le bufferPool
                 last = last.remove();  // Supprime le dernier élément
                 break;
-            case "MRU":
+            case "LRU":
                 id = junkFile.id;
                 noeud = cadre.delete(id); // Enlève la frame associée dans le bufferPool
                 junkFile = junkFile.remove();  // Supprime le premier élément
@@ -148,7 +156,7 @@ public class BufferManager{
         buffer = noeud.buffer;
         // Si la page a été modifié
         if(noeud.dirtyFlag)
-            dskM.WritePage(id, buffer); // L'écrit en mémoir
+            dskM.WritePage(id, buffer); // L'écrit en mémoire
 
         buffer.clear(); // Réinitialise le buffer
         emptyBuffer.add(buffer); // Récupère le buffer vide ici
@@ -173,7 +181,48 @@ public class BufferManager{
         DBConfig.bm_policy = policy;  // Applique la nouvelle politique
     }
 
+    /**
+     * Récupère le nombre de Pages allouées
+     * 
+     * @return le nombre de Pages allouées
+     */
     public int getNbAllocFrame() {
         return nbAllocFrame;
+    }
+    
+    /**
+     * Récupère le nombre de buffers vides restants
+     * 
+     * @return le nombre de buffers vides restants
+     */
+    public int getEmptyBufferSize() {
+    	return emptyBuffer.size();
+    }
+    
+    /**
+     * Récupère l'AVL du Buffer Manager
+     * 
+     * @return l'AVL du Buffer Manager
+     */
+    public AVL getCadre() {
+    	return cadre;
+    }
+    
+    /**
+     * Récupère le pointeur vers le premier élément de la JunkFile
+     * 
+     * @return le pointeur vers le premier élément de la JunkFile
+     */
+    public Liste getJunkFile() {
+    	return junkFile;
+    }
+    
+    /**
+     * Répère le pointeur vers le dernier élément de la JunkFile
+     * 
+     * @return le pointeur vers le dernier élément de la JunkFile
+     */
+    public Liste getLast() {
+    	return last;
     }
 }
