@@ -73,8 +73,7 @@ public class TestAVL{
         assertNull(node, "La recherche dans un arbre vide devrait retourner null.");
         
         // Vérification de la suppression dans un arbre vide
-        ByteBuffer buffer = arbre.delete(new PageId(0, 2)).buffer;
-        assertNull(buffer, "La suppression dans un arbre vide devrait retourner null.");
+        assertNull(arbre.delete(new PageId(0, 2)), "La suppression dans un arbre vide devrait retourner null.");
     }    
 
     @Test
@@ -94,8 +93,9 @@ public class TestAVL{
     }
 
     private boolean isBalancedNode(AVLNode node){
-        if(node == null)
+        if(node == null) {
             return true;
+        }
 
         int balanceFactor = arbre.getHeight(node.left) - arbre.getHeight(node.right);
 
