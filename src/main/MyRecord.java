@@ -8,7 +8,9 @@ import java.util.ArrayList;
  */
 public class MyRecord extends ArrayList<Pair<Object, DataType>> {
 
-    /**
+    private static final long serialVersionUID = 1L;
+
+	/**
      * Constructeur par défaut qui initialise une liste vide.
      * Appelle le constructeur de la classe parent ArrayList.
      */
@@ -101,10 +103,12 @@ public class MyRecord extends ArrayList<Pair<Object, DataType>> {
             // Sinno on regarde dans la relation
             else{
                 // Si c'est un char on regarde dans la relation
-                if(this.getType(i) == DataType.CHAR)
+                if(this.getType(i) == DataType.CHAR) {
                     sum += relation.getLength(i)*2; // Taille fois 2 car 1char = 2octets
-                else
+                }
+                else {
                     sum += relation.getLength(i);   // Sinon on a juste a prendre la taille
+                }
             }
         }
         return sum;

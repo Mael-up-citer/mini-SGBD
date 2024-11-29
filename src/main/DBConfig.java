@@ -240,8 +240,9 @@ public class DBConfig {
         }
 
         // Si un test échoue, on met dbpath à null
-        if(!flag)
+        if(!flag) {
             dbpath = null;
+        }
 
         return flag; // Retourne l'état du flag
     }

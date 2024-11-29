@@ -107,8 +107,9 @@ public class SGBD {
                 query = sc.nextLine();   // Récupère la commande de l'utilisateur et la nettoie
 
                 // Vérifier la validité de la requête avant de la traiter
-                if (isValidSQL(query))
+                if (isValidSQL(query)) {
                     assocQuery(query);      // Si valide, associer la commande à sa méthode correspondante
+                }
 
             } while (true);
 
@@ -145,8 +146,9 @@ public class SGBD {
                 break;
             }
         }
-        if(!succes)
+        if(!succes) {
             System.out.println("la commande "+query+"   n'est pas supporté par le system");
+        }
     }
 
     /**
@@ -239,13 +241,16 @@ public class SGBD {
             int firstSpaceIndex = param.indexOf(' ');
 
             // Vérifier si un espace a été trouvé (ce qui signifie qu'il y a un nom de table suivi d'un espace)
-            if (firstSpaceIndex != -1)
+            if (firstSpaceIndex != -1) {
+
                 param = param.substring(firstSpaceIndex + 1).trim();  // Enlever le nom de la table
-
+            }
+            
             // Étape 2: Enlever les parenthèses extérieures
-            if (param.startsWith("(") && param.endsWith(")"))
+            if (param.startsWith("(") && param.endsWith(")")) {
                 param = param.substring(1, param.length() - 1).trim();  // Supprime les parenthèses extérieures
-
+            }
+            
             // Crée une liste d'attribut qu'on initialise avec parseRelation qui a pour but de convertir une chaine de caractère en Pair<attribut, longueur>
             ArrayList<Pair<String, Data>> attribut = parseRelation(param);
             // Instancie la relation avec les variables précédente
@@ -282,9 +287,10 @@ public class SGBD {
             // Séparer en deux parties : nom et type
             String[] parts = paire.split(":");
     
-            if (parts.length != 2)
+            if (parts.length != 2) {
                 throw new Exception("Erreur de format dans la chaîne d'attribut : " + paire);
-    
+            }
+            
             String attName = parts[0].trim(); // Nom de l'attribut
             String typePart = parts[1].trim(); // Type de l'attribut
             
@@ -299,9 +305,10 @@ public class SGBD {
                 // Ajouter l'attribut à la liste avec sa taille
                 attributs.add(new Pair<>(attName, new Data(type, length)));
             } 
-            else
+            else {
                 // Ajouter l'attribut à la liste sans taille
                 attributs.add(new Pair<>(attName, new Data(type)));
+            }
         }
     
         // Retourner la liste d'attributs
@@ -388,20 +395,24 @@ public class SGBD {
      */
     public static boolean isValidName(String name) {
         // Vérifie que le nom contienne quelque chose
-        if (name == null || name.isEmpty())
-        return false;
+        if (name == null || name.isEmpty()) {
+            return false;
+        }
 
         // Le nom ne doit pas commencer par un chiffre
-        if (Character.isDigit(name.charAt(0)))
+        if (Character.isDigit(name.charAt(0))) {
             return false;
+        }
 
         // Vérifie que le nom ne contient que des lettres, des chiffres et des underscores
-        if (!name.matches("^[a-zA-Z0-9_]+$"))
+        if (!name.matches("^[a-zA-Z0-9_]+$")) {
             return false;
+        }
 
         // Vérifie que le nom ne dépasse pas 64 caractères (exemple de limite de MySQL)
-        if (name.length() > 64)
+        if (name.length() > 64) {
             return false;
+        }
 
         // Liste des mots réservés sous forme d'ArrayList
         ArrayList<String> reservedWords = new ArrayList<>(Arrays.asList(

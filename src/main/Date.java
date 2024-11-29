@@ -22,8 +22,9 @@ public class Date implements Comparable<Date> {
      */
     public Date(int day, int month, int year){
         // Vérifie si les paramètres représentent une date valide
-        if(!isValidDate(day, month, year))
+        if(!isValidDate(day, month, year)) {
             throw new IllegalArgumentException(String.format("Date non valide : %02d/%02d/%04d", day, month, year));
+        }
 
         // Si la date est valide, les valeurs sont assignées
         this.day = day;
@@ -40,8 +41,9 @@ public class Date implements Comparable<Date> {
      */
     public static Date toDate(String str) {
         // Vérifie si la chaîne est bien au format "JJ/MM/AAAA"
-        if (str == null || str.length() != 10 || str.charAt(2) != '/' || str.charAt(5) != '/')
+        if (str == null || str.length() != 10 || str.charAt(2) != '/' || str.charAt(5) != '/') {
             throw new IllegalArgumentException("Le format de la date doit être JJ/MM/AAAA.");
+        }
 
         // Extraire le jour, le mois et l'année à partir de la chaîne
         int day = Integer.parseInt(str.substring(0, 2));   // Les 2 premiers caractères représentent le jour
@@ -82,15 +84,17 @@ public class Date implements Comparable<Date> {
      */
     private boolean isValidDate(int day, int month, int year){
         // Vérifie si le mois est compris entre 1 et 12
-        if(month < 1 || month > 12) 
+        if(month < 1 || month > 12) {
             return false;
+        }
 
         // Tableau contenant le nombre de jours pour chaque mois (index 0 = janvier, 11 = décembre)
         int[] daysInMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
         // Si l'année est bissextile, février aura 29 jours
-        if(isBissextile(year))
+        if(isBissextile(year)) {
             daysInMonth[1] = 29; // Février a 29 jours dans une année bissextile
+        }
 
         // Vérifie si le jour est valide pour le mois donné
         return day > 0 && day <= daysInMonth[month - 1];
@@ -104,8 +108,9 @@ public class Date implements Comparable<Date> {
      */
     private boolean isBissextile(int year){
         if(year % 4 == 0){
-            if(year % 100 == 0)
+            if(year % 100 == 0) {
                 return year % 400 == 0;
+            }
             return true;
         }
         return false;
@@ -130,11 +135,13 @@ public class Date implements Comparable<Date> {
      */
     @Override
     public int compareTo(Date other){
-        if (this.year != other.year)
+        if (this.year != other.year) {
             return this.year - other.year;
+        }
 
-        if (this.month != other.month)
+        if (this.month != other.month) {
             return this.month - other.month;
+        }
 
         return this.day - other.day;
     }
@@ -177,9 +184,10 @@ public class Date implements Comparable<Date> {
      * @throws IllegalArgumentException Si le jour n'est pas valide pour la date actuelle.
      */
     public void setDay(int day){
-        if (!isValidDate(day, this.month, this.year))
+        if (!isValidDate(day, this.month, this.year)) {
             throw new IllegalArgumentException(String.format("Jour %d non valide pour le mois %d/%d.", day, this.month, this.year));
-
+        }
+        
         this.day = day;
     }
 
@@ -190,9 +198,10 @@ public class Date implements Comparable<Date> {
      * @throws IllegalArgumentException Si le mois n'est pas valide pour la date actuelle.
      */
     public void setMonth(int month){
-        if (!isValidDate(this.day, month, this.year))
+        if (!isValidDate(this.day, month, this.year)) {
             throw new IllegalArgumentException(String.format("Mois %d non valide pour le jour %d/%d.", month, this.day, this.year));
-
+        }
+        
         this.month = month;
     }
 

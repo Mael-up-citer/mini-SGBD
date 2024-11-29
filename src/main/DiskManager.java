@@ -25,8 +25,9 @@ public class DiskManager {
      * @throws Exception Si une instance existe déjà.
      */
     private DiskManager() throws Exception {
-        if (!instanceable)
+        if (!instanceable) {
             throw new Exception("Une instance existe déjà");
+        }
         instanceable = false; // Empêche l'instanciation future
     }
 
@@ -38,8 +39,9 @@ public class DiskManager {
      * @throws Exception Si l'instance ne peut pas être créée.
      */
     public static synchronized DiskManager getInstance() throws Exception {
-        if (instance == null)
+        if (instance == null) {
             instance = new DiskManager();
+        }
         return instance;
     }
 
@@ -54,8 +56,9 @@ public class DiskManager {
         PageId id = new PageId();
 
         // Si des pages sont disponibles dans freePage, on les récupère
-        if (freePage.size() != 0)
+        if (freePage.size() != 0) {
             id = freePage.remove(freePage.size() - 1); // Retirer la dernière page libre
+        }
         else {
             // Calculer l'index du fichier en fonction de l'espace global alloué
             id.FileIdx = (int) (GlobalStorage / DBConfig.dm_maxfilesize);
@@ -90,10 +93,12 @@ public class DiskManager {
             buffer.clear(); // Nettoyer le buffer avant de lire
             int bytesRead = channel.read(buffer); // Lire dans le buffer
 
-            if (bytesRead == -1)
+            if (bytesRead == -1) {
                 throw new Exception("Aucune donnée lue. Vérifiez si la page existe.");
-            else if (bytesRead < DBConfig.pagesize)
+            }
+            else if (bytesRead < DBConfig.pagesize) {
                 throw new Exception("Lecture partielle : " + bytesRead + " octets lus.");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -118,8 +123,9 @@ public class DiskManager {
             int bytesWritten = channel.write(buffer); // Écrire le buffer dans le fichier
 
             // Vérifier si l'écriture a été complète
-            if (bytesWritten != DBConfig.pagesize)
+            if (bytesWritten != DBConfig.pagesize) {
                 throw new Exception("Erreur d'écriture : " + bytesWritten + " octets écrits au lieu de " + DBConfig.pagesize);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -176,8 +182,9 @@ public class DiskManager {
         String cheminFichier = DBConfig.dbpath + "dm.save"; // Chemin du fichier de sauvegarde
 
         try (RandomAccessFile raf = new RandomAccessFile(cheminFichier, "rw")) {
-            if (raf.length() == 0)
+            if (raf.length() == 0) {
                 throw new Exception("Il n'y a pas de sauvegarde de ce Disque Manager");
+            }
 
             GlobalStorage = raf.readLong(); // Charger l'espace global alloué
 

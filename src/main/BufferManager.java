@@ -37,6 +37,7 @@ public class BufferManager{
      */
     public ByteBuffer getPage(PageId id) throws Exception{
         AVLNode node = cadre.search(id); // Recherche si la pageId est présente dans le buffer pool
+        System.out.println("get " + id);
 
         // Si la page n'est pas dans le buffer pool
         if (node == null) {
@@ -49,17 +50,18 @@ public class BufferManager{
             dskM.ReadPage(id, tmp);
             cadre.insert(new AVLNode(id, tmp)); // Insère le nouveau noeud dans l'arbre
             nbAllocFrame++;
+            System.out.println("Création du noeud");
             return tmp;
         }
         // Si le noeud est dans l'arbre
         else {
             ByteBuffer buffer = node.buffer; // Récupère le buffer associé au noeud
         	// Si la page était dans junkFile, on l'enlève
-            if(node.pointeurListe != null)
+            if(node.pointeurListe != null) {
                 suppJunk(node.pointeurListe); // Retire de junkFile
+            }
 
             node.pin_count++; // Augmente le compteur d'utilisation
-
             return buffer;  // Retourne le buffer
         }
     }
@@ -73,14 +75,16 @@ public class BufferManager{
     public void freePage(PageId id, boolean valdirty) throws RuntimeException{
         AVLNode noeud = cadre.search(id); // Recherche le noeud à libérer
 
-        if (noeud == null)
+        if (noeud == null) {
             throw new RuntimeException("Aucun noeud ne correspond à "+id);
+        }
         noeud.dirtyFlag = (valdirty || noeud.dirtyFlag); // Déclare si la page a été modifiée et si elle a déjà été modifié on laisse à true
         noeud.pin_count--;   // Décrémenter le compteur d'utilisation
 
         // Si plus personne ne l'utilise, on l'ajoute à la junkFile
-        if(noeud.pin_count == 0)
+        if(noeud.pin_count == 0) {
             ajoutJunk(noeud);   // L'ajoute à la junkFile
+        }
     }
 
     /**
@@ -126,6 +130,8 @@ public class BufferManager{
     		//Met le pointeur au maillon suivant
     		last = junkFile;
     	}
+
+    	System.out.println(last == null);
     }
 
     /**
@@ -139,6 +145,7 @@ public class BufferManager{
         switch (DBConfig.bm_policy){
             case "MRU":
                 id = last.id;
+                System.out.println("Supression" + id);
                 noeud = cadre.delete(id);  // Enlève la frame associée dans le bufferPool
                 last = last.remove();  // Supprime le dernier élément
                 break;
@@ -150,13 +157,15 @@ public class BufferManager{
             default:
                 throw new Exception("La politique de remplacement '"+DBConfig.bm_policy+"' n'a pas d'implémentation");
         }
-        if(noeud == null)
+        if(noeud == null) {
             System.out.println("Erreurrrrr");
+        }
 
         buffer = noeud.buffer;
         // Si la page a été modifié
-        if(noeud.dirtyFlag)
+        if(noeud.dirtyFlag) {
             dskM.WritePage(id, buffer); // L'écrit en mémoire
+        }
 
         buffer.clear(); // Réinitialise le buffer
         emptyBuffer.add(buffer); // Récupère le buffer vide ici

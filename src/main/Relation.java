@@ -283,14 +283,19 @@ public class Relation {
             // PageId de la prochaine header Page
             PageId nextPage = new PageId(headerPageId.FileIdx, headerPageId.PageIdx);
 
-            System.out.println("debut: dernier int ecris = "+buffer.getInt(DBConfig.pagesize - 4));
+            //System.out.println("debut: dernier int ecris = "+buffer.getInt(DBConfig.pagesize - 4));
 
             // Parcourt les header Pages pour trouver la dernière
             while ((buffer.getInt(DBConfig.pagesize - 4)) != -1) {
                 System.out.println("parcour... curret id = "+currentPage);
+                //ICI LE NOEUD EXISTE
+                System.out.println(bm.getCadre().search(currentPage) == null);
+
                 // Charge l'identifiant de la prochaine header Page
                 nextPage.FileIdx = buffer.getInt(DBConfig.pagesize - 8);
+                //ICI IL N'EXISTE PLUS
                 nextPage.PageIdx = buffer.getInt(DBConfig.pagesize - 4);
+                System.out.println(currentPage);
                 System.out.println("parcour... next id = "+nextPage);
 
                 // Libère l'anciennes header pages
@@ -357,11 +362,11 @@ public class Relation {
 
             bm.freePage(headerPageId, false);
 
-            System.out.println("avant le get dernier int ecris = "+bm.getPage(headerPageId).getInt(DBConfig.pagesize - 4));
+            //System.out.println("avant le get dernier int ecris = "+bm.getPage(headerPageId).getInt(DBConfig.pagesize - 4));
             // Ecrit l'offset directory de la nouvelle data Page
             buffer = bm.getPage(id);    // Charge la nouvelle dataPage
 
-            System.out.println("apres le get dernier int ecris = "+bm.getPage(headerPageId).getInt(DBConfig.pagesize - 4));
+            //System.out.println("apres le get dernier int ecris = "+bm.getPage(headerPageId).getInt(DBConfig.pagesize - 4));
             bm.freePage(headerPageId, false);
 
             buffer.putInt(DBConfig.pagesize - 4, 0);    // Ecrit le début de l'espace disponible

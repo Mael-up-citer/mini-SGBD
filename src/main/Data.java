@@ -37,11 +37,12 @@ public class Data{
      * @throws IllegalArgumentException Si le type de données n'est pas CHAR ou VARCHAR.
      */
     public Data(DataType t, int lg){
-        if((t == DataType.CHAR) || (t == DataType.VARCHAR))
+        if((t == DataType.CHAR) || (t == DataType.VARCHAR)) {
             length = lg;
-        else
+        }
+        else {
             throw new IllegalArgumentException("Cette méthode est applicable qu'au type CHAR et VARCHAR");
-
+        }
         type = t;
     }
 
@@ -70,9 +71,11 @@ public class Data{
      * @throws IllegalArgumentException Si la longueur est modifiée pour un type qui n'est pas VARCHAR.
      */
     public void setLenght(int n){
-        if(type == DataType.VARCHAR)
+        if(type == DataType.VARCHAR) {
             length = n;
-        else
+        }
+        else {
             throw new IllegalArgumentException("Seul la taille des VARCHAR peut etre modifié !");
+        }
     }
 }

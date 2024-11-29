@@ -29,9 +29,10 @@ public class Liste{
                 this.suivant.precedent = null;  // Le prédécesseur du suivant devient null
                 return this.suivant;  // Retourner le nouvel élément de tête
             }
-            else
+            else {
                 // La liste est vide après la suppression
                 return null;  // Il n'y a plus d'élément
+            }
         }
         // Si l'élément est le dernier de la liste
         if(this.suivant == null){

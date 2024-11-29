@@ -69,22 +69,28 @@ public class AVL{
      */
     private AVLNode searchNode(AVLNode node, PageId id){
         // Si le noeud est nul, la page n'a pas été trouvée
-        if(node == null)
+        if(node == null) {
             return null;
+        }
         
         // Comparaison sur FileIdx, puis sur PageIdx si nécessaire
-        if(id.FileIdx < node.id.FileIdx)
+        if(id.FileIdx < node.id.FileIdx) {
             return searchNode(node.left, id);   // Rechercher à gauche
-        else if(id.FileIdx > node.id.FileIdx)
+        }
+        else if(id.FileIdx > node.id.FileIdx) {
             return searchNode(node.right, id);  // Rechercher à droite
+        }
         else{
             // Si FileIdx est égal, on compare le PageIdx
-            if (id.PageIdx == node.id.PageIdx)
+            if (id.PageIdx == node.id.PageIdx) {
                 return node; // La page est trouvée
-            else if (id.PageIdx < node.id.PageIdx)
+            }
+            else if (id.PageIdx < node.id.PageIdx) {
                 return searchNode(node.left, id); // Rechercher à gauche
-            else
+            }
+            else {
                 return searchNode(node.right, id); // Rechercher à droite
+            }
         }
     }
 
@@ -106,20 +112,25 @@ public class AVL{
      */
     private AVLNode insertNode(AVLNode root, AVLNode node){
         // Si l'arbre est vide, insérer le noeud
-        if(root == null)
+        if(root == null) {
             return node;
+        }
 
         // Recherche du bon emplacement pour le noeud
-        if(node.id.FileIdx < root.id.FileIdx)
+        if(node.id.FileIdx < root.id.FileIdx) {
             root.left = insertNode(root.left, node); // Insérer à gauche
-        else if(node.id.FileIdx > root.id.FileIdx)
+        }
+        else if(node.id.FileIdx > root.id.FileIdx) {
             root.right = insertNode(root.right, node); // Insérer à droite
+        }
         else{
             // Si FileIdx est égal, on compare le PageIdx
-            if(node.id.PageIdx < root.id.PageIdx)
+            if(node.id.PageIdx < root.id.PageIdx) {
                 root.left = insertNode(root.left, node); // Insérer à gauche
-            else
+            }
+            else {
                 root.right = insertNode(root.right, node); // Insérer à droite
+            }
         }
 
         // Mise à jour de la hauteur du noeud actuel
@@ -157,30 +168,37 @@ public class AVL{
      */
     private AVLNode deleteNode(AVLNode node, PageId id, AVLNode[] deletedNode) {
         // Phase de recherche
-        if (node == null)
+        if (node == null) {
             return null; // Si le noeud est nul, retourner nul
+        }
 
         // Comparer le FileIdx pour la recherche
-        if (id.FileIdx < node.id.FileIdx)
+        if (id.FileIdx < node.id.FileIdx) {
             node.left = deleteNode(node.left, id, deletedNode);
-        else if (id.FileIdx > node.id.FileIdx)
+        }
+        else if (id.FileIdx > node.id.FileIdx) {
             node.right = deleteNode(node.right, id, deletedNode);
+        }
         else {
             // Si FileIdx est égal, comparer PageIdx
-            if (id.PageIdx < node.id.PageIdx)
+            if (id.PageIdx < node.id.PageIdx) {
                 node.left = deleteNode(node.left, id, deletedNode);
-            else if (id.PageIdx > node.id.PageIdx)
+            }
+            else if (id.PageIdx > node.id.PageIdx) {
                 node.right = deleteNode(node.right, id, deletedNode);
+            }
             else {
                 // Le noeud à supprimer a été trouvé !
-                if (deletedNode[0] == null)
+                if (deletedNode[0] == null) {
                     deletedNode[0] = new AVLNode(node.id, node.buffer, node.dirtyFlag); // Capture le noeud supprimé (et son buffer associé)
-
+                }
                 // Si le noeud a un seul enfant ou aucun enfant
-                if (node.left == null)
+                if (node.left == null) {
                     return node.right;
-                else if (node.right == null)
+                }
+                else if (node.right == null) {
                     return node.left;
+                }
 
                 // Noeud avec deux enfants, obtenir le minimum dans le sous-arbre droit
                 AVLNode temp = minValueNode(node.right);
@@ -221,8 +239,9 @@ public class AVL{
     private void dump(DiskManager dskm, AVLNode node, ArrayList<ByteBuffer> emptyBuffer) throws Exception {
         if(node != null){
             // Si le buffer est marqué comme modifié, l'écrire sur le disque
-            if (node.dirtyFlag)
+            if (node.dirtyFlag) {
                 dskm.WritePage(node.id, node.buffer); // Écrire le buffer modifié
+            }
 
             // Vider le buffer et l'ajouter à la liste des buffers vides
             node.buffer.clear();
@@ -243,16 +262,18 @@ public class AVL{
      * @return Le noeud rééquilibré
      */
     private AVLNode balanceNode(AVLNode node){
-        if(node == null)
+        if(node == null) {
             return node; // Aucun besoin de rééquilibrer un noeud nul
+        }
 
         int balanceFactor = getBalance(node); // Calcul du facteur d'équilibre
 
         // Si l'arbre est déséquilibré à gauche
         if(balanceFactor > 1){
             // Cas gauche-gauche
-            if(getBalance(node.left) >= 0)
+            if(getBalance(node.left) >= 0) {
                 return rightRotate(node); // Rotation droite
+            }
             // Cas gauche-droit
             else{
                 node.left = leftRotate(node.left); // Rotation gauche sur le sous-arbre gauche
@@ -262,8 +283,9 @@ public class AVL{
         // Si l'arbre est déséquilibré à droite
         else if(balanceFactor < -1){
             // Cas droit-droit
-            if(getBalance(node.right) <= 0)
+            if(getBalance(node.right) <= 0) {
                 return leftRotate(node); // Rotation gauche
+            }
             // Cas droit-gauche
             else{
                 node.right = rightRotate(node.right); // Rotation droite sur le sous-arbre droit
