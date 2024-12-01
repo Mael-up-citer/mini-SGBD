@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.management.RuntimeErrorException;
+
 import java.nio.ByteBuffer;
 
 /**
@@ -108,7 +111,7 @@ public class Relation {
             }
             return posValue - start; // Retourne la taille totale de l'enregistrement écrit
 
-        } catch (IndexOutOfBoundsException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return 0;  // En cas d'erreur, retourne 0
@@ -177,7 +180,7 @@ public class Relation {
             }
             return posValue - start; // Retourne la taille totale lue du buffer
 
-        } catch (IndexOutOfBoundsException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return 0;  // En cas d'erreur, retourne 0
@@ -255,7 +258,6 @@ public class Relation {
         try {
             // Alloue une nouvelle page
             PageId id = dskm.AllocPage();
-
             // Charge la header Page en mémoire
             ByteBuffer buffer = bm.getPage(headerPageId);
 
@@ -263,8 +265,6 @@ public class Relation {
             int nbDataPage = buffer.getInt(0);
             nbDataPage++;   // Incrémente le nombre total de pages
             buffer.putInt(0, nbDataPage); // Mise à jour dans la page d'en-tête
-
-            //System.out.println("header Page = "+headerPageId.FileIdx+"  "+headerPageId.PageIdx+" nb data Page "+nbDataPage);
 
             bm.freePage(headerPageId, true);    // Relache la page a true
 
@@ -280,38 +280,27 @@ public class Relation {
             // PageId de la header Page courante
             PageId currentPage = new PageId(headerPageId.FileIdx, headerPageId.PageIdx);
 
-            // PageId de la prochaine header Page
-            PageId nextPage = new PageId(headerPageId.FileIdx, headerPageId.PageIdx);
-
-            //System.out.println("debut: dernier int ecris = "+buffer.getInt(DBConfig.pagesize - 4));
-
             // Parcourt les header Pages pour trouver la dernière
             while ((buffer.getInt(DBConfig.pagesize - 4)) != -1) {
-                System.out.println("parcour... curret id = "+currentPage);
-                //ICI LE NOEUD EXISTE
-                System.out.println(bm.getCadre().search(currentPage) == null);
+                // Crée une nouvelle instance temporaire pour stocker la prochaine page
+                PageId tempNextPage = new PageId(
+                    buffer.getInt(DBConfig.pagesize - 8),
+                    buffer.getInt(DBConfig.pagesize - 4)
+                );
 
-                // Charge l'identifiant de la prochaine header Page
-                nextPage.FileIdx = buffer.getInt(DBConfig.pagesize - 8);
-                //ICI IL N'EXISTE PLUS
-                nextPage.PageIdx = buffer.getInt(DBConfig.pagesize - 4);
-                System.out.println(currentPage);
-                System.out.println("parcour... next id = "+nextPage);
+                // Libère l'ancienne header Page
+                bm.freePage(currentPage, false);
 
-                // Libère l'anciennes header pages
-                bm.freePage(currentPage, false); // Non modifiée, donc false
+                // Charge la prochaine page en mémoire
+                buffer = bm.getPage(tempNextPage);
 
-                // Charge la prochaine page en mémoir
-                buffer = bm.getPage(nextPage);
-
-                // Sauvegarde l'@ de l'ancienne page
-                currentPage.FileIdx = nextPage.FileIdx;
-                currentPage.PageIdx = nextPage.PageIdx;
+                // Passe à la page suivante
+                currentPage = tempNextPage;
 
                 // Incrémente le compteur de header pages
                 nbHeaderPage++;
-            }            
-            // À ce moment, 'buffer' contient la dernière header page et 'nextPage' l'@ de la derniere header Page
+            }
+            // À ce moment, 'buffer' contient la dernière header page et 'currentPage' l'@ de la derniere header Page
 
             // Calcule le nombre d'entrées déjà utilisées dans les pages précédentes
             int entriesBefore = (nbHeaderPage == 1) 
@@ -329,45 +318,36 @@ public class Relation {
                 // Alloue une nouvelle header page
                 PageId newHeaderPage = dskm.AllocPage();
                 
-                System.out.println("new header page = "+newHeaderPage);
-                
                 // Ajoute le chaînage vers la nouvelle page
                 buffer.putInt(DBConfig.pagesize - 8, newHeaderPage.FileIdx);
                 buffer.putInt(DBConfig.pagesize - 4, newHeaderPage.PageIdx);
 
-                System.out.println("ecris dans le buffer: "+buffer.getInt(DBConfig.pagesize - 8)+"  "+buffer.getInt(DBConfig.pagesize - 4));
-
                 // Libère la page actuelle avec indication de modification
-                bm.freePage(nextPage, true);
+                bm.freePage(currentPage, true);
 
                 // Initialise la nouvelle header page
                 // Charge dans le buffer
                 buffer = bm.getPage(newHeaderPage);
-                buffer.putInt(DBConfig.pagesize - 4, -1); // Indique qu'il n'y a pas de page suivante
+                buffer.putInt(DBConfig.pagesize-4, -1); // Indique qu'il n'y a pas de page suivante
 
                 // Remet l'offset à 0 dans la nouvelle page
                 offset = 0;
 
                 // Maintenant la dernière page devient celle qu'on a alloué
-                nextPage.FileIdx = newHeaderPage.FileIdx;
-                nextPage.PageIdx = newHeaderPage.PageIdx;
+                currentPage = newHeaderPage;
             }
-            // Écrit les informations de la nouvelle page dans la header Page
+            // 'buffer' contient la derniere header Page
+            // Écrit les informations de la nouvelle data page dans la dernière header Page
             buffer.putInt(offset, id.FileIdx);      // Fichier de la nouvelle page
             buffer.putInt(offset + 4, id.PageIdx);  // Index de la nouvelle page
-            buffer.putInt(offset + 8, DBConfig.pagesize - 8);  // octets libre
+            buffer.putInt(offset + 8, DBConfig.pagesize - 8);  // octets libre -8 pour page directory
 
             // Libère la dernière header page avec indication de modification
-            bm.freePage(nextPage, true);
+            bm.freePage(currentPage, true);
 
-            bm.freePage(headerPageId, false);
-
-            //System.out.println("avant le get dernier int ecris = "+bm.getPage(headerPageId).getInt(DBConfig.pagesize - 4));
             // Ecrit l'offset directory de la nouvelle data Page
-            buffer = bm.getPage(id);    // Charge la nouvelle dataPage
-
-            //System.out.println("apres le get dernier int ecris = "+bm.getPage(headerPageId).getInt(DBConfig.pagesize - 4));
-            bm.freePage(headerPageId, false);
+            // Charge la nouvelle dataPage
+            buffer = bm.getPage(id);
 
             buffer.putInt(DBConfig.pagesize - 4, 0);    // Ecrit le début de l'espace disponible
             buffer.putInt(DBConfig.pagesize - 8, 0);    // Ecrit le nombre de slot dedans
@@ -393,11 +373,8 @@ public class Relation {
 
         // Contient la header Page courante
         PageId currentPage = new PageId();
-
-        // PageId de la page suivante dans le chainage
-        PageId nextPage = new PageId(headerPageId.FileIdx, headerPageId.PageIdx);
-
-        int offset = 4;  // Premiers 4 octets pour le compteur
+        currentPage = headerPageId; // Initialise à la 1er header page
+        int offset = 4;  // Premiers 4 octets pour le nombre de data Page
 
         try {
             // Charger la 1er Header Page en mémoire
@@ -405,7 +382,7 @@ public class Relation {
             // Recupere le nombre de data Page
             int nbDataPage = buffer.getInt(0);
 
-            // tantqu'il y a du chainage faire
+            // tantqu'on a pas toutes les data Page
             while (pageIds.size() < nbDataPage) {
                 // Parcourir chaque entrée d'une header Page pour lire les PageId
                 while ((pageIds.size() < nbDataPage) && (offset < DBConfig.pagesize-(8+12))) {
@@ -416,30 +393,29 @@ public class Relation {
                     // Créer un PageId avec fileIdx et pageIdx, puis l'ajouter à la liste
                     pageIds.add(new PageId(fileIdx, pageIdx));
 
-                    offset += 4;   // Avance dans la page de 4 pour sauter l'espace libre coder sur 4octets
+                    offset += 12;   // Avance dans la page de 4 pour sauter l'espace libre coder sur 4octets
                 }
-
-                // current recoit l'ancienne valeur
-                currentPage.FileIdx = nextPage.FileIdx; currentPage.PageIdx = nextPage.PageIdx;
-
-                // Extrait l'adresse de la prochaine page de header Page
-                nextPage.FileIdx = buffer.getInt(DBConfig.pagesize-8);
-                nextPage.PageIdx = buffer.getInt(DBConfig.pagesize-4);
-
+                // Crée une nouvelle instance temporaire pour stocker la prochaine page
+                PageId tempNextPage = new PageId(
+                    buffer.getInt(DBConfig.pagesize - 8),
+                    buffer.getInt(DBConfig.pagesize - 4)
+                );
                 // Libère l'ancienne valeur
                 bm.freePage(currentPage, false);
+                // Passe à la page suivante
+                currentPage = tempNextPage;
 
                 // Si il y a du chainage
-                if(nextPage.PageIdx != -1)
+                if(tempNextPage.PageIdx != -1)
                     // charge la header page chainé suivante
-                    buffer = bm.getPage(nextPage);
+                    buffer = bm.getPage(tempNextPage);
 
                 offset = 0; // RAZ l'offset
             }
         } catch(Exception e) {
             e.printStackTrace();
             // Libérer la page courrante en cas d'excpetion
-            bm.freePage(nextPage, false); // False car pas de modification
+            bm.freePage(currentPage, false); // False car pas de modification
         }
         // Retourner la liste des PageIds
         return pageIds;
@@ -494,36 +470,44 @@ public class Relation {
      * @throws Exception Si une erreur se produit lors de l'insertion de l'enregistrement.
     */
     public RecordId InsertRecord(MyRecord record) throws Exception {
-        // Calculer la taille du record (offset compris :) )
-        int recordSize = record.getSizeOctet(this) + ((attribut.size()+1)*4);   // taille du record + la taille de l'offset directory du record
+        // Calculer la taille du record offset compris
+        int recordSize = record.getSizeOctet(this) + ((attribut.size()+1) * 4);   // taille du record + la taille de son l'offset directory
 
         // Contient la header Page courante
         PageId currentPage = new PageId();
 
-        PageId dataPageId = null;   // Contient le pageId de la page ou l'on insère le record
+        // Contient le pageId de la page ou l'on insère le record
+        PageId dataPageId = null;
 
+        // header Page courante
         currentPage = headerPageId;
 
+        // offset d'écriture du record en octet
         int offset = 4;
 
         try {
-            // Charger la 1er Header Page en mémoire
+            // Charge la 1er Header Page en mémoire
             ByteBuffer buffer = bm.getPage(headerPageId);
-            // Recupere le nombre de data Page
+            // Récupère le nombre de data Page
             int nbDataPage = buffer.getInt(0);
-            int cpt = 0;    // Compte combien de data Page on été essayer
+            int cpt = 0;    // Compte combien de data Page on été essayé
 
-            // tantqu'on a pas trouver de data Page pouvant aucceuillir le record ou qu'il reste des header Page a explorer
-            while (cpt < nbDataPage && dataPageId == null) {
-                // Parcourir chaque entrée d'une header Page pour lire les PageId
-                while ((cpt < nbDataPage) && dataPageId == null) {
-                    // Si la page a asser de place
-                    if (buffer.getInt(offset) >= recordSize) {
+            // Label pour quitter la boucle en la 'nommant'
+            outerLoop:
+            // tant qu'on a pas trouvé de data Page pouvant accueillir le record ou qu'il reste des header Page à explorer
+            while (cpt < nbDataPage) {
+                // Parcourir chaque entrée d'une header Page
+                while (offset < DBConfig.pagesize - 8) {
+                    // Si la page + record ne déborde pas
+                    if ((buffer.getInt(offset) + recordSize) <= DBConfig.pagesize) {
                         // Récupère l'@ de la data Page
                         dataPageId = new PageId();
                         dataPageId.FileIdx = buffer.getInt(offset-8);
-                        dataPageId.FileIdx = buffer.getInt(offset-8);
-                    }                    
+                        dataPageId.PageIdx = buffer.getInt(offset-4);
+
+                        // Quitte la boucle nommé
+                        break outerLoop;
+                    }
                     offset += 8;   // Avance dans la page de 8 pour sauter l'@ de la prochaine data Page
                     cpt++;
                 }
@@ -543,39 +527,50 @@ public class Relation {
             }
 
             // Si aucune page n'a suffisamment d'espace, en ajouter une nouvelle
-            if (dataPageId == null){
+            if (dataPageId == null)
                 dataPageId = addDataPage();
-                buffer = bm.getPage(dataPageId);
-            }
 
+            // Charge la data Page en mémoir
+            buffer = bm.getPage(dataPageId);
+            
+            // 'Buffer' contient la data Page dans laquelle on va écrire et 'dataPageId' sont PageId
+
+            System.out.println("page d'écriture = "+dataPageId);
+            
             // Insére le record dans la page sélectionnée
             int recordPos = buffer.getInt(DBConfig.pagesize - 4); // Position de l'espace libre
 
-            // Écrire le record dans le buffer
-            writeRecordToBuffer(record, buffer, recordPos);
+            System.out.println("pos ecriture = "+recordPos);
+ 
+            // Écrire le record dans le buffer et si on écrit pas exactement la taille du record c'est un échec
+            if (writeRecordToBuffer(record, buffer, recordPos) != recordSize)
+                throw new RuntimeException("échec de l'écriture du record dans le buffer");
 
+            // Si l'écriture à marché
             // Mettre à jour le Slot Directory
             int nbSlots = buffer.getInt(DBConfig.pagesize - 8); // Nombre de slots
             nbSlots++;
             buffer.putInt(DBConfig.pagesize - 8, nbSlots); // Ecris le nombre de slots incrémenté
 
-            // Met à jour le slot directory 
+            // récupere la position d'écriture du slotOffset
             int slotOffset = DBConfig.pagesize - 8 - (nbSlots * 8);
 
             buffer.putInt(slotOffset, recordPos); // Position du record
             buffer.putInt(slotOffset + 4, recordSize); // Taille du record
 
-            // Actualiser l'espace libre et le nombre de slots
+            // Actualise l'espace libre et le nombre de slots
             buffer.putInt(DBConfig.pagesize - 4, recordPos + recordSize); // Nouvelle position libre
 
-            // Libérer la page après modification
+            // Libére la page après modification
             bm.freePage(dataPageId, true); // True car la page a été modifiée
-
-            // Retourner un RecordId
-            return new RecordId(nbSlots, dataPageId); // Page ID et index du slot du record
-        } finally{
-            bm.freePage(dataPageId, false);
+            
+            // Retourne le RecordId du record composé d'un Page ID et l'index du slot
+            return new RecordId(nbSlots, dataPageId);
+        } catch(Exception e) {
+            e.printStackTrace();
+            bm.freePage(dataPageId, true);
         }
+        return null;    // Si on rencontre un problème retourne null
     }
 
     /**

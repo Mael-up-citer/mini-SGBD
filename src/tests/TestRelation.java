@@ -57,8 +57,6 @@ class TestRelation {
         record.add("Alice", DataType.CHAR); // Valeur de type CHAR
         record.add(2.1f, DataType.REAL); // Valeur de type REAL
         record.add(new Date(20, 5, 2000), DataType.DATE); // Valeur de type DATE
-        // Insere le record
-        //relation.InsertRecord(record);
     }
 
     @AfterEach
@@ -108,7 +106,7 @@ class TestRelation {
         // Écriture de l'enregistrement dans le buffer
         int writtenSize = relation.writeRecordToBuffer(record, buffer, pos);
         // Vérification de la taille écrite
-        assertTrue(writtenSize > 0, "La taille écrite doit être positive");
+        assertTrue(writtenSize > 0, "La taille écrite doit être positive non null");
 
         // Lecture de l'enregistrement depuis le buffer
         MyRecord newRecord = new MyRecord();
@@ -123,44 +121,77 @@ class TestRelation {
 
 
         // Ecriture / Lecture depuis une position imposible
-        ByteBuffer buffer2 = ByteBuffer.allocate(1024);
-        pos = 1000;
-    
+        ByteBuffer buffer2 = ByteBuffer.allocate(DBConfig.pagesize);
+        pos = DBConfig.pagesize;
+
         // Écriture de l'enregistrement dans le buffer
         writtenSize = relation.writeRecordToBuffer(record, buffer2, pos);
         // Vérification de la taille écrite
-        assertTrue(writtenSize == 0, "La taille écrite doit être null");
-    
+        assertTrue(writtenSize == 0, "La taille écrite doit être null but was "+writtenSize);
+
         // Lecture de l'enregistrement depuis le buffer
         readSize = relation.readRecordFromBuffer(newRecord, buffer, pos);
         // Vérification de la taille lu
-        assertTrue(writtenSize == 0, "La taille lu doit être null");
+        assertTrue(readSize == 0, "La taille lu doit être null but was "+readSize);
+    }
+
+    @Test
+    void testAddDataPageANDGetDataPages() throws Exception {
+        // Liste des pageId alloue a la relation
+        ArrayList<PageId> allocatePage = new ArrayList<>();
+
+        // Ajoute 1000 data Page
+        for (int i = 0; i < 1000; i++)
+            // Ajoute la nouvelle data Page à la liste
+            allocatePage.add(relation.addDataPage());
+
+        // On fait un get data Page
+        ArrayList<PageId> dataPages = (ArrayList<PageId>)relation.getDataPages();
+
+        // Test qu'il y ai autant de page alloué que trouvé
+        assertTrue(dataPages.size() == allocatePage.size(), "Il devrait y avoir exactement: "+allocatePage.size()+" data Page or on en a: "+dataPages.size());
+
+        // Test que les 2 listes soient identique
+        assertIterableEquals(allocatePage, dataPages);
     }
 */
     @Test
-    void testAddDataPageANDGetDataPages() throws Exception {
-        int i;
-        // Ajoute 10 000 data Page
-        for (i = 0; i < 10000; i++) {
-            System.out.println(i);
-            relation.addDataPage();
-        }
+    void testInsertRecord() {
+        try {
+          // Boucle pour insérer plusieurs records
+            for (int i = 0; i < 1000; i++) {
+                System.out.println("\n\nstep: "+i);
 
-        // On fait un get data Page
-        List<PageId> dataPages = relation.getDataPages();
-        assertTrue(dataPages.size() == i+1, "Il devrait y avoir exactement: "+(i+1)+" data Page or on en a: "+dataPages.size());
+                // Insertion de l'enregistrement
+                RecordId recordId = relation.InsertRecord(record);
+
+                // Vérification que l'insertion à retourné un RecordId valide
+                assertNotNull(recordId, "Le RecordId ne doit pas être null pour le record " + i);
+                assertNotNull(recordId.pageIdx, "Le RecordId doit contenir un PageId valide pour le record " + i);
+                assertTrue(recordId.pageIdx.FileIdx >= 0, "Le PageId doit être un index valide de page pour le record " + i);
+                assertTrue(recordId.pageIdx.PageIdx >= 0, "Le PageId doit être un index valide de page pour le record " + i);
+
+                // Lire la page contenant l'enregistrement inséré
+                ByteBuffer buffer = bm.getPage(recordId.pageIdx);
+                // Calcul la position en octet du tuple
+                int pos = buffer.getInt(DBConfig.pagesize - (recordId.slotIdx * 8 + 12));
+
+                System.out.println("pos lecture = "+pos);
+
+                // Lire le record depuis le buffer à la position indiquée par le RecordId
+                MyRecord readRecord = new MyRecord();
+                relation.readRecordFromBuffer(readRecord, buffer, pos);
+
+                bm.freePage(recordId.pageIdx, false);
+
+                // Vérification que le record lu correspond à celui inséré
+                assertIterableEquals(record, readRecord, "Le record inséré ne correspond pas au record lu pour l'index " + i);
+            }
+        } catch(Exception e){
+            e.printStackTrace();
+        }
     }
 /*
-    @Test
-    void testInsertRecord() throws Exception {
-        // Insertion de l'enregistrement
-        RecordId recordId = relation.InsertRecord(record);
-
-        // Vérification de l'insertion
-        assertNotNull(recordId);
-        assertTrue(recordId.pageIdx != null, "Le RecordId doit contenir un PageId");
-    }
-
     @Test
     void testGetAllRecords() throws Exception {
         MyRecord record2 = new MyRecord();
@@ -201,13 +232,6 @@ class TestRelation {
 
     @Test
     void testSetRelationName() {
-        // Définir un nom pour la relation
-        relation.setRelationName("NewRelation");
-        assertEquals("NEWRELATION", relation.getRelationName());
-    }
-
-    @Test
-    void testInvalidSetRelationName() {
         // Tentative de définir un nom invalide (null ou vide)
         assertThrows(IllegalArgumentException.class, () -> {
             relation.setRelationName("");

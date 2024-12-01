@@ -1,5 +1,6 @@
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 
 /**
  * Classe représentant une date au format jour/mois/année.
@@ -52,6 +53,35 @@ public class Date implements Comparable<Date> {
 
         // Retourne un objet Date après avoir validé la date
         return new Date(day, month, year);
+    }
+
+    /**
+     * Compare deux dates pour vérifier si elles sont égales.
+     * 
+     * @param obj L'objet à comparer.
+     * @return true si les dates sont égales, sinon false.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true; // Même instance
+
+        if (obj == null || getClass() != obj.getClass())
+            return false; // Différente classe ou null
+
+        Date other = (Date) obj;
+
+        return this.day == other.day && this.month == other.month && this.year == other.year;
+    }
+
+    /**
+     * Génère un code de hachage pour la date.
+     * 
+     * @return Le code de hachage de la date.
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(day, month, year); // Crée un hash basé sur les attributs
     }
 
     /**

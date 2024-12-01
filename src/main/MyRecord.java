@@ -1,6 +1,7 @@
 // Importation de la classe ArrayList, une structure de données de type liste dynamique, 
 // qui est utilisée comme base pour la classe MyRecord.
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Classe MyRecord qui représente un enregistrement de paires (valeur, type).
@@ -8,14 +9,50 @@ import java.util.ArrayList;
  */
 public class MyRecord extends ArrayList<Pair<Object, DataType>> {
 
-    private static final long serialVersionUID = 1L;
-
 	/**
      * Constructeur par défaut qui initialise une liste vide.
      * Appelle le constructeur de la classe parent ArrayList.
      */
     public MyRecord() {
         super(); // Initialise une liste vide dans la classe parent.
+    }
+
+    /**
+     * Méthode qui compare l'objet actuel avec un autre objet pour vérifier s'ils sont égaux.
+     * Deux objets MyRecord sont considérés comme égaux s'ils contiennent les mêmes paires 
+     * (valeur, type) dans le même ordre.
+     *
+     * @param obj L'objet à comparer avec l'objet actuel.
+     * @return true si l'objet comparé est identique (même contenu) à l'objet actuel, sinon false.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        // Vérifie si l'objet actuel est identique à l'objet comparé
+        if (this == obj)
+            return true;
+
+        // Vérifie si l'objet est null ou si les classes sont différentes
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+
+        // Cast l'objet en MyRecord
+        MyRecord other = (MyRecord) obj;
+
+        // Compare les tailles des deux listes et vérifie si elles contiennent les mêmes éléments
+        return this.size() == other.size() && this.containsAll(other);
+    }
+
+    /**
+     * Méthode qui génère un code de hachage basé sur le contenu de l'objet actuel.
+     * Le code de hachage est calculé en fonction des paires (valeur, type) présentes 
+     * dans le MyRecord, garantissant que deux objets identiques génèrent le même code de hachage.
+     *
+     * @return Un entier représentant le code de hachage de l'objet actuel.
+     */
+    @Override
+    public int hashCode() {
+        // Utilise la méthode hash de la classe Objects pour générer un code de hachage basé sur les paires
+        return Objects.hash(this); // Calcule un code de hachage basé sur le contenu de la liste
     }
 
     /**
@@ -115,14 +152,18 @@ public class MyRecord extends ArrayList<Pair<Object, DataType>> {
     }
 
     /**
-     * @return le tuple sous forme de chaine
+     * Retourne une représentation sous forme de chaîne de caractères de l'objet MyRecord.
+     * Cette méthode construit une chaîne contenant les valeurs et les types de toutes les paires
+     * présentes dans le MyRecord.
+     *
+     * @return Une chaîne représentant l'objet MyRecord avec les valeurs et types des paires.
      */
     @Override
-    public String toString(){
+    public String toString() {
         StringBuilder res = new StringBuilder();
-        // Parcour le record
-        for(int i = 0; i < this.size(); i++)
-            res.append("Value = "+getValue(i)+"     Type = "+getType(i)+"\n");
+        // Parcours le record et construit la chaîne
+        for (int i = 0; i < this.size(); i++)
+            res.append("Value = " + getValue(i) + "     Type = " + getType(i) + "\n");
 
         return res.toString();
     }

@@ -1,0 +1,48 @@
+
+Thanks for using JUnit! Support its development at https://junit.org/sponsoring
+
+
+
+step: 0
+page d'écriture = 0	1
+pos ecriture = 0
+pos2 = 120
+pos lecture = 0
+
+
+step: 1
+[36m╷[0m
+[36m├─[0m [36mJUnit Platform Suite[0m [32m✔[0m
+[36m├─[0m [36mJUnit Jupiter[0m [32m✔[0m
+[36m│  └─[0m [36mTestRelation[0m [32m✔[0m
+[36m│     └─[0m [31mtestInsertRecord()[0m [31m✘[0m [31mLe RecordId ne doit pas être null pour le record 1 ==> expected: not <null>[0m
+[36m└─[0m [36mJUnit Vintage[0m [32m✔[0m
+
+Failures (1):
+  JUnit Jupiter:TestRelation:testInsertRecord()
+    MethodSource [className = 'TestRelation', methodName = 'testInsertRecord', methodParameterTypes = '']
+    => org.opentest4j.AssertionFailedError: Le RecordId ne doit pas être null pour le record 1 ==> expected: not <null>
+       org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
+       org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+       org.junit.jupiter.api.AssertNotNull.failNull(AssertNotNull.java:49)
+       org.junit.jupiter.api.AssertNotNull.assertNotNull(AssertNotNull.java:35)
+       org.junit.jupiter.api.Assertions.assertNotNull(Assertions.java:312)
+       TestRelation.testInsertRecord(TestRelation.java:169)
+       java.base/java.lang.reflect.Method.invoke(Method.java:580)
+       java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+       java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+Test run finished after 50 ms
+[         4 containers found      ]
+[         0 containers skipped    ]
+[         4 containers started    ]
+[         0 containers aborted    ]
+[         4 containers successful ]
+[         0 containers failed     ]
+[         1 tests found           ]
+[         0 tests skipped         ]
+[         1 tests started         ]
+[         0 tests aborted         ]
+[         0 tests successful      ]
+[         1 tests failed          ]
+
