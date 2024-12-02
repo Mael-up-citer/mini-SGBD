@@ -31,6 +31,7 @@ public class DBConfig {
         for(Map.Entry<String, String> entry : configValues.entrySet())
             assignValue(entry.getKey(), entry.getValue());
 
+        // TOREAD
         // Assure que la taille maximum d'un fichier est un multiple de la taille d'une page
         dm_maxfilesize -= (dm_maxfilesize % pagesize);
     }

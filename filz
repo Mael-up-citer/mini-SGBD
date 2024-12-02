@@ -4,24 +4,5920 @@ Thanks for using JUnit! Support its development at https://junit.org/sponsoring
 
 
 step: 0
+le record à inserer occupe 120 octets
+nombre de data Page =  0
+1rst header Page =  0	0
+last header Page =  0	0
+
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 12
+espace libre après ecriture = 314
+
 page d'écriture = 0	1
 pos ecriture = 0
-pos2 = 120
-pos lecture = 0
+slotOffset = 434
 
 
 step: 1
+le record à inserer occupe 120 octets
+nombre de data Page =  1
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+314 >= 128 true
+data Page: 0	1
+pos ou ecrire l'espace libre dans la header Page = 12
+espace libre après ecriture = 186
+
+page d'écriture = 0	1
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 2
+le record à inserer occupe 120 octets
+nombre de data Page =  1
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+186 >= 128 true
+data Page: 0	1
+pos ou ecrire l'espace libre dans la header Page = 12
+espace libre après ecriture = 58
+
+page d'écriture = 0	1
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 3
+le record à inserer occupe 120 octets
+nombre de data Page =  1
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 24
+espace libre après ecriture = 314
+
+page d'écriture = 1	0
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 4
+le record à inserer occupe 120 octets
+nombre de data Page =  2
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+314 >= 128 true
+data Page: 1	0
+pos ou ecrire l'espace libre dans la header Page = 24
+espace libre après ecriture = 186
+
+page d'écriture = 1	0
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 5
+le record à inserer occupe 120 octets
+nombre de data Page =  2
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+186 >= 128 true
+data Page: 1	0
+pos ou ecrire l'espace libre dans la header Page = 24
+espace libre après ecriture = 58
+
+page d'écriture = 1	0
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 6
+le record à inserer occupe 120 octets
+nombre de data Page =  2
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 36
+espace libre après ecriture = 314
+
+page d'écriture = 1	1
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 7
+le record à inserer occupe 120 octets
+nombre de data Page =  3
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+314 >= 128 true
+data Page: 1	1
+pos ou ecrire l'espace libre dans la header Page = 36
+espace libre après ecriture = 186
+
+page d'écriture = 1	1
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 8
+le record à inserer occupe 120 octets
+nombre de data Page =  3
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+186 >= 128 true
+data Page: 1	1
+pos ou ecrire l'espace libre dans la header Page = 36
+espace libre après ecriture = 58
+
+page d'écriture = 1	1
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 9
+le record à inserer occupe 120 octets
+nombre de data Page =  3
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 48
+espace libre après ecriture = 314
+
+page d'écriture = 2	0
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 10
+le record à inserer occupe 120 octets
+nombre de data Page =  4
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+314 >= 128 true
+data Page: 2	0
+pos ou ecrire l'espace libre dans la header Page = 48
+espace libre après ecriture = 186
+
+page d'écriture = 2	0
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 11
+le record à inserer occupe 120 octets
+nombre de data Page =  4
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+186 >= 128 true
+data Page: 2	0
+pos ou ecrire l'espace libre dans la header Page = 48
+espace libre après ecriture = 58
+
+page d'écriture = 2	0
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 12
+le record à inserer occupe 120 octets
+nombre de data Page =  4
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 60
+espace libre après ecriture = 314
+
+page d'écriture = 2	1
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 13
+le record à inserer occupe 120 octets
+nombre de data Page =  5
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+314 >= 128 true
+data Page: 2	1
+pos ou ecrire l'espace libre dans la header Page = 60
+espace libre après ecriture = 186
+
+page d'écriture = 2	1
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 14
+le record à inserer occupe 120 octets
+nombre de data Page =  5
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+186 >= 128 true
+data Page: 2	1
+pos ou ecrire l'espace libre dans la header Page = 60
+espace libre après ecriture = 58
+
+page d'écriture = 2	1
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 15
+le record à inserer occupe 120 octets
+nombre de data Page =  5
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 72
+espace libre après ecriture = 314
+
+page d'écriture = 3	0
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 16
+le record à inserer occupe 120 octets
+nombre de data Page =  6
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+314 >= 128 true
+data Page: 3	0
+pos ou ecrire l'espace libre dans la header Page = 72
+espace libre après ecriture = 186
+
+page d'écriture = 3	0
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 17
+le record à inserer occupe 120 octets
+nombre de data Page =  6
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+186 >= 128 true
+data Page: 3	0
+pos ou ecrire l'espace libre dans la header Page = 72
+espace libre après ecriture = 58
+
+page d'écriture = 3	0
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 18
+le record à inserer occupe 120 octets
+nombre de data Page =  6
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 84
+espace libre après ecriture = 314
+
+page d'écriture = 3	1
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 19
+le record à inserer occupe 120 octets
+nombre de data Page =  7
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+314 >= 128 true
+data Page: 3	1
+pos ou ecrire l'espace libre dans la header Page = 84
+espace libre après ecriture = 186
+
+page d'écriture = 3	1
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 20
+le record à inserer occupe 120 octets
+nombre de data Page =  7
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+186 >= 128 true
+data Page: 3	1
+pos ou ecrire l'espace libre dans la header Page = 84
+espace libre après ecriture = 58
+
+page d'écriture = 3	1
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 21
+le record à inserer occupe 120 octets
+nombre de data Page =  7
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 96
+espace libre après ecriture = 314
+
+page d'écriture = 4	0
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 22
+le record à inserer occupe 120 octets
+nombre de data Page =  8
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+314 >= 128 true
+data Page: 4	0
+pos ou ecrire l'espace libre dans la header Page = 96
+espace libre après ecriture = 186
+
+page d'écriture = 4	0
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 23
+le record à inserer occupe 120 octets
+nombre de data Page =  8
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+186 >= 128 true
+data Page: 4	0
+pos ou ecrire l'espace libre dans la header Page = 96
+espace libre après ecriture = 58
+
+page d'écriture = 4	0
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 24
+le record à inserer occupe 120 octets
+nombre de data Page =  8
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 108
+espace libre après ecriture = 314
+
+page d'écriture = 4	1
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 25
+le record à inserer occupe 120 octets
+nombre de data Page =  9
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+314 >= 128 true
+data Page: 4	1
+pos ou ecrire l'espace libre dans la header Page = 108
+espace libre après ecriture = 186
+
+page d'écriture = 4	1
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 26
+le record à inserer occupe 120 octets
+nombre de data Page =  9
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+186 >= 128 true
+data Page: 4	1
+pos ou ecrire l'espace libre dans la header Page = 108
+espace libre après ecriture = 58
+
+page d'écriture = 4	1
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 27
+le record à inserer occupe 120 octets
+nombre de data Page =  9
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 120
+espace libre après ecriture = 314
+
+page d'écriture = 5	0
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 28
+le record à inserer occupe 120 octets
+nombre de data Page =  10
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+314 >= 128 true
+data Page: 5	0
+pos ou ecrire l'espace libre dans la header Page = 120
+espace libre après ecriture = 186
+
+page d'écriture = 5	0
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 29
+le record à inserer occupe 120 octets
+nombre de data Page =  10
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+186 >= 128 true
+data Page: 5	0
+pos ou ecrire l'espace libre dans la header Page = 120
+espace libre après ecriture = 58
+
+page d'écriture = 5	0
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 30
+le record à inserer occupe 120 octets
+nombre de data Page =  10
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 132
+espace libre après ecriture = 314
+
+page d'écriture = 5	1
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 31
+le record à inserer occupe 120 octets
+nombre de data Page =  11
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+314 >= 128 true
+data Page: 5	1
+pos ou ecrire l'espace libre dans la header Page = 132
+espace libre après ecriture = 186
+
+page d'écriture = 5	1
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 32
+le record à inserer occupe 120 octets
+nombre de data Page =  11
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+186 >= 128 true
+data Page: 5	1
+pos ou ecrire l'espace libre dans la header Page = 132
+espace libre après ecriture = 58
+
+page d'écriture = 5	1
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 33
+le record à inserer occupe 120 octets
+nombre de data Page =  11
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 144
+espace libre après ecriture = 314
+
+page d'écriture = 6	0
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 34
+le record à inserer occupe 120 octets
+nombre de data Page =  12
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+314 >= 128 true
+data Page: 6	0
+pos ou ecrire l'espace libre dans la header Page = 144
+espace libre après ecriture = 186
+
+page d'écriture = 6	0
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 35
+le record à inserer occupe 120 octets
+nombre de data Page =  12
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+186 >= 128 true
+data Page: 6	0
+pos ou ecrire l'espace libre dans la header Page = 144
+espace libre après ecriture = 58
+
+page d'écriture = 6	0
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 36
+le record à inserer occupe 120 octets
+nombre de data Page =  12
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 156
+espace libre après ecriture = 314
+
+page d'écriture = 6	1
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 37
+le record à inserer occupe 120 octets
+nombre de data Page =  13
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+314 >= 128 true
+data Page: 6	1
+pos ou ecrire l'espace libre dans la header Page = 156
+espace libre après ecriture = 186
+
+page d'écriture = 6	1
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 38
+le record à inserer occupe 120 octets
+nombre de data Page =  13
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+186 >= 128 true
+data Page: 6	1
+pos ou ecrire l'espace libre dans la header Page = 156
+espace libre après ecriture = 58
+
+page d'écriture = 6	1
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 39
+le record à inserer occupe 120 octets
+nombre de data Page =  13
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 168
+espace libre après ecriture = 314
+
+page d'écriture = 7	0
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 40
+le record à inserer occupe 120 octets
+nombre de data Page =  14
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+314 >= 128 true
+data Page: 7	0
+pos ou ecrire l'espace libre dans la header Page = 168
+espace libre après ecriture = 186
+
+page d'écriture = 7	0
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 41
+le record à inserer occupe 120 octets
+nombre de data Page =  14
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+186 >= 128 true
+data Page: 7	0
+pos ou ecrire l'espace libre dans la header Page = 168
+espace libre après ecriture = 58
+
+page d'écriture = 7	0
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 42
+le record à inserer occupe 120 octets
+nombre de data Page =  14
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 180
+espace libre après ecriture = 314
+
+page d'écriture = 7	1
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 43
+le record à inserer occupe 120 octets
+nombre de data Page =  15
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+314 >= 128 true
+data Page: 7	1
+pos ou ecrire l'espace libre dans la header Page = 180
+espace libre après ecriture = 186
+
+page d'écriture = 7	1
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 44
+le record à inserer occupe 120 octets
+nombre de data Page =  15
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+186 >= 128 true
+data Page: 7	1
+pos ou ecrire l'espace libre dans la header Page = 180
+espace libre après ecriture = 58
+
+page d'écriture = 7	1
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 45
+le record à inserer occupe 120 octets
+nombre de data Page =  15
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 192
+espace libre après ecriture = 314
+
+page d'écriture = 8	0
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 46
+le record à inserer occupe 120 octets
+nombre de data Page =  16
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+314 >= 128 true
+data Page: 8	0
+pos ou ecrire l'espace libre dans la header Page = 192
+espace libre après ecriture = 186
+
+page d'écriture = 8	0
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 47
+le record à inserer occupe 120 octets
+nombre de data Page =  16
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+186 >= 128 true
+data Page: 8	0
+pos ou ecrire l'espace libre dans la header Page = 192
+espace libre après ecriture = 58
+
+page d'écriture = 8	0
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 48
+le record à inserer occupe 120 octets
+nombre de data Page =  16
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 204
+espace libre après ecriture = 314
+
+page d'écriture = 8	1
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 49
+le record à inserer occupe 120 octets
+nombre de data Page =  17
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+314 >= 128 true
+data Page: 8	1
+pos ou ecrire l'espace libre dans la header Page = 204
+espace libre après ecriture = 186
+
+page d'écriture = 8	1
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 50
+le record à inserer occupe 120 octets
+nombre de data Page =  17
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+186 >= 128 true
+data Page: 8	1
+pos ou ecrire l'espace libre dans la header Page = 204
+espace libre après ecriture = 58
+
+page d'écriture = 8	1
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 51
+le record à inserer occupe 120 octets
+nombre de data Page =  17
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 216
+espace libre après ecriture = 314
+
+page d'écriture = 9	0
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 52
+le record à inserer occupe 120 octets
+nombre de data Page =  18
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+314 >= 128 true
+data Page: 9	0
+pos ou ecrire l'espace libre dans la header Page = 216
+espace libre après ecriture = 186
+
+page d'écriture = 9	0
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 53
+le record à inserer occupe 120 octets
+nombre de data Page =  18
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+186 >= 128 true
+data Page: 9	0
+pos ou ecrire l'espace libre dans la header Page = 216
+espace libre après ecriture = 58
+
+page d'écriture = 9	0
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 54
+le record à inserer occupe 120 octets
+nombre de data Page =  18
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 228
+espace libre après ecriture = 314
+
+page d'écriture = 9	1
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 55
+le record à inserer occupe 120 octets
+nombre de data Page =  19
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+314 >= 128 true
+data Page: 9	1
+pos ou ecrire l'espace libre dans la header Page = 228
+espace libre après ecriture = 186
+
+page d'écriture = 9	1
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 56
+le record à inserer occupe 120 octets
+nombre de data Page =  19
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+186 >= 128 true
+data Page: 9	1
+pos ou ecrire l'espace libre dans la header Page = 228
+espace libre après ecriture = 58
+
+page d'écriture = 9	1
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 57
+le record à inserer occupe 120 octets
+nombre de data Page =  19
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 240
+espace libre après ecriture = 314
+
+page d'écriture = 10	0
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 58
+le record à inserer occupe 120 octets
+nombre de data Page =  20
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+314 >= 128 true
+data Page: 10	0
+pos ou ecrire l'espace libre dans la header Page = 240
+espace libre après ecriture = 186
+
+page d'écriture = 10	0
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 59
+le record à inserer occupe 120 octets
+nombre de data Page =  20
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+186 >= 128 true
+data Page: 10	0
+pos ou ecrire l'espace libre dans la header Page = 240
+espace libre après ecriture = 58
+
+page d'écriture = 10	0
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 60
+le record à inserer occupe 120 octets
+nombre de data Page =  20
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 252
+espace libre après ecriture = 314
+
+page d'écriture = 10	1
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 61
+le record à inserer occupe 120 octets
+nombre de data Page =  21
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+314 >= 128 true
+data Page: 10	1
+pos ou ecrire l'espace libre dans la header Page = 252
+espace libre après ecriture = 186
+
+page d'écriture = 10	1
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 62
+le record à inserer occupe 120 octets
+nombre de data Page =  21
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+186 >= 128 true
+data Page: 10	1
+pos ou ecrire l'espace libre dans la header Page = 252
+espace libre après ecriture = 58
+
+page d'écriture = 10	1
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 63
+le record à inserer occupe 120 octets
+nombre de data Page =  21
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 264
+espace libre après ecriture = 314
+
+page d'écriture = 11	0
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 64
+le record à inserer occupe 120 octets
+nombre de data Page =  22
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+314 >= 128 true
+data Page: 11	0
+pos ou ecrire l'espace libre dans la header Page = 264
+espace libre après ecriture = 186
+
+page d'écriture = 11	0
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 65
+le record à inserer occupe 120 octets
+nombre de data Page =  22
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+186 >= 128 true
+data Page: 11	0
+pos ou ecrire l'espace libre dans la header Page = 264
+espace libre après ecriture = 58
+
+page d'écriture = 11	0
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 66
+le record à inserer occupe 120 octets
+nombre de data Page =  22
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 276
+espace libre après ecriture = 314
+
+page d'écriture = 11	1
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 67
+le record à inserer occupe 120 octets
+nombre de data Page =  23
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+314 >= 128 true
+data Page: 11	1
+pos ou ecrire l'espace libre dans la header Page = 276
+espace libre après ecriture = 186
+
+page d'écriture = 11	1
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 68
+le record à inserer occupe 120 octets
+nombre de data Page =  23
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+186 >= 128 true
+data Page: 11	1
+pos ou ecrire l'espace libre dans la header Page = 276
+espace libre après ecriture = 58
+
+page d'écriture = 11	1
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 69
+le record à inserer occupe 120 octets
+nombre de data Page =  23
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 288
+espace libre après ecriture = 314
+
+page d'écriture = 12	0
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 70
+le record à inserer occupe 120 octets
+nombre de data Page =  24
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+314 >= 128 true
+data Page: 12	0
+pos ou ecrire l'espace libre dans la header Page = 288
+espace libre après ecriture = 186
+
+page d'écriture = 12	0
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 71
+le record à inserer occupe 120 octets
+nombre de data Page =  24
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+186 >= 128 true
+data Page: 12	0
+pos ou ecrire l'espace libre dans la header Page = 288
+espace libre après ecriture = 58
+
+page d'écriture = 12	0
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 72
+le record à inserer occupe 120 octets
+nombre de data Page =  24
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 300
+espace libre après ecriture = 314
+
+page d'écriture = 12	1
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 73
+le record à inserer occupe 120 octets
+nombre de data Page =  25
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+314 >= 128 true
+data Page: 12	1
+pos ou ecrire l'espace libre dans la header Page = 300
+espace libre après ecriture = 186
+
+page d'écriture = 12	1
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 74
+le record à inserer occupe 120 octets
+nombre de data Page =  25
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+186 >= 128 true
+data Page: 12	1
+pos ou ecrire l'espace libre dans la header Page = 300
+espace libre après ecriture = 58
+
+page d'écriture = 12	1
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 75
+le record à inserer occupe 120 octets
+nombre de data Page =  25
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 312
+espace libre après ecriture = 314
+
+page d'écriture = 13	0
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 76
+le record à inserer occupe 120 octets
+nombre de data Page =  26
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+314 >= 128 true
+data Page: 13	0
+pos ou ecrire l'espace libre dans la header Page = 312
+espace libre après ecriture = 186
+
+page d'écriture = 13	0
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 77
+le record à inserer occupe 120 octets
+nombre de data Page =  26
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+186 >= 128 true
+data Page: 13	0
+pos ou ecrire l'espace libre dans la header Page = 312
+espace libre après ecriture = 58
+
+page d'écriture = 13	0
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 78
+le record à inserer occupe 120 octets
+nombre de data Page =  26
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 324
+espace libre après ecriture = 314
+
+page d'écriture = 13	1
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 79
+le record à inserer occupe 120 octets
+nombre de data Page =  27
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+314 >= 128 true
+data Page: 13	1
+pos ou ecrire l'espace libre dans la header Page = 324
+espace libre après ecriture = 186
+
+page d'écriture = 13	1
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 80
+le record à inserer occupe 120 octets
+nombre de data Page =  27
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+186 >= 128 true
+data Page: 13	1
+pos ou ecrire l'espace libre dans la header Page = 324
+espace libre après ecriture = 58
+
+page d'écriture = 13	1
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 81
+le record à inserer occupe 120 octets
+nombre de data Page =  27
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 336
+espace libre après ecriture = 314
+
+page d'écriture = 14	0
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 82
+le record à inserer occupe 120 octets
+nombre de data Page =  28
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+314 >= 128 true
+data Page: 14	0
+pos ou ecrire l'espace libre dans la header Page = 336
+espace libre après ecriture = 186
+
+page d'écriture = 14	0
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 83
+le record à inserer occupe 120 octets
+nombre de data Page =  28
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+186 >= 128 true
+data Page: 14	0
+pos ou ecrire l'espace libre dans la header Page = 336
+espace libre après ecriture = 58
+
+page d'écriture = 14	0
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 84
+le record à inserer occupe 120 octets
+nombre de data Page =  28
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 348
+espace libre après ecriture = 314
+
+page d'écriture = 14	1
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 85
+le record à inserer occupe 120 octets
+nombre de data Page =  29
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+314 >= 128 true
+data Page: 14	1
+pos ou ecrire l'espace libre dans la header Page = 348
+espace libre après ecriture = 186
+
+page d'écriture = 14	1
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 86
+le record à inserer occupe 120 octets
+nombre de data Page =  29
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+186 >= 128 true
+data Page: 14	1
+pos ou ecrire l'espace libre dans la header Page = 348
+espace libre après ecriture = 58
+
+page d'écriture = 14	1
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 87
+le record à inserer occupe 120 octets
+nombre de data Page =  29
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 360
+espace libre après ecriture = 314
+
+page d'écriture = 15	0
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 88
+le record à inserer occupe 120 octets
+nombre de data Page =  30
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+314 >= 128 true
+data Page: 15	0
+pos ou ecrire l'espace libre dans la header Page = 360
+espace libre après ecriture = 186
+
+page d'écriture = 15	0
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 89
+le record à inserer occupe 120 octets
+nombre de data Page =  30
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+186 >= 128 true
+data Page: 15	0
+pos ou ecrire l'espace libre dans la header Page = 360
+espace libre après ecriture = 58
+
+page d'écriture = 15	0
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 90
+le record à inserer occupe 120 octets
+nombre de data Page =  30
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 372
+espace libre après ecriture = 314
+
+page d'écriture = 15	1
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 91
+le record à inserer occupe 120 octets
+nombre de data Page =  31
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+58 >= 128 false
+offset = 372 in header Page = 0	0
+314 >= 128 true
+data Page: 15	1
+pos ou ecrire l'espace libre dans la header Page = 372
+espace libre après ecriture = 186
+
+page d'écriture = 15	1
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 92
+le record à inserer occupe 120 octets
+nombre de data Page =  31
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+58 >= 128 false
+offset = 372 in header Page = 0	0
+186 >= 128 true
+data Page: 15	1
+pos ou ecrire l'espace libre dans la header Page = 372
+espace libre après ecriture = 58
+
+page d'écriture = 15	1
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 93
+le record à inserer occupe 120 octets
+nombre de data Page =  31
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+58 >= 128 false
+offset = 372 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 384
+espace libre après ecriture = 314
+
+page d'écriture = 16	0
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 94
+le record à inserer occupe 120 octets
+nombre de data Page =  32
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+58 >= 128 false
+offset = 372 in header Page = 0	0
+58 >= 128 false
+offset = 384 in header Page = 0	0
+314 >= 128 true
+data Page: 16	0
+pos ou ecrire l'espace libre dans la header Page = 384
+espace libre après ecriture = 186
+
+page d'écriture = 16	0
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 95
+le record à inserer occupe 120 octets
+nombre de data Page =  32
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+58 >= 128 false
+offset = 372 in header Page = 0	0
+58 >= 128 false
+offset = 384 in header Page = 0	0
+186 >= 128 true
+data Page: 16	0
+pos ou ecrire l'espace libre dans la header Page = 384
+espace libre après ecriture = 58
+
+page d'écriture = 16	0
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 96
+le record à inserer occupe 120 octets
+nombre de data Page =  32
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+58 >= 128 false
+offset = 372 in header Page = 0	0
+58 >= 128 false
+offset = 384 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 396
+espace libre après ecriture = 314
+
+page d'écriture = 16	1
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 97
+le record à inserer occupe 120 octets
+nombre de data Page =  33
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+58 >= 128 false
+offset = 372 in header Page = 0	0
+58 >= 128 false
+offset = 384 in header Page = 0	0
+58 >= 128 false
+offset = 396 in header Page = 0	0
+314 >= 128 true
+data Page: 16	1
+pos ou ecrire l'espace libre dans la header Page = 396
+espace libre après ecriture = 186
+
+page d'écriture = 16	1
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 98
+le record à inserer occupe 120 octets
+nombre de data Page =  33
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+58 >= 128 false
+offset = 372 in header Page = 0	0
+58 >= 128 false
+offset = 384 in header Page = 0	0
+58 >= 128 false
+offset = 396 in header Page = 0	0
+186 >= 128 true
+data Page: 16	1
+pos ou ecrire l'espace libre dans la header Page = 396
+espace libre après ecriture = 58
+
+page d'écriture = 16	1
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 99
+le record à inserer occupe 120 octets
+nombre de data Page =  33
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+58 >= 128 false
+offset = 372 in header Page = 0	0
+58 >= 128 false
+offset = 384 in header Page = 0	0
+58 >= 128 false
+offset = 396 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 408
+espace libre après ecriture = 314
+
+page d'écriture = 17	0
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 100
+le record à inserer occupe 120 octets
+nombre de data Page =  34
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+58 >= 128 false
+offset = 372 in header Page = 0	0
+58 >= 128 false
+offset = 384 in header Page = 0	0
+58 >= 128 false
+offset = 396 in header Page = 0	0
+58 >= 128 false
+offset = 408 in header Page = 0	0
+314 >= 128 true
+data Page: 17	0
+pos ou ecrire l'espace libre dans la header Page = 408
+espace libre après ecriture = 186
+
+page d'écriture = 17	0
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 101
+le record à inserer occupe 120 octets
+nombre de data Page =  34
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+58 >= 128 false
+offset = 372 in header Page = 0	0
+58 >= 128 false
+offset = 384 in header Page = 0	0
+58 >= 128 false
+offset = 396 in header Page = 0	0
+58 >= 128 false
+offset = 408 in header Page = 0	0
+186 >= 128 true
+data Page: 17	0
+pos ou ecrire l'espace libre dans la header Page = 408
+espace libre après ecriture = 58
+
+page d'écriture = 17	0
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 102
+le record à inserer occupe 120 octets
+nombre de data Page =  34
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+58 >= 128 false
+offset = 372 in header Page = 0	0
+58 >= 128 false
+offset = 384 in header Page = 0	0
+58 >= 128 false
+offset = 396 in header Page = 0	0
+58 >= 128 false
+offset = 408 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 420
+espace libre après ecriture = 314
+
+page d'écriture = 17	1
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 103
+le record à inserer occupe 120 octets
+nombre de data Page =  35
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+58 >= 128 false
+offset = 372 in header Page = 0	0
+58 >= 128 false
+offset = 384 in header Page = 0	0
+58 >= 128 false
+offset = 396 in header Page = 0	0
+58 >= 128 false
+offset = 408 in header Page = 0	0
+58 >= 128 false
+offset = 420 in header Page = 0	0
+314 >= 128 true
+data Page: 17	1
+pos ou ecrire l'espace libre dans la header Page = 420
+espace libre après ecriture = 186
+
+page d'écriture = 17	1
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 104
+le record à inserer occupe 120 octets
+nombre de data Page =  35
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+58 >= 128 false
+offset = 372 in header Page = 0	0
+58 >= 128 false
+offset = 384 in header Page = 0	0
+58 >= 128 false
+offset = 396 in header Page = 0	0
+58 >= 128 false
+offset = 408 in header Page = 0	0
+58 >= 128 false
+offset = 420 in header Page = 0	0
+186 >= 128 true
+data Page: 17	1
+pos ou ecrire l'espace libre dans la header Page = 420
+espace libre après ecriture = 58
+
+page d'écriture = 17	1
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 105
+le record à inserer occupe 120 octets
+nombre de data Page =  35
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+58 >= 128 false
+offset = 372 in header Page = 0	0
+58 >= 128 false
+offset = 384 in header Page = 0	0
+58 >= 128 false
+offset = 396 in header Page = 0	0
+58 >= 128 false
+offset = 408 in header Page = 0	0
+58 >= 128 false
+offset = 420 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 432
+espace libre après ecriture = 314
+
+page d'écriture = 18	0
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 106
+le record à inserer occupe 120 octets
+nombre de data Page =  36
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+58 >= 128 false
+offset = 372 in header Page = 0	0
+58 >= 128 false
+offset = 384 in header Page = 0	0
+58 >= 128 false
+offset = 396 in header Page = 0	0
+58 >= 128 false
+offset = 408 in header Page = 0	0
+58 >= 128 false
+offset = 420 in header Page = 0	0
+58 >= 128 false
+offset = 432 in header Page = 0	0
+314 >= 128 true
+data Page: 18	0
+pos ou ecrire l'espace libre dans la header Page = 432
+espace libre après ecriture = 186
+
+page d'écriture = 18	0
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 107
+le record à inserer occupe 120 octets
+nombre de data Page =  36
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+58 >= 128 false
+offset = 372 in header Page = 0	0
+58 >= 128 false
+offset = 384 in header Page = 0	0
+58 >= 128 false
+offset = 396 in header Page = 0	0
+58 >= 128 false
+offset = 408 in header Page = 0	0
+58 >= 128 false
+offset = 420 in header Page = 0	0
+58 >= 128 false
+offset = 432 in header Page = 0	0
+186 >= 128 true
+data Page: 18	0
+pos ou ecrire l'espace libre dans la header Page = 432
+espace libre après ecriture = 58
+
+page d'écriture = 18	0
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 108
+le record à inserer occupe 120 octets
+nombre de data Page =  36
+1rst header Page =  0	0
+last header Page =  0	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+58 >= 128 false
+offset = 372 in header Page = 0	0
+58 >= 128 false
+offset = 384 in header Page = 0	0
+58 >= 128 false
+offset = 396 in header Page = 0	0
+58 >= 128 false
+offset = 408 in header Page = 0	0
+58 >= 128 false
+offset = 420 in header Page = 0	0
+58 >= 128 false
+offset = 432 in header Page = 0	0
+58 >= 128 false
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 8
+espace libre après ecriture = -127
+
+page d'écriture = 18	1
+pos ecriture = 0
+slotOffset = 434
+
+
+step: 109
+le record à inserer occupe 120 octets
+nombre de data Page =  37
+1rst header Page =  0	0
+last header Page =  19	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+58 >= 128 false
+offset = 372 in header Page = 0	0
+58 >= 128 false
+offset = 384 in header Page = 0	0
+58 >= 128 false
+offset = 396 in header Page = 0	0
+58 >= 128 false
+offset = 408 in header Page = 0	0
+58 >= 128 false
+offset = 420 in header Page = 0	0
+58 >= 128 false
+offset = 432 in header Page = 0	0
+58 >= 128 false
+old header Page = 0	0
+new header Page = 19	0
+switch header Page: 19	0
+offset = 8 in header Page = 19	0
+442 >= 128 true
+data Page: 18	1
+pos ou ecrire l'espace libre dans la header Page = 8
+espace libre après ecriture = 314
+
+page d'écriture = 18	1
+pos ecriture = 120
+slotOffset = 426
+
+
+step: 110
+le record à inserer occupe 120 octets
+nombre de data Page =  37
+1rst header Page =  0	0
+last header Page =  19	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+58 >= 128 false
+offset = 372 in header Page = 0	0
+58 >= 128 false
+offset = 384 in header Page = 0	0
+58 >= 128 false
+offset = 396 in header Page = 0	0
+58 >= 128 false
+offset = 408 in header Page = 0	0
+58 >= 128 false
+offset = 420 in header Page = 0	0
+58 >= 128 false
+offset = 432 in header Page = 0	0
+58 >= 128 false
+old header Page = 0	0
+new header Page = 19	0
+switch header Page: 19	0
+offset = 8 in header Page = 19	0
+314 >= 128 true
+data Page: 18	1
+pos ou ecrire l'espace libre dans la header Page = 8
+espace libre après ecriture = 186
+
+page d'écriture = 18	1
+pos ecriture = 240
+slotOffset = 418
+
+
+step: 111
+le record à inserer occupe 120 octets
+nombre de data Page =  37
+1rst header Page =  0	0
+last header Page =  19	0
+
+offset = 12 in header Page = 0	0
+58 >= 128 false
+offset = 24 in header Page = 0	0
+58 >= 128 false
+offset = 36 in header Page = 0	0
+58 >= 128 false
+offset = 48 in header Page = 0	0
+58 >= 128 false
+offset = 60 in header Page = 0	0
+58 >= 128 false
+offset = 72 in header Page = 0	0
+58 >= 128 false
+offset = 84 in header Page = 0	0
+58 >= 128 false
+offset = 96 in header Page = 0	0
+58 >= 128 false
+offset = 108 in header Page = 0	0
+58 >= 128 false
+offset = 120 in header Page = 0	0
+58 >= 128 false
+offset = 132 in header Page = 0	0
+58 >= 128 false
+offset = 144 in header Page = 0	0
+58 >= 128 false
+offset = 156 in header Page = 0	0
+58 >= 128 false
+offset = 168 in header Page = 0	0
+58 >= 128 false
+offset = 180 in header Page = 0	0
+58 >= 128 false
+offset = 192 in header Page = 0	0
+58 >= 128 false
+offset = 204 in header Page = 0	0
+58 >= 128 false
+offset = 216 in header Page = 0	0
+58 >= 128 false
+offset = 228 in header Page = 0	0
+58 >= 128 false
+offset = 240 in header Page = 0	0
+58 >= 128 false
+offset = 252 in header Page = 0	0
+58 >= 128 false
+offset = 264 in header Page = 0	0
+58 >= 128 false
+offset = 276 in header Page = 0	0
+58 >= 128 false
+offset = 288 in header Page = 0	0
+58 >= 128 false
+offset = 300 in header Page = 0	0
+58 >= 128 false
+offset = 312 in header Page = 0	0
+58 >= 128 false
+offset = 324 in header Page = 0	0
+58 >= 128 false
+offset = 336 in header Page = 0	0
+58 >= 128 false
+offset = 348 in header Page = 0	0
+58 >= 128 false
+offset = 360 in header Page = 0	0
+58 >= 128 false
+offset = 372 in header Page = 0	0
+58 >= 128 false
+offset = 384 in header Page = 0	0
+58 >= 128 false
+offset = 396 in header Page = 0	0
+58 >= 128 false
+offset = 408 in header Page = 0	0
+58 >= 128 false
+offset = 420 in header Page = 0	0
+58 >= 128 false
+offset = 432 in header Page = 0	0
+58 >= 128 false
+old header Page = 0	0
+new header Page = 19	0
+switch header Page: 19	0
+offset = 8 in header Page = 19	0
+186 >= 128 true
+data Page: 18	1
+pos ou ecrire l'espace libre dans la header Page = 8
+espace libre après ecriture = 58
+
+page d'écriture = 18	1
+pos ecriture = 360
 [36m╷[0m
 [36m├─[0m [36mJUnit Platform Suite[0m [32m✔[0m
 [36m├─[0m [36mJUnit Jupiter[0m [32m✔[0m
 [36m│  └─[0m [36mTestRelation[0m [32m✔[0m
-[36m│     └─[0m [31mtestInsertRecord()[0m [31m✘[0m [31mLe RecordId ne doit pas être null pour le record 1 ==> expected: not <null>[0m
+[36m│     └─[0m [31mtestInsertRecord()[0m [31m✘[0m [31mLe RecordId ne doit pas être null pour le record 111 ==> expected: not <null>[0m
 [36m└─[0m [36mJUnit Vintage[0m [32m✔[0m
 
 Failures (1):
   JUnit Jupiter:TestRelation:testInsertRecord()
     MethodSource [className = 'TestRelation', methodName = 'testInsertRecord', methodParameterTypes = '']
-    => org.opentest4j.AssertionFailedError: Le RecordId ne doit pas être null pour le record 1 ==> expected: not <null>
+    => org.opentest4j.AssertionFailedError: Le RecordId ne doit pas être null pour le record 111 ==> expected: not <null>
        org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
        org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
        org.junit.jupiter.api.AssertNotNull.failNull(AssertNotNull.java:49)
@@ -32,7 +5928,7 @@ Failures (1):
        java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
        java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
 
-Test run finished after 50 ms
+Test run finished after 92 ms
 [         4 containers found      ]
 [         0 containers skipped    ]
 [         4 containers started    ]

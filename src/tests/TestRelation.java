@@ -171,12 +171,10 @@ class TestRelation {
                 assertTrue(recordId.pageIdx.FileIdx >= 0, "Le PageId doit être un index valide de page pour le record " + i);
                 assertTrue(recordId.pageIdx.PageIdx >= 0, "Le PageId doit être un index valide de page pour le record " + i);
 
-                // Lire la page contenant l'enregistrement inséré
+                // Charge la page contenant l'enregistrement inséré
                 ByteBuffer buffer = bm.getPage(recordId.pageIdx);
                 // Calcul la position en octet du tuple
-                int pos = buffer.getInt(DBConfig.pagesize - (recordId.slotIdx * 8 + 12));
-
-                System.out.println("pos lecture = "+pos);
+                int pos = buffer.getInt(DBConfig.pagesize - ((recordId.slotIdx-1) * 8 + 16));
 
                 // Lire le record depuis le buffer à la position indiquée par le RecordId
                 MyRecord readRecord = new MyRecord();

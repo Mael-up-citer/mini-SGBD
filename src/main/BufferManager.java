@@ -72,14 +72,13 @@ public class BufferManager{
      * @param id L'identifiant de la page à libérer.
      * @param valdirty Indique si la page a été modifiée (dirty).
      */
-    public void freePage(PageId id, boolean valdirty) throws RuntimeException{
+    public boolean freePage(PageId id, boolean valdirty) {
         AVLNode noeud = cadre.search(id); // Recherche le noeud à libérer
 
         // Si le noeud n'est pas trouvé
-        if (noeud == null) {
-            // Lève une exception
-            throw new RuntimeException("Aucun noeud ne correspond à "+id);
-        }
+        if (noeud == null)
+            return false; // retourne faux pour signaler que la liberation ne c'est pas faite
+
         noeud.dirtyFlag = (valdirty || noeud.dirtyFlag); // Déclare si la page a été modifiée et si elle a déjà été modifié on laisse à true
         noeud.pin_count--;   // Décrémenter le compteur d'utilisation
 
@@ -87,6 +86,8 @@ public class BufferManager{
         if(noeud.pin_count == 0) {
             ajoutJunk(noeud);   // L'ajoute à la junkFile
         }
+        // Si tout c'est bien passé return true
+        return true;
     }
 
     /**
