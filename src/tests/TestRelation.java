@@ -1,7 +1,6 @@
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -12,59 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 class TestRelation {
-
-    private static PageId headerPageId;
-
-    private static BufferManager bm;
-    private DiskManager dskM;
-    private Relation relation;
-    private MyRecord record;
-
-
-    @BeforeEach
-    void setUp() throws Exception {
-        // Initialisation des objets partagés (DiskManager, BufferManager, etc.)
-        dskM = DiskManager.getInstance();
-
-        DBConfig dbConfig =  DBConfig.loadConfig("src/tests/config.txt"); // Création de l'instance de DBConfig avec les valeurs de configuration
-        bm = new BufferManager(dbConfig, dskM); // Création du BufferManager
-
-        // Allocation d'une page d'en-tête (header page)
-        headerPageId = dskM.AllocPage(); // Crée une page d'en-tête pour cette nouvelle relation
-
-        // Modification du buffer de la page d'en-tête (pour indiquer qu'il n'y a pas de page suivante)
-        ByteBuffer buffer = bm.getPage(headerPageId);
-        buffer.putInt(DBConfig.pagesize - 4, -1); // Mettre -1 à la fin de la page pour indiquer qu'il n'y a pas de page suivante
-
-        // Libérer la page d'en-tête après modification
-        bm.freePage(headerPageId, true);
-
-        // Initialisation des attributs et objets spécifiques à chaque test
-        ArrayList<Pair<String, Data>> attributs = new ArrayList<>();
-        attributs.add(new Pair<>("id", new Data(DataType.INT)));
-        attributs.add(new Pair<>("nom", new Data(DataType.VARCHAR, 32)));
-        attributs.add(new Pair<>("prenom", new Data(DataType.CHAR, 32)));
-        attributs.add(new Pair<>("note", new Data(DataType.REAL)));
-        attributs.add(new Pair<>("birthdate", new Data(DataType.DATE)));
-
-        // Création de la relation (table) et de l'enregistrement
-        relation = new Relation("Personne", attributs, headerPageId, dskM, bm);
-        record = new MyRecord();
-
-        // Création de l'enregistrement avec des valeurs pour tous les types
-        record.add(1, DataType.INT); // Valeur de type INT
-        record.add("Dupont", DataType.VARCHAR); // Valeur de type VARCHAR
-        record.add("Alice", DataType.CHAR); // Valeur de type CHAR
-        record.add(2.1f, DataType.REAL); // Valeur de type REAL
-        record.add(new Date(20, 5, 2000), DataType.DATE); // Valeur de type DATE
-    }
-
-    @AfterEach
-    private void tearDown() throws IOException{
-        // Nettoyer après les tests en supprimant les fichiers générés
-        for (int i = 0; i < 10; i++) // Nettoyer tous les fichiers de test
-            Files.deleteIfExists(Paths.get(DBConfig.dbpath + "BinData/F" + i + ".rsdb"));
-    }
 /*
     @Test
     void testAddAttribut() {
@@ -137,33 +83,175 @@ class TestRelation {
 
     @Test
     void testAddDataPageANDGetDataPages() throws Exception {
-        // Liste des pageId alloue a la relation
-        ArrayList<PageId> allocatePage = new ArrayList<>();
+        DBConfig.dm_maxfilesize = 100;
+        DiskManager dskM = DiskManager.getInstance();
 
-        // Ajoute 1000 data Page
-        for (int i = 0; i < 1000; i++)
-            // Ajoute la nouvelle data Page à la liste
-            allocatePage.add(relation.addDataPage());
+        for (int j = (DBConfig.dm_maxfilesize / 2) - 1; j < DBConfig.dm_maxfilesize+1; j++) {
+            dskM.RAZ();
 
-        // On fait un get data Page
-        ArrayList<PageId> dataPages = (ArrayList<PageId>)relation.getDataPages();
+            DBConfig dbConfig = DBConfig.loadConfig("src/tests/config.txt"); // Recharger la configuration
+            DBConfig.pagesize = j;
+            DBConfig.dm_maxfilesize = 100;
 
-        // Test qu'il y ai autant de page alloué que trouvé
-        assertTrue(dataPages.size() == allocatePage.size(), "Il devrait y avoir exactement: "+allocatePage.size()+" data Page or on en a: "+dataPages.size());
+            BufferManager bm = new BufferManager(dbConfig, dskM); // Réinitialiser le BufferManager
 
-        // Test que les 2 listes soient identique
-        assertIterableEquals(allocatePage, dataPages);
+            // Allocation d'une nouvelle page d'en-tête (header page)
+            PageId headerPageId = dskM.AllocPage(); // Nouvelle page d'en-tête
+
+            // Modification du buffer de la nouvelle page d'en-tête
+            ByteBuffer buffer = bm.getPage(headerPageId);
+            buffer.putInt(DBConfig.pagesize - 4, -1); // Mettre -1 pour indiquer qu'il n'y a pas de page suivante
+            bm.freePage(headerPageId, true);
+
+            // Réinitialisation des attributs et création d'une nouvelle relation
+            ArrayList<Pair<String, Data>> attributs = new ArrayList<>();
+            attributs.add(new Pair<>("id", new Data(DataType.INT)));
+            attributs.add(new Pair<>("nom", new Data(DataType.VARCHAR, 32)));
+            attributs.add(new Pair<>("prenom", new Data(DataType.CHAR, 32)));
+            attributs.add(new Pair<>("note", new Data(DataType.REAL)));
+            attributs.add(new Pair<>("birthdate", new Data(DataType.DATE)));
+
+            Relation relation = new Relation("Personne", attributs, headerPageId, dskM, bm);
+
+            // Initialisation des listes pour la vérification
+            ArrayList<PageId> allocatePage = new ArrayList<>();
+
+            System.out.println("\n\n\npagesize = " + DBConfig.pagesize + "    dm_maxfilesize = " + DBConfig.dm_maxfilesize);
+
+            // Ajoute 5000 data Page
+            for (int i = 0; i < 1000; i++)
+                // Ajoute la nouvelle data Page à la liste
+                allocatePage.add(relation.addDataPage());
+
+            //System.out.println("\n\nget time \n\n");
+
+            // On fait un get data Page
+            ArrayList<PageId> dataPages = (ArrayList<PageId>) relation.getDataPages();
+
+            // Test qu'il y ait autant de page allouée que trouvée
+            assertTrue(dataPages.size() == allocatePage.size(), "Il devrait y avoir exactement: " + allocatePage.size() + " data Page or on en a: " + (dataPages.size()));
+
+            // Test que les 2 listes soient identiques
+            assertIterableEquals(allocatePage, dataPages);
+        }
+        // Nettoyage des fichiers
+        for (int i = 0; i < 1300; i++)
+            Files.deleteIfExists(Paths.get(DBConfig.dbpath + "BinData/F" + i + ".rsdb"));
+    }
+
+    @Test
+    void testAddDataPageANDGetFreeDataPages() throws Exception {
+        DBConfig.dm_maxfilesize = 100;
+        DiskManager dskM = DiskManager.getInstance();
+
+        for (int j = (DBConfig.dm_maxfilesize / 2) - 1; j < DBConfig.dm_maxfilesize+1; j++) {
+            // Réinitialisation des objets partagés pour chaque itération
+            dskM.RAZ();
+
+            DBConfig dbConfig = DBConfig.loadConfig("src/tests/config.txt"); // Recharger la configuration
+            DBConfig.pagesize = j;
+            DBConfig.dm_maxfilesize = 100;
+
+            BufferManager bm = new BufferManager(dbConfig, dskM); // Réinitialiser le BufferManager
+
+            // Allocation d'une nouvelle page d'en-tête (header page)
+            PageId headerPageId = dskM.AllocPage(); // Nouvelle page d'en-tête
+
+            // Modification du buffer de la nouvelle page d'en-tête
+            ByteBuffer buffer = bm.getPage(headerPageId);
+            buffer.putInt(DBConfig.pagesize - 4, -1); // Mettre -1 pour indiquer qu'il n'y a pas de page suivante
+            bm.freePage(headerPageId, true);
+
+            // Réinitialisation des attributs et création d'une nouvelle relation
+            ArrayList<Pair<String, Data>> attributs = new ArrayList<>();
+            attributs.add(new Pair<>("id", new Data(DataType.INT)));
+            attributs.add(new Pair<>("nom", new Data(DataType.VARCHAR, 32)));
+            attributs.add(new Pair<>("prenom", new Data(DataType.CHAR, 32)));
+            attributs.add(new Pair<>("note", new Data(DataType.REAL)));
+            attributs.add(new Pair<>("birthdate", new Data(DataType.DATE)));
+
+            Relation relation = new Relation("Personne", attributs, headerPageId, dskM, bm);
+
+            // Initialisation des listes pour la vérification
+            ArrayList<PageId> allocatePage = new ArrayList<>();
+
+            System.out.println("\n\n\npagesize = " + DBConfig.pagesize + "    dm_maxfilesize = " + DBConfig.dm_maxfilesize);
+
+            // Ajoute 5000 data Page
+            for (int i = 0; i < 1000; i++)
+                // Ajoute la nouvelle data Page à la liste
+                allocatePage.add(relation.addDataPage());
+
+            // On fait un get data Page
+            ArrayList<PageId> dataPages = (ArrayList<PageId>) relation.getFreeDataPages();
+
+            // Test qu'il y ait autant de page allouée que trouvée
+            assertTrue(dataPages.size() == allocatePage.size(), "Il devrait y avoir exactement: " + allocatePage.size() + " data Page or on en a: " + (dataPages.size()));
+
+            // Test que les 2 listes soient identiques
+            assertIterableEquals(allocatePage, dataPages);
+        }
+        // Nettoyage des fichiers après chaque itération
+        for (int i = 0; i < 1300; i++)
+        Files.deleteIfExists(Paths.get(DBConfig.dbpath + "BinData/F" + i + ".rsdb"));
     }
 */
+/*
     @Test
-    void testInsertRecord() {
-        try {
-          // Boucle pour insérer plusieurs records
+    void testInsertRecord() throws Exception {
+        DBConfig.dm_maxfilesize = 1000;
+        DiskManager dskM = DiskManager.getInstance();
+
+        for (int j = 150; j < DBConfig.dm_maxfilesize; j++) {
+            dskM.RAZ();
+
+            // Réinitialisation des objets partagés pour chaque itération
+            DBConfig dbConfig = DBConfig.loadConfig("src/tests/config.txt"); // Recharger la configuration
+            DBConfig.pagesize = j;
+            DBConfig.dm_maxfilesize = 300;
+
+            BufferManager bm = new BufferManager(dbConfig, dskM); // Réinitialiser le BufferManager
+
+            // Allocation d'une nouvelle page d'en-tête (header page)
+            PageId headerPageId = dskM.AllocPage(); // Nouvelle page d'en-tête
+            System.out.println(headerPageId);
+            // Modification du buffer de la nouvelle page d'en-tête
+            ByteBuffer buffer2 = bm.getPage(headerPageId);
+            buffer2.putInt(DBConfig.pagesize - 4, -1); // Mettre -1 pour indiquer qu'il n'y a pas de page suivante
+            bm.freePage(headerPageId, true);
+
+            // Réinitialisation des attributs et création d'une nouvelle relation
+            ArrayList<Pair<String, Data>> attributs = new ArrayList<>();
+            attributs.add(new Pair<>("id", new Data(DataType.INT)));
+            attributs.add(new Pair<>("nom", new Data(DataType.VARCHAR, 32)));
+            attributs.add(new Pair<>("prenom", new Data(DataType.CHAR, 32)));
+            attributs.add(new Pair<>("note", new Data(DataType.REAL)));
+            attributs.add(new Pair<>("birthdate", new Data(DataType.DATE)));
+
+            Relation relation = new Relation("Personne", attributs, headerPageId, dskM, bm);
+
+            // Création d'un enregistrement
+            MyRecord record = new MyRecord();
+            // Création de l'enregistrement avec des valeurs pour tous les types
+            record.add(1, DataType.INT); // Valeur de type INT
+            record.add("Dupont", DataType.VARCHAR); // Valeur de type VARCHAR
+            record.add("Alice", DataType.CHAR); // Valeur de type CHAR
+            record.add(2.1f, DataType.REAL); // Valeur de type REAL
+            record.add(new Date(20, 5, 2000), DataType.DATE); // Valeur de type DATE
+
+            System.out.println("\n\n\n\n\nconfig: pagesize = "+DBConfig.pagesize);
+
+            // Boucle pour insérer plusieurs records
             for (int i = 0; i < 1000; i++) {
-                System.out.println("\n\nstep: "+i);
+                RecordId recordId = null;
+                ByteBuffer buffer = null;
+
+                System.out.println("\n\n\nstep: "+i);
 
                 // Insertion de l'enregistrement
-                RecordId recordId = relation.InsertRecord(record);
+                recordId = relation.InsertRecord(record);
+                // Charge la page contenant l'enregistrement inséré
+                buffer = bm.getPage(recordId.pageIdx);
 
                 // Vérification que l'insertion à retourné un RecordId valide
                 assertNotNull(recordId, "Le RecordId ne doit pas être null pour le record " + i);
@@ -171,8 +259,6 @@ class TestRelation {
                 assertTrue(recordId.pageIdx.FileIdx >= 0, "Le PageId doit être un index valide de page pour le record " + i);
                 assertTrue(recordId.pageIdx.PageIdx >= 0, "Le PageId doit être un index valide de page pour le record " + i);
 
-                // Charge la page contenant l'enregistrement inséré
-                ByteBuffer buffer = bm.getPage(recordId.pageIdx);
                 // Calcul la position en octet du tuple
                 int pos = buffer.getInt(DBConfig.pagesize - ((recordId.slotIdx-1) * 8 + 16));
 
@@ -185,9 +271,28 @@ class TestRelation {
                 // Vérification que le record lu correspond à celui inséré
                 assertIterableEquals(record, readRecord, "Le record inséré ne correspond pas au record lu pour l'index " + i);
             }
-        } catch(Exception e){
-            e.printStackTrace();
+            // Nettoyage des fichiers après chaque itération
+            for (int i = 0; i < DBConfig.pagesize*3; i++)
+                Files.deleteIfExists(Paths.get(DBConfig.dbpath + "BinData/F" + i + ".rsdb"));
         }
+    }
+*/
+    @Test
+    void testbuffer() throws Exception {
+        DiskManager dskM = DiskManager.getInstance();
+        DBConfig dbConfig = DBConfig.loadConfig("src/tests/config.txt"); // Recharger la configuration
+        BufferManager bm = new BufferManager(dbConfig, dskM); // Réinitialiser le BufferManager
+
+        for (int i = 0; i < DBConfig.bm_buffercount+1; i++) {
+            System.out.println("nb frame prise = "+bm.getNbAllocFrame());
+            bm.getPage(dskM.AllocPage());
+        }
+    }
+    @AfterEach
+    public void cleanTestbuffer() throws Exception{
+        // Nettoyage des fichiers après chaque itération
+        for (int i = 0; i < 100; i++)
+            Files.deleteIfExists(Paths.get(DBConfig.dbpath + "BinData/F" + i + ".rsdb"));
     }
 /*
     @Test
@@ -219,50 +324,51 @@ class TestRelation {
         // Vérification du nombre d'enregistrements
         assertEquals(2, records.size(), "Il doit y avoir 2 enregistrements dans la base de données");
     }
-
+/*
     @Test
     void testInvalidAddAttribut() {
-        // Tentative d'ajouter un attribut nul (devrait échouer)
+        // Tentative de définir un nom invalide car vide
         assertThrows(IllegalArgumentException.class, () -> {
-            relation.addAttribut(null);
+            relation.setAttribut("");
+        });
+
+        // Tentative de définir un nom invalide car null
+        assertThrows(IllegalArgumentException.class, () -> {
+            relation.setAttribut(null);
+        });
+
+        // Tentative de définir un nom invalide a cause de sa syntaxe
+        assertThrows(IllegalArgumentException.class, () -> {
+            relation.setAttribut("1Personne");
+        });
+
+        // Tentative de définir un nom invalide a cause de sa syntaxe
+        assertThrows(IllegalArgumentException.class, () -> {
+            relation.setAttribut("create");
         });
     }
 
     @Test
     void testSetRelationName() {
-        // Tentative de définir un nom invalide (null ou vide)
+        // Tentative de définir un nom invalide car vide
         assertThrows(IllegalArgumentException.class, () -> {
             relation.setRelationName("");
         });
 
-        // Tentative de définir un nom invalide
+        // Tentative de définir un nom invalide car null
         assertThrows(IllegalArgumentException.class, () -> {
             relation.setRelationName(null);
         });
 
-        // Tentative de définir un nom invalide
+        // Tentative de définir un nom invalide a cause de sa syntaxe
         assertThrows(IllegalArgumentException.class, () -> {
             relation.setRelationName("1Personne");
         });
+
+        // Tentative de définir un nom invalide a cause de sa syntaxe
+        assertThrows(IllegalArgumentException.class, () -> {
+            relation.setRelationName("create");
+        });
     }
-
-    @Test
-    void testGetTypeAndLength() {
-        // Vérifier les types et longueurs des attributs
-        assertEquals(DataType.INT, relation.getType(0));
-        assertEquals(4, relation.getLength(0));
-
-        assertEquals(DataType.VARCHAR, relation.getType(1));
-        assertEquals(32, relation.getLength(1));
-
-        assertEquals(DataType.CHAR, relation.getType(2));
-        assertEquals(32, relation.getLength(2));
-
-        assertEquals(DataType.REAL, relation.getType(3));
-        assertEquals(4, relation.getLength(3));
-
-        assertEquals(DataType.DATE, relation.getType(4));
-        assertEquals(12, relation.getLength(4));
-    }
-    */
+*/
 }

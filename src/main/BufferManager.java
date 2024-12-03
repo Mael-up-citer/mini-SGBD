@@ -37,7 +37,6 @@ public class BufferManager{
      */
     public ByteBuffer getPage(PageId id) throws Exception{
         AVLNode node = cadre.search(id); // Recherche si la pageId est présente dans le buffer pool
-        //System.out.println("get " + id);
 
         // Si la page n'est pas dans le buffer pool
         if (node == null) {
@@ -49,8 +48,8 @@ public class BufferManager{
             ByteBuffer tmp = emptyBuffer.remove(emptyBuffer.size() - 1);
             dskM.ReadPage(id, tmp);
             cadre.insert(new AVLNode(id, tmp)); // Insère le nouveau noeud dans l'arbre
-            nbAllocFrame++;
-            //System.out.println("Création du noeud");
+            nbAllocFrame++; // L'AVL à une frame de plus
+
             return tmp;
         }
         // Si le noeud est dans l'arbre
@@ -60,8 +59,6 @@ public class BufferManager{
             if(node.pointeurListe != null) {
                 suppJunk(node.pointeurListe); // Retire de junkFile
             }
-
-            node.pin_count++; // Augmente le compteur d'utilisation
             return buffer;  // Retourne le buffer
         }
     }
@@ -84,6 +81,7 @@ public class BufferManager{
 
         // Si plus personne ne l'utilise, on l'ajoute à la junkFile
         if(noeud.pin_count == 0) {
+            nbAllocFrame--; // Une frame de moins qui ne peut pas etre enlevé
             ajoutJunk(noeud);   // L'ajoute à la junkFile
         }
         // Si tout c'est bien passé return true
@@ -146,7 +144,6 @@ public class BufferManager{
         switch (DBConfig.bm_policy){
             case "MRU":
                 id = last.id;
-                //System.out.println("Supression " + id);
                 noeud = cadre.delete(id);  // Enlève la frame associée dans le bufferPool
                 last = last.remove();  // Supprime le dernier élément
                 break;
@@ -164,10 +161,8 @@ public class BufferManager{
         if(noeud.dirtyFlag) {
             dskM.WritePage(id, buffer); // L'écrit en mémoire
         }
-
         buffer.clear(); // Réinitialise le buffer
         emptyBuffer.add(buffer); // Récupère le buffer vide ici
-        nbAllocFrame--;
     }
 
     /**

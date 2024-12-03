@@ -33,16 +33,19 @@ public class DiskManager {
 
     /**
      * Méthode pour obtenir l'unique instance du DiskManager.
-     * Synchronisée pour garantir qu'un seul thread peut l'appeler à la fois.
      * 
      * @return L'instance unique de DiskManager.
      * @throws Exception Si l'instance ne peut pas être créée.
      */
-    public static synchronized DiskManager getInstance() throws Exception {
+    public static DiskManager getInstance() throws Exception {
         if (instance == null) {
             instance = new DiskManager();
         }
         return instance;
+    }
+
+    public void RAZ() {
+        GlobalStorage = 0;
     }
 
     /**
@@ -123,9 +126,9 @@ public class DiskManager {
             int bytesWritten = channel.write(buffer); // Écrire le buffer dans le fichier
 
             // Vérifier si l'écriture a été complète
-            if (bytesWritten != DBConfig.pagesize) {
+            if (bytesWritten != DBConfig.pagesize)
                 throw new Exception("Erreur d'écriture : " + bytesWritten + " octets écrits au lieu de " + DBConfig.pagesize);
-            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }

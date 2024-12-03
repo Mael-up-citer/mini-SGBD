@@ -11,7 +11,7 @@ public class Relation {
     private String relationName;    // Nom de la relation
     private ArrayList<Pair<String, Data>> attribut; // Liste des attributs (nom et type de chaque colonne)
     private PageId headerPageId;    // Identifiant de la première page d'en-tête de la relation
-    private PageId LastheaderPageId;    // Identifiant de la dernière page d'en-tête de la relation
+    private PageId LastHeaderPageId;    // Identifiant de la dernière page d'en-tête de la relation
     private DiskManager dskm;       // Gestionnaire de disque pour l'allocation et la gestion des pages
     private BufferManager bm;       // Gestionnaire de buffer pour la gestion des pages en mémoire
 
@@ -35,7 +35,7 @@ public class Relation {
         this.headerPageId = headerPageId;
         this.dskm = dsmk;
         this.bm = bm;
-        LastheaderPageId = headerPageId;    // La dernière header Page est initialisé à la 1er
+        LastHeaderPageId = headerPageId;    // La dernière header Page est initialisé à la 1er
     }
 
     /**
@@ -186,67 +186,6 @@ public class Relation {
     }
 
     /**
-     * Récupère tous les identifiants de pages de données libre de la base de données.
-     *
-     * @return Une liste d'objets PageId représentant toutes les pages de données.
-    */
-    public List<PageId> getFreeDataPages() {
-        // Initialiser la liste pour stocker les PageIds
-        List<PageId> pageIds = new ArrayList<>();
-
-        PageId currentPage = new PageId();  // Contient l'id de la header Page courrente
-
-        int offset = 12;    // Premiers 4 octets pour le compteur + 8 pour l'@ de la 1er dataPage
-
-        try {
-            // Charger la 1er Header Page en mémoire
-            ByteBuffer headerData = bm.getPage(currentPage);
-            // Récupère le nombre de page référencé
-            int nbDataPage = headerData.getInt(0);
-
-            currentPage = headerPageId; // Affecte  currentPage a la 1er header Page
-
-            // tantque on n'a pas toute les pages
-            while (pageIds.size() < nbDataPage) {
-                // Parcourir chaque entrée d'une header Page pour lire les PageId
-                while ((pageIds.size() < nbDataPage) && (offset <= DBConfig.pagesize-(8+12))) {
-                    // Si la datapage est vide 8 pour le slot directory
-                    if (headerData.getInt(offset) <= 8) {
-                        // Lire le fileIdx et le pageIdx de l'entrée actuelle
-                        int fileIdx = headerData.getInt(offset - 8);
-                        int pageIdx = headerData.getInt(offset - 4);
-
-                        // Créer un PageId avec fileIdx et pageIdx, puis l'ajouter à la liste
-                        pageIds.add(new PageId(fileIdx, pageIdx));
-                    }
-                    offset += 8;   // Avance dans la page de 8 pour sauter le pointage vers la data page
-                }
-                // Libère la header Page courante
-                bm.freePage(currentPage, false);
-
-                // Extrait l'adresse de la prochaine page de header Page
-                currentPage.FileIdx = headerData.getInt(DBConfig.pagesize-8);
-                currentPage.PageIdx = headerData.getInt(DBConfig.pagesize-4);
-
-                // Si il y a du chainage
-                if(currentPage.PageIdx != -1)
-                    // charge la header page chainé suivante
-                    headerData = bm.getPage(currentPage);
-
-                offset = 8; // RAZ l'offset
-            }
-        } catch(Exception e){
-
-        }finally {
-            // Libérer la page après la lecture
-            bm.freePage(currentPage, false); // False car pas de modification
-        }
-        // Retourner la liste des PageIds
-        return pageIds;
-    }
-
-    // OPTIMISABLE !!! i1: Ne pas libere la 1er headerPage mais faire node.dirty = true :)
-    /**
      * Ajoute une nouvelle page de données à la relation.
      * Alloue une nouvelle page, met à jour le nombre de pages dans la page d'en-tête 
      * et ajoute la nouvelle page au répertoire des pages.
@@ -257,94 +196,60 @@ public class Relation {
         try {
             // Alloue une nouvelle page
             PageId id = dskm.AllocPage();
-            // Charge la header Page en mémoire
+            // Charge la 1er header Page en mémoire
             ByteBuffer buffer = bm.getPage(headerPageId);
+
+            // Calcul des limites des entrées pour chaque type de header Page
+            int maxEntriesFirstHeader = (DBConfig.pagesize - 4 - 8) / 12; // Premières 4 octets pour le compteur + 8 pour l'@
+            int maxEntriesOtherHeader = (DBConfig.pagesize - 8) / 12; // 8 octets pour le chaînage
 
             // Récupère et met à jour le nombre total de pages de données
             int nbDataPage = buffer.getInt(0);
             nbDataPage++;   // Incrémente le nombre total de pages
             buffer.putInt(0, nbDataPage); // Mise à jour dans la page d'en-tête
 
-            bm.freePage(headerPageId, true);    // Relache la page a true
-
-            // compteur de header Page initialisé à 1 car 0 impossible
-            int nbHeaderPage = 1;
-
-            // Calcul des limites des entrées pour chaque type de header Page
-            int maxEntriesFirstHeader = (DBConfig.pagesize - 4 - 8) / 12; // Premières 4 octets pour le compteur + 8 pour l'@
-            int maxEntriesOtherHeader = (DBConfig.pagesize - 8) / 12; // 8 octets pour le chaînage
-
-            buffer = bm.getPage(headerPageId);  // Recharge la 1er header Page
-
-            // PageId de la header Page courante
-            PageId currentPage = new PageId(headerPageId.FileIdx, headerPageId.PageIdx);
-
-            // Parcourt les header Pages pour trouver la dernière
-            while ((buffer.getInt(DBConfig.pagesize - 4)) != -1) {
-                // Crée une nouvelle instance temporaire pour stocker la prochaine page
-                PageId tempNextPage = new PageId(
-                    buffer.getInt(DBConfig.pagesize - 8),
-                    buffer.getInt(DBConfig.pagesize - 4)
-                );
-
-                // Libère l'ancienne header Page
-                bm.freePage(currentPage, false);
-
-                // Charge la prochaine page en mémoire
-                buffer = bm.getPage(tempNextPage);
-
-                // Passe à la page suivante
-                currentPage = tempNextPage;
-
-                // Incrémente le compteur de header pages
-                nbHeaderPage++;
-            }
-            // À ce moment, 'buffer' contient la dernière header page et 'currentPage' l'@ de la derniere header Page
-
-            // Calcule le nombre d'entrées déjà utilisées dans les pages précédentes
-            int entriesBefore = (nbHeaderPage == 1) 
-                                ? 0 
-                                : maxEntriesFirstHeader + (maxEntriesOtherHeader * (nbHeaderPage - 2));
-
-            // Calcule l'index relatif de l'entrée dans la page courante
-            int entryIndexInCurrentPage = nbDataPage - entriesBefore - 1;
-
             // Calcule l'offset pour ajouter la nouvelle entrée
-            int offset = (entryIndexInCurrentPage * 12) + (nbHeaderPage == 1 ? 4 : 0); // 4 octets en première page
+            int offset = 4+((nbDataPage-1)*12);
 
-            // Si l'offset est plus grand que la taille de la page réel (taille - chainage - espace d'une dataPage)
-            if (offset > (DBConfig.pagesize - (8+12))) {
+            // Si on a plusieurs header Page on peut libere la 1er
+            if (! LastHeaderPageId.equals(headerPageId)) {
+                bm.freePage(headerPageId, true);    // Relache la 1er header Page a true
+                buffer = bm.getPage(LastHeaderPageId);  // Charge la dernière
+                
+                // Calcule l'offset pour ajouter la nouvelle entrée
+                offset = (nbDataPage - 1) - maxEntriesFirstHeader;
+                offset = ((offset % maxEntriesOtherHeader) * 12);
+            }
+            // Si l'offset est plus grand que la taille réel de la page (taille - chainage - espace d'une dataPage)
+            if ((offset > (DBConfig.pagesize - (8+12))) || (offset <= 0)) {
                 // Alloue une nouvelle header page
                 PageId newHeaderPage = dskm.AllocPage();
-                // MAJ la dernière header Page
-                LastheaderPageId = newHeaderPage;
 
                 // Ajoute le chaînage vers la nouvelle page
                 buffer.putInt(DBConfig.pagesize - 8, newHeaderPage.FileIdx);
                 buffer.putInt(DBConfig.pagesize - 4, newHeaderPage.PageIdx);
 
                 // Libère la page actuelle avec indication de modification
-                bm.freePage(currentPage, true);
+                bm.freePage(LastHeaderPageId, true);
+
+                // MAJ la dernière header Page
+                LastHeaderPageId = newHeaderPage;
 
                 // Initialise la nouvelle header page
                 // Charge dans le buffer
-                buffer = bm.getPage(newHeaderPage);
+                buffer = bm.getPage(LastHeaderPageId);
                 buffer.putInt(DBConfig.pagesize-4, -1); // Indique qu'il n'y a pas de page suivante
 
                 // Remet l'offset à 0 dans la nouvelle page
                 offset = 0;
-
-                // Maintenant la dernière page devient celle qu'on a alloué
-                currentPage = newHeaderPage;
             }
-            // 'buffer' contient la derniere header Page
             // Écrit les informations de la nouvelle data page dans la dernière header Page
             buffer.putInt(offset, id.FileIdx);      // Fichier de la nouvelle page
             buffer.putInt(offset + 4, id.PageIdx);  // Index de la nouvelle page
             buffer.putInt(offset + 8, DBConfig.pagesize - 8);  // octets libre -8 pour page directory
 
             // Libère la dernière header page avec indication de modification
-            bm.freePage(currentPage, true);
+            bm.freePage(LastHeaderPageId, true);
 
             // Ecrit l'offset directory de la nouvelle data Page
             // Charge la nouvelle dataPage
@@ -363,6 +268,66 @@ public class Relation {
     }
 
     /**
+     * Récupère tous les identifiants de pages de données libre de la base de données.
+     *
+     * @return Une liste d'objets PageId représentant toutes les pages de données.
+    */
+    public List<PageId> getFreeDataPages() {
+        // Initialiser la liste pour stocker les PageIds
+        List<PageId> pageIds = new ArrayList<>();
+        PageId currentPage = new PageId();  // Contient l'id de la header Page courrente
+        int offset = 4;    // Premiers 4 octets pour le compteur + 8 pour l'@ de la 1er dataPage
+
+        try {
+            // Charger la 1er Header Page en mémoire
+            ByteBuffer buffer = bm.getPage(headerPageId);
+            
+            // Récupère le nombre de page référencé
+            int nbDataPage = buffer.getInt(0);
+
+            currentPage = headerPageId; // Affecte  currentPage a la 1er header Page
+
+            // tantque on n'a pas toute les pages
+            while (pageIds.size() < nbDataPage) {
+                // Parcourir chaque entrée d'une header Page pour lire les PageId
+                while ((pageIds.size() < nbDataPage) && (offset <= DBConfig.pagesize - (8+12))) {
+                    // Si la data Page est vide (8 pour le slot directory)
+                    if (buffer.getInt(offset+8) <= (DBConfig.pagesize - 8)) {
+                        // Lire le fileIdx et le pageIdx de l'entrée actuelle
+                        int fileIdx = buffer.getInt(offset);
+                        int pageIdx = buffer.getInt(offset + 4);
+
+                        // Créer un PageId avec fileIdx et pageIdx, puis l'ajouter à la liste
+                        pageIds.add(new PageId(fileIdx, pageIdx));
+                    }
+                    offset += 12;   // Avance dans la page de 8 pour sauter le pointage vers la data page
+                }
+                // Crée une nouvelle instance temporaire pour stocker la prochaine page
+                PageId tempNextPage = new PageId(
+                    buffer.getInt(DBConfig.pagesize - 8),
+                    buffer.getInt(DBConfig.pagesize - 4)
+                );
+                // Libère la header Page courante
+                bm.freePage(currentPage, false);
+
+                // Si il y a du chainage
+                if (tempNextPage.PageIdx != -1) {
+                    currentPage = tempNextPage;
+                    // charge la header page chainé suivante
+                    buffer = bm.getPage(currentPage);
+                    offset = 0; // RAZ l'offset
+                }
+                // Sinon c'est la fin de la boucle
+            }
+        } catch(Exception e){
+            e.printStackTrace();
+            bm.freePage(currentPage, false); // En cas d'erreur libere la header Page de travail
+        }
+        // Retourner la liste des PageIds
+        return pageIds;
+    }
+
+    /**
      * Récupère tous les identifiants de pages de données de la base de données.
      *
      * @return Une liste d'objets PageId représentant toutes les pages de données.
@@ -371,7 +336,6 @@ public class Relation {
     public List<PageId> getDataPages() throws Exception {
         // Initialiser la liste pour stocker les PageIds
         List<PageId> pageIds = new ArrayList<>();
-
         // Contient la header Page courante
         PageId currentPage = new PageId();
         currentPage = headerPageId; // Initialise à la 1er header page
@@ -385,8 +349,11 @@ public class Relation {
 
             // tantqu'on a pas toutes les data Page
             while (pageIds.size() < nbDataPage) {
+
+                //System.out.println("offset = "+offset);
+
                 // Parcourir chaque entrée d'une header Page pour lire les PageId
-                while ((pageIds.size() < nbDataPage) && (offset < DBConfig.pagesize-(8+12))) {
+                while ((pageIds.size() < nbDataPage) && (offset <= DBConfig.pagesize-(8+12))) {
                     // Lire le fileIdx et le pageIdx de l'entrée actuelle
                     int fileIdx = buffer.getInt(offset);
                     int pageIdx = buffer.getInt(offset + 4);
@@ -409,7 +376,7 @@ public class Relation {
                 // Si il y a du chainage
                 if(tempNextPage.PageIdx != -1)
                     // charge la header page chainé suivante
-                    buffer = bm.getPage(tempNextPage);
+                    buffer = bm.getPage(currentPage);
 
                 offset = 0; // RAZ l'offset
             }
@@ -422,46 +389,7 @@ public class Relation {
         return pageIds;
     }
 
-    /**
-     * Récupère tous les enregistrements d'une page de données donnée.
-     *
-     * @param id L'identifiant de la page de données à traiter.
-     * @return Une liste d'objets MyRecord représentant les enregistrements trouvés sur la page.
-     * @throws Exception Si une erreur se produit lors de la lecture des enregistrements depuis la page.
-    */
-    public ArrayList<MyRecord> getRecordsInDataPage(PageId id) throws Exception {
-        // Initialiser la liste de records
-        ArrayList<MyRecord> records = new ArrayList<>();
-
-        try {
-            // Charger la page en mémoire
-            ByteBuffer pageData = bm.getPage(id);
-            int nbSlots = pageData.getInt(DBConfig.pagesize - 8); // Nombre de slots
-
-            // Parcourir le Slot Directory pour récupérer chaque record
-            for (int i = 0; i < nbSlots; i++) {
-                // Calculer l'offset pour chaque slot (4 octets pour position et 4 pour taille)
-                int slotOffset = DBConfig.pagesize - 8 - ((i + 1) * 8);
-                // Lire la position et la taille du record depuis le Slot Directory
-                int recordPos = pageData.getInt(slotOffset);
-                int recordSize = pageData.getInt(slotOffset + 4);
-
-                // Si la taille est non nulle, cela signifie que le record existe
-                if (recordSize > 0){
-                    records.add(new MyRecord());    // Initialise le tuple
-                    // Lire le record en utilisant une méthode de lecture depuis le buffer
-                    readRecordFromBuffer(records.get(i), pageData, recordPos);
-                }
-            }
-        } finally {
-            // Libérer la page après la lecture
-            bm.freePage(id, false); // False car pas de modification
-        }
-        // Retourner la liste de records
-        return records;
-    }
-
-    /**
+/**
      * Insère un enregistrement dans la table. Si une page de données
      * avec suffisamment d'espace est trouvée, l'enregistrement est inséré dans celle-ci.
      * Sinon, une nouvelle page est ajoutée à la base de données.
@@ -498,7 +426,7 @@ public class Relation {
 
             System.out.println("nombre de data Page =  "+nbDataPage);
             System.out.println("1rst header Page =  "+headerPageId);
-            System.out.println("last header Page =  "+LastheaderPageId+"\n");
+            System.out.println("last header Page =  "+LastHeaderPageId+"\n");
 
             // Label pour quitter la boucle en la nommant
             outerLoop:
@@ -507,8 +435,8 @@ public class Relation {
                 // Parcourir chaque entrée d'une header Page
                 while ((offset < DBConfig.pagesize - 8) && (cpt < nbDataPage)) {
 
-                    System.out.println("offset = "+offset+" in header Page = "+currentPage);
-                    System.out.println(buffer.getInt(offset)+" >= "+(recordSize + 8)+" "+((buffer.getInt(offset)) >= (recordSize + 8)));
+                    //System.out.println("offset = "+offset+" in header Page = "+currentPage);
+                    //System.out.println(buffer.getInt(offset)+" >= "+(recordSize + 8)+" "+((buffer.getInt(offset)) >= (recordSize + 8)));
 
                     // Si l'espace libre >= à la taille du record + son offset directory
                     if ((buffer.getInt(offset)) >= (recordSize + 8)) {
@@ -535,10 +463,6 @@ public class Relation {
 
                 // Si il y a du chainage
                 if (tempNextPage.PageIdx != -1) {
-
-                    System.out.println("old header Page = "+currentPage);
-                    System.out.println("new header Page = "+tempNextPage);
-
                     // Libère la header Page courante
                     bm.freePage(currentPage, false);
                     // charge la header page chainé suivante
@@ -556,14 +480,17 @@ public class Relation {
 
                 // Met de coter l'ancienne derniere header Page
                 PageId tmp = new PageId();
-                tmp.FileIdx = LastheaderPageId.FileIdx;
-                tmp.PageIdx = LastheaderPageId.PageIdx;
+                tmp.FileIdx = LastHeaderPageId.FileIdx;
+                tmp.PageIdx = LastHeaderPageId.PageIdx;
+
                 // Ajoute une nouvelle data page APRES la dernière header Page !
                 dataPageId = addDataPage();
 
                 // Si on a une nouvelle header Page
-                if (! tmp.equals(LastheaderPageId)) {
-                    currentPage = LastheaderPageId; // Met a jour current
+                if (! tmp.equals(LastHeaderPageId)) {
+                    bm.freePage(tmp, false);  // Libère l'ancienne header Page
+                    currentPage = LastHeaderPageId; // Met a jour current
+                    buffer = bm.getPage(currentPage);  // Charge la dernière header Page
                     offset = 8; // RAZ l'offset
                 }
             }
@@ -623,7 +550,7 @@ public class Relation {
             e.printStackTrace();
             // Libere les pages de travail en cas d'erreur à faux pour ne pas propager d'erreur
             bm.freePage(dataPageId, false);
-            bm.freePage(LastheaderPageId, false);
+            bm.freePage(LastHeaderPageId, false);
         }
         return null;    // Si on rencontre un problème retourne null
     }
@@ -648,6 +575,45 @@ public class Relation {
             bm.freePage(pid, false); // False car il n'y a pas eu de modification
         }
         return allRecords;
+    }
+
+    /**
+     * Récupère tous les enregistrements d'une page de données donnée.
+     *
+     * @param id L'identifiant de la page de données à traiter.
+     * @return Une liste d'objets MyRecord représentant les enregistrements trouvés sur la page.
+     * @throws Exception Si une erreur se produit lors de la lecture des enregistrements depuis la page.
+    */
+    public ArrayList<MyRecord> getRecordsInDataPage(PageId id) throws Exception {
+        // Initialiser la liste de records
+        ArrayList<MyRecord> records = new ArrayList<>();
+
+        try {
+            // Charger la page en mémoire
+            ByteBuffer pageData = bm.getPage(id);
+            int nbSlots = pageData.getInt(DBConfig.pagesize - 8); // Nombre de slots
+
+            // Parcourir le Slot Directory pour récupérer chaque record
+            for (int i = 0; i < nbSlots; i++) {
+                // Calculer l'offset pour chaque slot (4 octets pour position et 4 pour taille)
+                int slotOffset = DBConfig.pagesize - 8 - ((i + 1) * 8);
+                // Lire la position et la taille du record depuis le Slot Directory
+                int recordPos = pageData.getInt(slotOffset);
+                int recordSize = pageData.getInt(slotOffset + 4);
+
+                // Si la taille est non nulle, cela signifie que le record existe
+                if (recordSize > 0){
+                    records.add(new MyRecord());    // Initialise le tuple
+                    // Lire le record en utilisant une méthode de lecture depuis le buffer
+                    readRecordFromBuffer(records.get(i), pageData, recordPos);
+                }
+            }
+        } finally {
+            // Libérer la page après la lecture
+            bm.freePage(id, false); // False car pas de modification
+        }
+        // Retourner la liste de records
+        return records;
     }
 
     /**
@@ -722,6 +688,9 @@ public class Relation {
      * @throws IllegalArgumentException Si le nom de la relation est null ou vide.
      */
     public void setRelationName(String relationName) throws IllegalArgumentException {
+        if (relationName == null)
+            throw new IllegalArgumentException("Le nom ne peut pas etre null");
+
         relationName = relationName.toUpperCase();  // Met en majuscule la chaine
 
         // Vérification si le nom est valide
