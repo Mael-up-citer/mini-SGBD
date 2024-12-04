@@ -42,8 +42,6 @@ public class DBManager {
 
     	// Crée une nouvelle Database et l'ajoute dans la liste des database crées
         listeDatabase.put(databaseName, new HashMap<>());
-        // Informe l'utilisateur de la réussite de l'opération
-        System.out.println("Création de la base de données : " + databaseName);
     }
 
     /**
@@ -58,8 +56,6 @@ public class DBManager {
 
     	// Charge la database demandée dans current
         this.current = listeDatabase.get(databaseName);
-        // Informe l'utilisateur de la réussite de l'opération
-        System.out.println("Base de données actuelle définie sur : " + databaseName);
     }
 
     /**
@@ -108,8 +104,6 @@ public class DBManager {
 
     	// Supprime la table de current
         current.remove(nomTable);
-        //Informe l'utilisateur de la réussite de l'opération
-        System.out.println("Table " + nomTable + " supprimée de la base de données actuelle.");
     }
     
     /**
@@ -123,8 +117,6 @@ public class DBManager {
 
         // Supprime la BDD de la liste de BDD existantes
         listeDatabase.remove(databaseName);
-        // Informe l'utilisateur de la réussite de l'opération
-        System.out.println("Suppression de la base de données : " + databaseName);
     }
     
     /**
@@ -157,7 +149,6 @@ public class DBManager {
     	// Les clés de la liste sont les noms des BDD
         for(String i : listeDatabase.keySet())
         	System.out.println(i);
-
     }
     
     /**
@@ -272,7 +263,7 @@ public class DBManager {
         						 }else {
         							 dataCol = new Data(typeCol);
         						 }
-        						 RelationEnCours.addAttribut(new Pair<>(infos[0].trim(), dataCol));
+        						 RelationEnCours.setOneAttribut(new Pair<>(infos[0].trim(), dataCol));
         					 }
         					 break;
         				 default:

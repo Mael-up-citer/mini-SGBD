@@ -1,190 +1,151 @@
 /**
- * La classe Condition représente une condition d'une requête SQL dans une clause WHERE.
- * Elle permet de comparer deux termes (qui peuvent être des colonnes ou des valeurs constantes)
- * en utilisant un opérateur de comparaison (par exemple '=', '<', '>', '>=', '<=').
+ * Classe représentant une condition dans une requête SQL, par exemple : 
+ * "age > 30" ou "nom = 'John'".
  */
 public class Condition {
 
-    private final String TERME1;   // Le premier terme de la condition, peut être une colonne ou une valeur constante.
-    private final String TERME2;   // Le second terme de la condition, peut être une colonne ou une valeur constante.
-    private final String OPERATEUR; // L'opérateur de comparaison, comme '=', '<', '>', '<=', '>=', '<>'.
+    private final String terme1; // Premier terme de la condition (ex: 'age')
+    private final String operateur; // L'opérateur de comparaison (ex: '=', '>', '<', etc.)
+    private final String terme2; // Deuxième terme de la condition (ex: '30' ou 'John')
 
     /**
      * Constructeur de la classe Condition.
      * 
-     * @param terme1 Le premier terme de la condition (par exemple, un nom de colonne ou une valeur constante).
-     * @param operateur L'opérateur de comparaison (par exemple, '=', '<', '>', etc.).
-     * @param terme2 Le second terme de la condition (par exemple, un nom de colonne ou une valeur constante).
+     * @param terme1 Le premier terme de la condition (peut être un attribut ou une constante).
+     * @param operateur L'opérateur de comparaison (ex: '=', '<', etc.).
+     * @param terme2 Le deuxième terme de la condition (peut être une constante ou un attribut).
      */
     public Condition(String terme1, String operateur, String terme2) {
-        this.TERME1 = terme1.toUpperCase();
-        this.OPERATEUR = operateur;
-        this.TERME2 = terme2.toUpperCase();
+        this.terme1 = terme1.toUpperCase();  // Convertir le terme1 en majuscules pour normaliser la casse
+        this.operateur = operateur;  // Affecter l'opérateur
+        this.terme2 = terme2.toUpperCase();  // Convertir le terme2 en majuscules pour normaliser la casse
     }
 
     /**
-     * Cette méthode évalue si la condition est satisfaite par un tuple donné.
-     * Elle compare les valeurs des termes de la condition en fonction de l'opérateur spécifié.
+     * Évalue la condition en utilisant une relation et un enregistrement.
      * 
-     * @param relation La relation contenant les attributs (colonnes) et leurs types.
-     * @return true si la condition est satisfaite, false sinon.
+     * @param relation La relation dans laquelle la condition sera évaluée.
+     * @param record L'enregistrement à vérifier.
+     * @return true si la condition est satisfaite, sinon false.
+     * @throws Exception Si une erreur survient lors de l'évaluation de la condition.
      */
-    public boolean evaluate(Relation relation, MyRecord record) throws Exception{
-        // Obtenir les valeurs des termes en fonction de la colonne ou de la constante.
-        Pair<Object, DataType> value1 = getValue(TERME1, relation, record);
-        Pair<Object, DataType> value2 = getValue(TERME2, relation, record);
+    public boolean evaluate(Relation relation, MyRecord record) throws Exception {
+        // Récupérer les valeurs des termes 1 et 2 de la condition
+        Pair<Object, DataType> value1 = getValue(terme1, relation, record);
+        Pair<Object, DataType> value2 = getValue(terme2, relation, record);
 
-        // Comparer les deux valeurs selon l'opérateur.
-        return compare(value1.getFirst(), value1.getSecond(), value2.getFirst(), value2.getSecond());
+        // Comparer les deux valeurs avec le type de données du premier terme
+        return compare(value1.getFirst(), value2.getFirst(), value1.getSecond());
     }
 
     /**
-     * Cette méthode récupère la valeur d'un terme, soit à partir du tableau record (si c'est une colonne),
-     * soit comme valeur constante (si c'est une valeur directe).
+     * Récupère la valeur d'un terme, qu'il s'agisse d'un attribut dans la relation
+     * ou d'une constante.
      * 
-     * @param terme Le terme à analyser (peut être une colonne ou une valeur constante).
-     * @param relation La relation contenant les attributs (colonnes).
-     * @return La valeur du terme.
+     * @param terme Le terme à analyser (peut être une colonne ou une constante).
+     * @param relation La relation dans laquelle chercher l'attribut.
+     * @param record L'enregistrement contenant les valeurs de la relation.
+     * @return La valeur du terme et son type associé.
+     * @throws Exception Si le terme n'est pas trouvé ou ne peut pas être évalué.
      */
-    private Pair<Object, DataType> getValue(String terme, Relation relation, MyRecord record)throws Exception {
-        // Vérifier si le terme est une colonne.
-        Pair<Object, DataType> res = isAttrb(terme, relation, record);
+    private Pair<Object, DataType> getValue(String terme, Relation relation, MyRecord record) throws Exception {
+        // Vérifier si c'est un attribut dans la relation
+        Pair<Object, DataType> value = isAttrb(terme, relation, record);
 
-        return (res != null)?res:parseConstant(terme);
-    }    
+        if (value != null)
+            return value;  // Si c'est un attribut, retourner la valeur correspondante
+
+        // Si ce n'est pas un attribut, tenter de le traiter comme une constante
+        value = parseConstant(terme);
+
+        if (value != null)
+            return value;  // Si c'est une constante, retourner sa valeur
+
+        // Si ce n'est ni un attribut ni une constante, lever une exception
+        throw new Exception("Valeur ou attribut non trouvé : " + terme);
+    }
 
     /**
-     * Vérifie si un terme est une colonne (par rapport aux noms de colonnes).
+     * Vérifie si le terme donné est un attribut dans la relation.
      * 
-     * @param terme Le terme à vérifier.
-     * @param relation La relation contenant les attributs.
-     * @return true si le terme est une colonne, false sinon.
+     * @param terme Le terme à vérifier (nom de l'attribut).
+     * @param relation La relation dans laquelle chercher l'attribut.
+     * @param record L'enregistrement contenant les valeurs des attributs.
+     * @return La paire (valeur, type) de l'attribut si trouvé, sinon null.
      */
-
     private Pair<Object, DataType> isAttrb(String terme, Relation relation, MyRecord record) {
-    
-        // Parcourir les attributs pour voir si le terme correspond à un nom de colonne
-        for (int i = 0; i < relation.getAttribut().size(); i++) {
-            String attrbName = relation.getNameAttribut(i);
-    
-            // Si le terme est égal à un attribut, retourner la valeur de cet attribut
-            if (terme.equals(attrbName))
+        // Parcourir tous les attributs de la relation pour vérifier si le terme correspond à un nom d'attribut
+        for (int i = 0; i < relation.getAttribut().size(); i++)
+            // Test si le terme vaut l'attribut courrant dans la relation
+            if (terme.equalsIgnoreCase(relation.getNameAttribut(i)))
+                // Retourner la valeur de l'attribut et son type associé
                 return new Pair<>(record.getValue(i), record.getType(i));
-        }
-        // Sinon, retourne null
-        return null;
+
+        return null;  // Retourner null si ce n'est pas un attribut
     }
 
     /**
-     * Cette méthode permet de convertir une valeur constante en son type correct.
-     * Si c'est un nombre, le convertir en Integer ou Float. Si c'est une chaîne, la retourner telle quelle.
+     * Analyse un terme pour le convertir en une constante (chaîne, entier, réel).
      * 
-     * @param terme La valeur sous forme de chaîne à convertir.
-     * @return L'objet correspondant à la valeur constante (Integer, Float ou String).
+     * @param terme Le terme à analyser (une constante).
+     * @return La paire (valeur, type) correspondant à la constante.
+     * @throws Exception Si le terme ne peut pas être parsé comme une constante valide.
      */
-    private Pair<Object, DataType> parseConstant(String terme) throws Exception{
-        // Si la valeur est entre guillemets, il s'agit d'une chaîne de caractères.
+    private Pair<Object, DataType> parseConstant(String terme) throws Exception {
+        // Si le terme commence et finit par des guillemets, c'est une chaîne de caractères
         if (terme.startsWith("'") && terme.endsWith("'"))
-            return new Pair<>(terme.substring(1, terme.length() - 1), DataType.CHAR);  // Enlever les guillemets autour de la chaîne.
+            return new Pair<>(terme.substring(1, terme.length() - 1), DataType.VARCHAR);  // Chaîne de caractères
 
-        // Si la valeur est un nombre (entier ou flottant), la convertir en Integer ou Float
         try {
-            // Si c'est un int
-            if (terme.matches("-?\\d+"))
-                return new Pair<>(Integer.parseInt(terme), DataType.INT);
-            // Si c'est un float
-            else if (terme.matches("-?\\d*\\.\\d+"))
-                return new Pair<>(Float.parseFloat(terme), DataType.REAL);
-
+            // Si le terme est un nombre entier
+            if (terme.matches("-?\\d+")) {
+                return new Pair<>(Integer.parseInt(terme), DataType.INT);  // Entier
+            }
+            // Si le terme est un nombre réel
+            else if (terme.matches("-?\\d*\\.\\d+")) {
+                return new Pair<>(Float.parseFloat(terme), DataType.REAL);  // Réel
+            }
         } catch (NumberFormatException e) {
+            throw new Exception("Impossible de parser la constante : " + terme);
         }
-
-        throw new Exception("Type de "+terme+" est inconnu");
+        return null;  // Retourner null si ce n'est pas une chaîne, un entier, ou un réel
     }
 
     /**
-     * Compare deux valeurs en fonction de leur type et de l'opérateur de comparaison.
-     * La méthode gère les types de données INTEGER, REAL, CHAR/VARCHAR et DATE.
-     * Si les types sont différents, la première valeur est convertie en un type compatible avec la seconde.
-     * 
-     * @param value1 La première valeur à comparer.
-     * @param type1 Le type de la première valeur (DataType).
-     * @param value2 La deuxième valeur à comparer.
-     * @param type2 Le type de la deuxième valeur (DataType).
-     * @return true si les deux valeurs sont égales selon leur type, false sinon.
-     * @throws Exception Si les types ne sont pas compatibles ou si une exception de conversion survient.
-     */
-    private boolean compare(Object value1, DataType type1, Object value2, DataType type2) throws Exception {
-        // Si les types des deux valeurs sont identiques, on peut les comparer directement
-        if (type1 == type2) {
-            // Appeler la méthode de comparaison des valeurs en utilisant le même type
-            return compareValues(value1, value2, type1);
-        }
-
-        // Si les types sont différents, on tente de convertir la première valeur en un type compatible avec le type de la deuxième valeur
-        Object convertedValue1 = DataType.convertToCompatibleType(value1, type2);
-        
-        // Comparer la valeur convertie avec la deuxième valeur (qui est déjà du bon type)
-        return compareValues(convertedValue1, value2, type2);
-    }
-
-    /**
-     * Compare deux valeurs de même type selon le type spécifié.
-     * Cette méthode est utilisée pour comparer des entiers, des réels (floats), des chaînes de caractères (CHAR/VARCHAR),
-     * ou des dates.
+     * Méthode générique qui compare deux valeurs selon l'opérateur spécifié.
      * 
      * @param value1 La première valeur à comparer.
      * @param value2 La deuxième valeur à comparer.
-     * @param type Le type des deux valeurs (DataType).
-     * @return true si les valeurs sont égales selon leur type, false sinon.
-     * @throws Exception Si le type n'est pas pris en charge pour la comparaison.
+     * @param type Le type de données des valeurs (utilisé pour vérifier la compatibilité des types).
+     * @return true si les valeurs satisfont la condition, sinon false.
+     * @throws Exception Si les valeurs ne sont pas comparables ou si un opérateur invalide est donné.
      */
-    private boolean compareValues(Object value1, Object value2, DataType type) throws Exception {
-        // Comparer les valeurs en fonction du type
-        switch (type) {
-            case INT:
-                // Comparaison des entiers (Integer)
-                return Integer.compare((Integer) value1, (Integer) value2) == 0;
-            case REAL:
-                // Comparaison des réels (Float)
-                return Float.compare((Float) value1, (Float) value2) == 0;
-            case CHAR:
-            case VARCHAR:
-                // Comparaison des chaînes de caractères (String)
-                return value1.equals(value2);
-            case DATE:
-                // Comparaison des dates (Date)
-                return ((Date) value1).compareTo((Date) value2) == 0;
-            default:
-                // Si le type n'est pas pris en charge, lever une exception
-                throw new UnsupportedOperationException("Type non pris en charge pour la comparaison");
+    @SuppressWarnings("unchecked")  // Ignore les avertissements de type
+    private boolean compare(Object value1, Object value2, DataType type) throws Exception {
+        // Vérifier que les deux valeurs sont non nulles
+        if (value1 == null || value2 == null)
+            throw new IllegalArgumentException("Les valeurs à comparer ne peuvent pas être nulles.");
+
+        // Vérifier que les valeurs sont du même type
+        if (value1.getClass() != value2.getClass())
+            throw new IllegalArgumentException("Les valeurs à comparer doivent être du même type.");
+
+        // Comparer les valeurs en utilisant la méthode Comparable (les objets doivent être comparables)
+        Comparable<Object> comp1 = (Comparable<Object>) value1;
+        Comparable<Object> comp2 = (Comparable<Object>) value2;
+
+        System.out.println(comp1+" "+operateur+" "+comp2);
+        System.out.println(comp1.compareTo(comp2)+"\n");
+
+        // Exécution de la comparaison en fonction de l'opérateur spécifié
+        switch (operateur) {
+            case "=": return comp1.compareTo(comp2) == 0;  // égalité
+            case "<": return comp1.compareTo(comp2) < 0;   // inférieur
+            case ">": return comp1.compareTo(comp2) > 0;   // supérieur
+            case "<=": return comp1.compareTo(comp2) <= 0;  // inférieur ou égal
+            case ">=": return comp1.compareTo(comp2) >= 0;  // supérieur ou égal
+            case "<>": return comp1.compareTo(comp2) != 0;  // différent
+            default: throw new UnsupportedOperationException("Opérateur non supporté: " + operateur);
         }
-    }  
-
-    /**
-     * Retourne le premier terme de la condition.
-     * 
-     * @return Le premier terme de la condition.
-     */
-    public String getTerme1() {
-        return TERME1;
-    }
-
-    /**
-     * Retourne le second terme de la condition.
-     * 
-     * @return Le second terme de la condition.
-     */
-    public String getTerme2() {
-        return TERME2;
-    }
-
-    /**
-     * Retourne l'opérateur de comparaison de la condition.
-     * 
-     * @return L'opérateur de comparaison.
-     */
-    public String getOperateur() {
-        return OPERATEUR;
     }
 }

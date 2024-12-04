@@ -129,11 +129,11 @@ public class TestDBManager {
 		DBM.CreateDatabase("bddtest");
 		DBM.CreateDatabase("bddtest2");
 		Relation rel = new Relation("relTest", new ArrayList<>(), new PageId(3, 0), dskM, bm);
-		rel.addAttribut(new Pair<>("coltest", new Data(DataType.CHAR, 20)));
-		rel.addAttribut(new Pair<>("coltestdeux", new Data(DataType.INT)));
+		rel.setOneAttribut(new Pair<>("coltest", new Data(DataType.CHAR, 20)));
+		rel.setOneAttribut(new Pair<>("coltestdeux", new Data(DataType.INT)));
 		
 		Relation rel2 = new Relation("relTestdeux", new ArrayList<>(), new PageId(0, 2), dskM, bm);
-		rel2.addAttribut(new Pair<>("coltesttrois", new Data(DataType.DATE)));
+		rel2.setOneAttribut(new Pair<>("coltesttrois", new Data(DataType.DATE)));
 		
 		Relation rel3 = new Relation("relTesttrois", new ArrayList<>(), new PageId(3, 2), dskM, bm);
 		try{

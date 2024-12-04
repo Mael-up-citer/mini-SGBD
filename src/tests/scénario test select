@@ -1,0 +1,6 @@
+create database test
+set database test
+
+CREATE TABLE tab (C1:INT,C2:REAL,C3:INT,C4:INT,C5:INT)
+
+select * from tab t

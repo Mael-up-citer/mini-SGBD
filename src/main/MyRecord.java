@@ -70,8 +70,33 @@ public class MyRecord extends ArrayList<Pair<Object, DataType>> {
             throw new IllegalArgumentException("Type mismatch: expected " + type 
                                                + " but was " + value.getClass().getSimpleName());
         }
+        if (value instanceof String)
+            value = ((String)value).toUpperCase();
+
         // Si la vérification est réussie, ajoute la paire à la liste en utilisant la méthode de la classe parent.
         return super.add(new Pair<>(value, type));
+    }
+    
+    /**
+     * Redéfinition de la méthode {@code add} pour interdire l'ajout d'éléments dans {@code MyRecord}.
+     * 
+     * Cette méthode surcharge la méthode {@code add} héritée de {@code ArrayList} et lève une exception
+     * {@code UnsupportedOperationException} chaque fois qu'une tentative d'ajout est effectuée.
+     * 
+     * Cela empêche toute modification de la liste en interdisant l'ajout de nouveaux éléments dans l'instance
+     * de la classe {@code MyRecord}. Elle est utilisée pour garantir que la structure de données reste immuable
+     * après sa création.
+     * 
+     * @param arg L'élément à ajouter à la collection (de type {@link Pair} avec un objet et un type de données).
+     * @return Cette méthode ne retourne jamais une valeur, car elle lève systématiquement une exception.
+     * 
+     * @throws UnsupportedOperationException Si cette méthode est appelée pour tenter d'ajouter un élément.
+     *         L'exception indique que l'ajout d'éléments n'est pas autorisé dans la classe {@code MyRecord}.
+     */
+    @Override
+    public boolean add(Pair<Object, DataType> arg) throws UnsupportedOperationException {
+        // Lever une exception pour interdire l'ajout
+        throw new UnsupportedOperationException("L'ajout d'éléments par Pair est interdit dans MyRecord. Utiliser add(Object value, DataType type)");
     }
 
     /**

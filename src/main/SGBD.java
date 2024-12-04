@@ -1,5 +1,6 @@
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.regex.*;
 
 /**
  * La classe SGBD représente un système de gestion de base de données. 
@@ -44,7 +45,7 @@ public class SGBD {
         COMMANDMAP.put("CREATE DATABASE", this::processCREATEDATABASECommand);
         COMMANDMAP.put("DROP DATABASE", this::processDROPDATABASECommand);
         COMMANDMAP.put("DROP DATABASES", unused -> processDROPDATABASESCommand());
-        COMMANDMAP.put("LIST DATABASES", this::processLISTDATABASESCommand);
+        COMMANDMAP.put("LIST DATABASES", unused -> processLISTDATABASESCommand());
         COMMANDMAP.put("SET DATABASE", this::processSETDATABASECommand);
 
         COMMANDMAP.put("CREATE TABLE", this::processCREATETABLECommand);
@@ -88,7 +89,6 @@ public class SGBD {
             e.printStackTrace();   // Si une erreur survient, elle est imprimée
             System.exit(-3);       // Le programme se termine avec un code d'erreur
         }
-
         sgbd.run();  // Lancement de la boucle principale
     }
 
@@ -107,12 +107,10 @@ public class SGBD {
                 query = sc.nextLine();   // Récupère la commande de l'utilisateur et la nettoie
 
                 // Vérifier la validité de la requête avant de la traiter
-                if (isValidSQL(query)) {
+                if (isValidSQL(query))
                     assocQuery(query);      // Si valide, associer la commande à sa méthode correspondante
-                }
 
             } while (true);
-
         } catch (NoSuchElementException | IllegalStateException e) {
             // En cas d'erreur de saisie (ex : entrée vide), afficher un message d'erreur
             System.out.println("Erreur dans la saisie, veuillez réessayer.");
@@ -130,7 +128,7 @@ public class SGBD {
         query = query.trim().toUpperCase();    // Passe la chaîne de caractères en majuscules et enleve les espaces autour
         boolean succes = false;
 
-        for(int i = 2; i <=3 ; i++){
+        for (int i = 1; i <=3 ; i++) {
             String[] string = extractCommand(query, i);  // Extrait la commande et les arguments
 
             String command = string[0];             // La commande
@@ -146,9 +144,8 @@ public class SGBD {
                 break;
             }
         }
-        if(!succes) {
-            System.out.println("la commande "+query+"   n'est pas supporté par le system");
-        }
+        if(!succes)
+            System.out.println("la commande "+query+" n'est pas supporté par le system");
     }
 
     /**
@@ -183,8 +180,7 @@ public class SGBD {
             dbM.CreateDatabase(param);  // Appel à la méthode pour créer la base de données
             System.out.println("La base de données '" + param + "' a été créée avec succès.");
         } catch (Exception e) {
-            System.out.println("Erreur lors de la création de la base de données '" + param + "'.");
-            e.printStackTrace();  // Si une erreur se produit, elle est imprimée
+            System.out.println("Erreur lors de la création de la base de données '" + param + "' "+e.getMessage());
         }
     }
 
@@ -194,16 +190,16 @@ public class SGBD {
     private void processSETDATABASECommand(String param) {
         try {
             dbM.SetCurrentDatabase(param);  // Définir la base de données actuelle
+            System.out.println("Base de données actuelle définie sur : " + param);
         } catch (Exception e) {
-            System.out.println("Verifier que la base " + param + " existe dans le systeme");
-            e.printStackTrace();  // Si une erreur se produit, elle est imprimée
+            System.out.println(e.getMessage());
         }
     }
 
     /**
      * Méthode pour traiter la commande LIST DATABASES.
      */
-    private void processLISTDATABASESCommand(String param) {
+    private void processLISTDATABASESCommand() {
         dbM.ListDatabases();  // Lister les bases de données
     }
 
@@ -213,8 +209,10 @@ public class SGBD {
     private void processDROPDATABASECommand(String param) {
         try {
             dbM.RemoveDatabase(param);  // Supprimer la base de données
+            // Informe l'utilisateur de la réussite de l'opération
+            System.out.println("Suppression de la base de données : "+param);
         } catch (Exception e) {
-            System.out.println("Erreur dans la suppression de la base"+ param);
+            System.out.println("Erreur dans la suppression de la base '"+param+"': "+e.getMessage());
         }
     }
 
@@ -241,20 +239,18 @@ public class SGBD {
             int firstSpaceIndex = param.indexOf(' ');
 
             // Vérifier si un espace a été trouvé (ce qui signifie qu'il y a un nom de table suivi d'un espace)
-            if (firstSpaceIndex != -1) {
-
+            if (firstSpaceIndex != -1)
                 param = param.substring(firstSpaceIndex + 1).trim();  // Enlever le nom de la table
-            }
             
             // Étape 2: Enlever les parenthèses extérieures
-            if (param.startsWith("(") && param.endsWith(")")) {
+            if (param.startsWith("(") && param.endsWith(")"))
                 param = param.substring(1, param.length() - 1).trim();  // Supprime les parenthèses extérieures
-            }
             
             // Crée une liste d'attribut qu'on initialise avec parseRelation qui a pour but de convertir une chaine de caractère en Pair<attribut, longueur>
             ArrayList<Pair<String, Data>> attribut = parseRelation(param);
             // Instancie la relation avec les variables précédente
             Relation relation = new Relation(name, attribut, dskM.AllocPage(), dskM, bm);
+
             dbM.AddTableToCurrentDatabase(relation);  // Ajouter la table à la base de données actuelle
 
         } catch(Exception e){
@@ -287,9 +283,8 @@ public class SGBD {
             // Séparer en deux parties : nom et type
             String[] parts = paire.split(":");
     
-            if (parts.length != 2) {
+            if (parts.length != 2)
                 throw new Exception("Erreur de format dans la chaîne d'attribut : " + paire);
-            }
             
             String attName = parts[0].trim(); // Nom de l'attribut
             String typePart = parts[1].trim(); // Type de l'attribut
@@ -310,7 +305,6 @@ public class SGBD {
                 attributs.add(new Pair<>(attName, new Data(type)));
             }
         }
-    
         // Retourner la liste d'attributs
         return attributs;
     }
@@ -321,8 +315,10 @@ public class SGBD {
     private void processDROPTABLECommand(String param) {
         try {
             dbM.RemoveTableFromCurrentDatabase(param);  // Supprimer la table de la base de données actuelle
+            //Informe l'utilisateur de la réussite de l'opération
+            System.out.println("Table " + param + " supprimée de la base de données actuelle.");
         } catch (Exception e) {
-            System.out.println("Erreur dans la suppression de la table"+ param);
+            System.out.println("Erreur dans la suppression de la table '"+ param+"': "+e.getMessage());
         }
     }
 
@@ -330,7 +326,11 @@ public class SGBD {
      * Méthode pour traiter la commande LIST TABLES.
     */
     private void processLISTTABLESCommand(String param) {
-        dbM.ListTablesInCurrentDatabase();  // Lister les tables dans la base de données actuelle
+        try {
+            dbM.ListTablesInCurrentDatabase();  // Lister les tables dans la base de données actuelle
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     /**
@@ -367,12 +367,148 @@ public class SGBD {
     }
 
     /**
-     * Méthode pour traiter la commande CREATE TABLE.
+     * Méthode pour traiter la commande SELECT.
+     * @param param Commande SQL sans le mot-clé "SELECT".
      */
     private void processSELECTCommand(String param) {
-        param.toUpperCase();
+        // Expression régulière pour valider et extraire les parties de la commande
+        String selectReg = String.join("",
+            "(\\*|[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+", // '*' ou aliasRel.col1
+            "(\\s*,\\s*[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+)*)", // , aliasRel.col2, ...
+            "\\s+FROM\\s+", // FROM obligatoire
+            "([a-zA-Z0-9_]+)\\s+([a-zA-Z0-9_]+)", // nomRelation aliasRel
+            "(\\s+WHERE\\s+", // WHERE optionnel
+            "([a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+\\s*(<|>|<=|>=|=|!=)\\s*[a-zA-Z0-9_'\"]+)", // aliasRel.col OP value
+            "(\\s+AND\\s+[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+\\s*(<|>|<=|>=|=|!=)\\s*[a-zA-Z0-9_'\"]+)*", // AND aliasRel.col OP value
+            ")?$" // WHERE est optionnel
+        );
+
+        // Compiler la regex
+        Pattern pattern = Pattern.compile(selectReg, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(param);
+
+        // Si la commande correspond à la regex, extraire les informations
+        if (matcher.matches()) {
+            String attributs = matcher.group(1); // Attributs sélectionnés
+            String tableName = matcher.group(3);  // Nom de la table
+            String alias = matcher.group(4);     // Alias de la table
+            String whereConditions = matcher.group(6); // Conditions dans WHERE (optionnel)
+
+            // Charger la relation (table) de la base de données
+            Relation relation = extractRelation(tableName);
+            if (relation == null) { 
+                System.out.println("La table " + tableName + " n'existe pas dans la base de donnée courrante");
+                return; // Quitter la méthode si la table n'existe pas
+            }
+
+            // Extraire les indices des attributs à afficher
+            ArrayList<Integer> attrbToPrint = extractAttribut(attributs, relation);
+
+            // Extraire les conditions
+            ArrayList<Condition> conditions = new ArrayList<>();
+            if (whereConditions != null)
+                conditions = extractCondition(whereConditions);
+
+            // Afficher les résultats extraits
+            System.out.println("Attributs : " + attrbToPrint);
+            System.out.println("Relation : " + relation.getRelationName());
+            System.out.println("Conditions : " + conditions);
+
+            // Exécuter la commande avec les opérateurs relationnels
+            try {
+                RelationScanner scanner = new RelationScanner(relation, bm, conditions);
+                ProjectOperator projOp = new ProjectOperator(scanner, attrbToPrint);
+                RecordPrinter rp = new RecordPrinter(projOp);
+
+                rp.printAllRecord();
+            } catch(Exception e){
+                System.out.println("Erreur lors de l'exécution de la commande");
+                e.printStackTrace();
+            }
+        }
+        else
+            System.out.println("Erreur de syntaxe dans la requête.");
     }
 
+    /**
+     * Méthode pour extraire une relation (table et alias) à partir du paramètre.
+     */
+    private Relation extractRelation(String tableName) {
+        // Accéder à la base de données courante pour récupérer la table
+        HashMap<String, Relation> db = dbM.getCurrentDatabase();
+
+        // Si la base de donné courrante est pas défini
+        if (db != null)
+            return db.get(tableName);
+        // Sinon retourne null
+        return null;
+    }
+
+    /**
+     * Méthode pour extraire les attributs à afficher.
+     * @param param Partie des attributs (ex. "aliasRel.col1, aliasRel.col2").
+     * @param relation Relation contenant les attributs.
+     * @return Liste des indices des attributs dans la relation.
+     */
+    private ArrayList<Integer> extractAttribut(String param, Relation relation) {
+        ArrayList<Integer> attributesToPrint = new ArrayList<>();
+
+         // Si à '*' on les prends tous
+         if ("*".equals(param.trim())) {
+            // Si l'utilisateur veut tous les attributs
+            for (int i = 0; i < relation.getNbAttribut(); i++)
+                attributesToPrint.add(i);  // Ajouter tous les indices des attributs
+        }
+        else{
+            // Séparer les attributs par des virgules
+            String[] attrb = param.split(",");
+            HashMap<String, Integer> fromNameToIndex = new HashMap<>();
+
+            // Associer chaque attribut de la relation à son index
+            for (int i = 0; i < relation.getNbAttribut(); i++)
+                fromNameToIndex.put(relation.getNameAttribut(i), i);
+
+            // Valider et récupérer les indices
+            for (String attr : attrb) {
+                attr = attr.trim();
+                String[] parts = attr.split("\\."); // Séparer l'alias et le nom de colonne
+
+                // Récupérer l'index de la colonne
+                if (fromNameToIndex.containsKey(parts[1]))
+                    attributesToPrint.add(fromNameToIndex.get(parts[1]));
+
+                else 
+                    throw new IllegalArgumentException("Colonne inexistante : " + parts[1]);
+            }
+        }
+        return attributesToPrint;
+    }
+
+    /**
+     * Méthode pour extraire les conditions WHERE.
+     * @param param Partie WHERE (ex. "aliasRel.col1 = 10 AND aliasRel.col2 > 20").
+     * @return Liste des conditions extraites.
+     */
+    private ArrayList<Condition> extractCondition(String param) {
+        String[] conditions = param.split("\\s+AND\\s+");
+        ArrayList<Condition> res = new ArrayList<>();
+        String regex = "([a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+)(<|>|<=|>=|=|!=)([a-zA-Z0-9_'\"]+)";
+        Pattern pattern = Pattern.compile(regex);
+
+        for (String cond : conditions) {
+            Matcher matcher = pattern.matcher(cond);
+            if (matcher.matches()) {
+                String terme1 = matcher.group(1).trim();
+                String operateur = matcher.group(2).trim();
+                String terme2 = matcher.group(3).trim();
+                res.add(new Condition(terme1, operateur, terme2));
+            } else {
+                throw new IllegalArgumentException("Condition invalide : " + cond);
+            }
+        }
+
+        return res;
+    }
     /**
      * Vérifie la validité d'une requête SQL
      *
@@ -384,7 +520,6 @@ public class SGBD {
             System.out.println("Erreur : La requête ne doit pas être null.");
             return false;
         }
-
         return true;
     }
 
@@ -395,14 +530,12 @@ public class SGBD {
      */
     public static boolean isValidName(String name) {
         // Vérifie que le nom contienne quelque chose
-        if (name == null || name.isEmpty()) {
+        if (name == null || name.isEmpty())
             return false;
-        }
 
         // Le nom ne doit pas commencer par un chiffre
-        if (Character.isDigit(name.charAt(0))) {
+        if (Character.isDigit(name.charAt(0)))
             return false;
-        }
 
         // Vérifie que le nom ne contient que des lettres, des chiffres et des underscores
         if (!name.matches("^[a-zA-Z0-9_]+$")) {

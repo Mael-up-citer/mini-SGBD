@@ -1,17 +1,24 @@
+import java.util.ArrayList;
+
 /*
  * Class pour filtrer dans un record les attribut que l'on veut afficher
  */
 public class ProjectOperator implements IRecordIterator{
     RelationScanner scanner;   // l'opérateur fils est un select
-    int[] attrbWeWant;   // Correspond aux index des attrb que l'on veut afficher
+    ArrayList<Integer> attrbWeWant;   // Correspond aux index des attrb que l'on veut afficher
 
-    ProjectOperator(RelationScanner rs, int[] attrbWeWant) {
+    ProjectOperator(RelationScanner rs, ArrayList<Integer> attrbWeWant) {
         scanner = rs;
         this.attrbWeWant = attrbWeWant;
     }
 
     public MyRecord GetNextRecord() {
         MyRecord record = scanner.GetNextRecord();
+
+        // Si on a plus de record
+        if (record == null)
+            return null;    // Return null
+
         MyRecord res = new MyRecord();  // Cree un nouveau record resultat
 
         // Parcourt tout les index que l'on veut garder

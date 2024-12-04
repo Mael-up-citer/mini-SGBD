@@ -31,7 +31,9 @@ public class Relation {
         else
             throw new IllegalArgumentException("Impossible de cree l'instance car le nom "+ relationName+"  est invalide");
 
-        this.attribut = attribut;
+        this.attribut = new ArrayList<>();
+
+        setAttribut(attribut);  // Appelle le setter pour vérifier et init les attributs
         this.headerPageId = headerPageId;
         this.dskm = dsmk;
         this.bm = bm;
@@ -617,23 +619,6 @@ public class Relation {
     }
 
     /**
-     * Ajoute un attribut à la liste des attributs de la relation.
-     *
-     * @param elmts Un objet Pair représentant l'attribut (nom, type de données).
-     */
-    public void addAttribut(Pair<String, Data> elmts) throws IllegalArgumentException{
-        if(elmts == null)
-            throw new IllegalArgumentException("Erreur l'attribut ne peut pas etre null");
-
-        elmts.setFirst(elmts.getFirst().toUpperCase());  // Met en majuscule le nom de la colonne
-
-        if(!SGBD.isValidName(elmts.getFirst()))
-            throw new IllegalArgumentException("Erreur le nom de l'attribut: "+elmts.getFirst()+"    est invalide");
-
-        attribut.add(elmts);    // L'ajoute dans le schéma de la relation
-    }
-
-    /**
      * Récupère le nom de l'attribut à l'index spécifié.
      *
      * @param index L'index de l'attribut dans la liste.
@@ -741,13 +726,11 @@ public class Relation {
      */
     public void setOneAttribut(Pair<String, Data> attrb) throws IllegalArgumentException{
         // Test l'objet Puis ses composant
-        if (attribut == null || attrb.getFirst() == null || attrb.getSecond() == null)
-            throw new IllegalArgumentException("La liste des attributs ne peut pas être vide.");
+        if (attrb == null || attrb.getFirst() == null || attrb.getSecond() == null)
+            throw new IllegalArgumentException("L' attributs ne peut pas être vide.");
 
         // Test le nom
-        if (SGBD.isValidName(attrb.getFirst()))
-            attribut.add(attrb);
-        else
+        if (! SGBD.isValidName(attrb.getFirst()))
             throw new IllegalArgumentException("Le nom de l'attribut "+attrb.getFirst() +"  n'est pas valide");
         
         // Le type est verifier lors de la construction
@@ -757,6 +740,23 @@ public class Relation {
         attribut.add(attrb);
     }
 
+    /**
+     * Ajoute un attribut à la liste des attributs de la relation.
+     *
+     * @param elmts Un objet Pair représentant l'attribut (nom, type de données).
+     */ /*
+    public void addAttribut(Pair<String, Data> elmts) throws IllegalArgumentException{
+        if(elmts == null)
+            throw new IllegalArgumentException("Erreur l'attribut ne peut pas etre null");
+
+        elmts.setFirst(elmts.getFirst().toUpperCase());  // Met en majuscule le nom de la colonne
+
+        if(!SGBD.isValidName(elmts.getFirst()))
+            throw new IllegalArgumentException("Erreur le nom de l'attribut: "+elmts.getFirst()+"    est invalide");
+
+        attribut.add(elmts);    // L'ajoute dans le schéma de la relation
+    }
+*/
     public PageId getHeaderPageId(){
         return headerPageId;
     }
