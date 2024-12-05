@@ -54,6 +54,7 @@ public class SGBD {
         COMMANDMAP.put("LIST TABLES", this::processLISTTABLESCommand);
 
         COMMANDMAP.put("SELECT", this::processSELECTCommand);
+        COMMANDMAP.put("INSERT INTO", this::processINSERTCommand);
 
         COMMANDMAP.put("QUIT", unused -> processQUITCommand());
     }
@@ -350,6 +351,9 @@ public class SGBD {
         }
     }
 
+    /**
+     * Méthode pour traiter la commande DROPDATABASES
+     */
     private void processDROPDATABASESCommand(){
         try {
             dbM.RemoveDatabases();
@@ -358,12 +362,41 @@ public class SGBD {
         }
     }
 
+    /**
+     * Méthode pour traiter la commande DROPTABLES
+     */
     private void processDROPTABLESCommand(){
         try {
             dbM.RemoveTablesFromCurrentDatabase();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    /**
+     * Méthode pour traiter la commande INSERT
+     */
+    private void processINSERTCommand(String param) {
+    	String[] parts = param.split("VALUES", 2);
+    	String nomTable = parts[0].trim();
+    	String values = parts[1].trim();
+    	if (values.startsWith("(") && values.endsWith(")")) {
+            values = values.substring(1, values.length() - 1).trim();
+            // Sépare la chaîne principale par les virgules
+            String[] listeValeur = values.split("\\s*,\\s*");
+        
+            // Parcourt chaque sous-chaîne (attribut) et traite les informations
+            for (String valeur : listeValeur) {
+                valeur = valeur.trim(); // Enlever les espaces superflus autour de chaque attribut
+            }
+            try {
+            	dbM.InsertIntoCurrentDatabase(nomTable, listeValeur);
+            }catch(Exception e){
+            	e.printStackTrace();
+            }
+    	}else {
+    		System.out.println("Format d'Insert non respecté");
+    	}
     }
 
     /**
