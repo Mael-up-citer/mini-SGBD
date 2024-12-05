@@ -23,7 +23,7 @@ public class TestDBManager {
 	@Test
 	void testCreateDatabase() {
 		DBM.CreateDatabase("bddtest");
-		assertTrue(DBM.getListeDatabase().containsKey("bddtest"));
+		assertTrue(DBM.getListeDatabase().containsKey("BDDTEST"));
 	}
 	
 	@Test
@@ -31,7 +31,7 @@ public class TestDBManager {
 		DBM.CreateDatabase("bddtest");
 		try{
 			DBM.SetCurrentDatabase("bddtest");
-			assertEquals(DBM.getCurrentDatabase(), DBM.getListeDatabase().get("bddtest"));
+			assertEquals(DBM.getCurrentDatabase(), DBM.getListeDatabase().get("bddtest".toUpperCase()));
 		}catch(Exception e) {
 			e.getMessage();
 		}
@@ -50,7 +50,7 @@ public class TestDBManager {
 			DBM.AddTableToCurrentDatabase(rel);
 			Relation rel2 = DBM.GetTableFromCurrentDatabase("relTest");
 			assertEquals(rel, rel2);
-			assertThrows(Exception.class, () -> {DBM.GetTableFromCurrentDatabase("relTest");});
+			assertThrows(Exception.class, () -> {DBM.GetTableFromCurrentDatabase("Inconnue");});
 		}catch(Exception e) {
 			e.getMessage();
 		}
@@ -95,7 +95,7 @@ public class TestDBManager {
 			DBM.AddTableToCurrentDatabase(rel2);
 			DBM.RemoveTableFromCurrentDatabase("relTest");
 			assertFalse(DBM.getCurrentDatabase().containsKey("relTest"));
-			assertTrue(DBM.getCurrentDatabase().containsKey("relTestdeux"));
+			assertTrue(DBM.getCurrentDatabase().containsKey("RELTESTDEUX"));
 			assertThrows(Exception.class, () -> {DBM.RemoveTableFromCurrentDatabase("relTestss");});
 			
 		}catch(Exception e) {
@@ -140,8 +140,10 @@ public class TestDBManager {
 			DBM.SetCurrentDatabase("bddtest");
 			DBM.AddTableToCurrentDatabase(rel);
 			DBM.AddTableToCurrentDatabase(rel2);
+			DBM.ListTablesInCurrentDatabase();
 			DBM.SetCurrentDatabase("bddtest2");
 			DBM.AddTableToCurrentDatabase(rel3);
+			DBM.ListDatabases();
 		}catch(Exception e) {
 			e.getMessage();
 		}
@@ -153,22 +155,22 @@ public class TestDBManager {
 			assertDoesNotThrow(() -> {DBM.SetCurrentDatabase("bddtest");});
 			DBM.ListTablesInCurrentDatabase();
 			
-			assertTrue(DBM.getCurrentDatabase().containsKey("relTest"));
-			Relation relpart2 = DBM.GetTableFromCurrentDatabase("relTest");
-			assertEquals(relpart2.getNameAttribut(0), "coltest");
+			assertTrue(DBM.getCurrentDatabase().containsKey("RELTEST"));
+			Relation relpart2 = DBM.GetTableFromCurrentDatabase("reltest");
+			assertEquals(relpart2.getNameAttribut(0), "COLTEST");
 			assertEquals(relpart2.getType(0), DataType.CHAR);
 			assertEquals(relpart2.getLength(0), 20);
-			assertEquals(relpart2.getNameAttribut(1), "coltestdeux");
+			assertEquals(relpart2.getNameAttribut(1), "COLTESTDEUX");
 			assertEquals(relpart2.getType(1), DataType.INT);
 			
-			assertTrue(DBM.getCurrentDatabase().containsKey("relTestdeux"));
+			assertTrue(DBM.getCurrentDatabase().containsKey("RELTESTDEUX"));
 			Relation rel2part2 = DBM.GetTableFromCurrentDatabase("relTestdeux");
-			assertEquals(rel2part2.getNameAttribut(0), "coltesttrois");
+			assertEquals(rel2part2.getNameAttribut(0), "COLTESTTROIS");
 			assertEquals(rel2part2.getType(0), DataType.DATE);
 			
 			assertDoesNotThrow(() -> {DBM.SetCurrentDatabase("bddtest2");});
 			
-			assertTrue(DBM.getCurrentDatabase().containsKey("relTesttrois"));
+			assertTrue(DBM.getCurrentDatabase().containsKey("RELTESTTROIS"));
 			
 			DBM.ListDatabases();
 		}catch(Exception e) {
