@@ -2,7 +2,7 @@
 #!/bin/bash
 
 # Défini la variable du nom de la classe de test
-nom="TestCondition"
+nom="TestRelation"
 
 # Défini si on lance tout les tests ensemble ou non: oui si: "--scan-class-path" non si: "--select-class""$nom"
 # option="--scan-class-path"
@@ -17,3 +17,6 @@ javac -d bin -sourcepath src/tests -cp "bin:lib/junit-platform-console-standalon
 
 # Exécution des tests
 java -jar lib/junit-platform-console-standalone-1.11.3.jar execute --classpath bin $option
+
+cd src/tests/db/BinData
+rm *

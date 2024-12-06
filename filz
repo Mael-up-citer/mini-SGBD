@@ -1,0 +1,121 @@
+
+Thanks for using JUnit! Support its development at https://junit.org/sponsoring
+
+0	0
+
+
+
+
+
+config: pagesize = 150
+
+
+
+step: 0
+le record à inserer occupe 120 octets
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 12
+espace libre après ecriture = 14
+
+page d'écriture = 0	1
+pos ecriture = 0
+slotOffset = 134
+
+
+
+step: 1
+le record à inserer occupe 120 octets
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 12
+espace libre après ecriture = -114
+
+page d'écriture = 1	0
+pos ecriture = 0
+slotOffset = 134
+
+
+
+step: 2
+le record à inserer occupe 120 octets
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 12
+espace libre après ecriture = -242
+
+page d'écriture = 1	1
+pos ecriture = 0
+slotOffset = 134
+
+
+
+step: 3
+le record à inserer occupe 120 octets
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 12
+espace libre après ecriture = -370
+
+page d'écriture = 2	0
+pos ecriture = 0
+slotOffset = 134
+
+
+
+step: 4
+le record à inserer occupe 120 octets
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 12
+espace libre après ecriture = -498
+
+page d'écriture = 2	1
+pos ecriture = 0
+slotOffset = 134
+
+
+
+step: 5
+le record à inserer occupe 120 octets
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 12
+espace libre après ecriture = -626
+
+page d'écriture = 3	0
+pos ecriture = 0
+slotOffset = 134
+
+
+
+step: 6
+le record à inserer occupe 120 octets
+add new data Page
+pos ou ecrire l'espace libre dans la header Page = 12
+espace libre après ecriture = -754
+
+page d'écriture = 3	1
+pos ecriture = 0
+slotOffset = 134
+
+
+
+step: 7
+le record à inserer occupe 120 octets
+add new data Page
+[36m╷[0m
+[36m├─[0m [36mJUnit Platform Suite[0m [32m✔[0m
+[36m├─[0m [36mJUnit Jupiter[0m [32m✔[0m
+[36m│  └─[0m [36mTestRelation[0m [32m✔[0m
+[36m│     └─[0m [34mtestInsertRecord()[0m [32m✔[0m
+[36m└─[0m [36mJUnit Vintage[0m [32m✔[0m
+
+Test run finished after 47 ms
+[         4 containers found      ]
+[         0 containers skipped    ]
+[         4 containers started    ]
+[         0 containers aborted    ]
+[         4 containers successful ]
+[         0 containers failed     ]
+[         1 tests found           ]
+[         0 tests skipped         ]
+[         1 tests started         ]
+[         0 tests aborted         ]
+[         1 tests successful      ]
+[         0 tests failed          ]
+

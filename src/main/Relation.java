@@ -420,6 +420,8 @@ public class Relation {
         int offset = 12;
 
         try {
+            /*
+
             // Charge la 1er Header Page en mémoire
             ByteBuffer buffer = bm.getPage(headerPageId);
             // Récupère le nombre de data Page
@@ -466,9 +468,9 @@ public class Relation {
                 // Si il y a du chainage
                 if (tempNextPage.PageIdx != -1) {
                     // Libère la header Page courante
-                    bm.freePage(currentPage, false);
+                    //bm.freePage(currentPage, false);
                     // charge la header page chainé suivante
-                    buffer = bm.getPage(tempNextPage);
+                    //buffer = bm.getPage(tempNextPage);
                     currentPage = tempNextPage;
 
                     System.out.println("switch header Page: "+currentPage);
@@ -476,20 +478,29 @@ public class Relation {
                     offset = 8; // RAZ l'offset
                 }
             }
+
+            */
+            ByteBuffer buffer = null;
+
             // Si aucune data page n'a suffisamment d'espace, en ajouter une nouvelle
             if (dataPageId == null) {
                 System.out.println("add new data Page");
 
                 // Met de coter l'ancienne derniere header Page
-                PageId tmp = new PageId();
-                tmp.FileIdx = LastHeaderPageId.FileIdx;
-                tmp.PageIdx = LastHeaderPageId.PageIdx;
-
+                PageId tmp = new PageId(
+                    LastHeaderPageId.FileIdx,
+                    LastHeaderPageId.PageIdx
+                );
                 // Ajoute une nouvelle data page APRES la dernière header Page !
                 dataPageId = addDataPage();
 
+                buffer = bm.getPage(currentPage);
+
                 // Si on a une nouvelle header Page
                 if (! tmp.equals(LastHeaderPageId)) {
+
+                    System.out.println("new hp");
+
                     bm.freePage(tmp, false);  // Libère l'ancienne header Page
                     currentPage = LastHeaderPageId; // Met a jour current
                     buffer = bm.getPage(currentPage);  // Charge la dernière header Page

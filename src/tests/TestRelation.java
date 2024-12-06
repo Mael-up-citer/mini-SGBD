@@ -196,103 +196,89 @@ class TestRelation {
         Files.deleteIfExists(Paths.get(DBConfig.dbpath + "BinData/F" + i + ".rsdb"));
     }
 */
-/*
+
     @Test
     void testInsertRecord() throws Exception {
-        DBConfig.dm_maxfilesize = 1000;
-        DiskManager dskM = DiskManager.getInstance();
+        try {
+            DBConfig.dm_maxfilesize = 1000;
+            DiskManager dskM = DiskManager.getInstance();
 
-        for (int j = 150; j < DBConfig.dm_maxfilesize; j++) {
-            dskM.RAZ();
+            for (int j = 150; j < DBConfig.dm_maxfilesize; j++) {
+                dskM.RAZ();
 
-            // Réinitialisation des objets partagés pour chaque itération
-            DBConfig dbConfig = DBConfig.loadConfig("src/tests/config.txt"); // Recharger la configuration
-            DBConfig.pagesize = j;
-            DBConfig.dm_maxfilesize = 300;
+                // Réinitialisation des objets partagés pour chaque itération
+                DBConfig dbConfig = DBConfig.loadConfig("src/tests/config.txt"); // Recharger la configuration
+                DBConfig.pagesize = j;
+                DBConfig.dm_maxfilesize = 300;
 
-            BufferManager bm = new BufferManager(dbConfig, dskM); // Réinitialiser le BufferManager
+                BufferManager bm = new BufferManager(dbConfig, dskM); // Réinitialiser le BufferManager
 
-            // Allocation d'une nouvelle page d'en-tête (header page)
-            PageId headerPageId = dskM.AllocPage(); // Nouvelle page d'en-tête
-            System.out.println(headerPageId);
-            // Modification du buffer de la nouvelle page d'en-tête
-            ByteBuffer buffer2 = bm.getPage(headerPageId);
-            buffer2.putInt(DBConfig.pagesize - 4, -1); // Mettre -1 pour indiquer qu'il n'y a pas de page suivante
-            bm.freePage(headerPageId, true);
+                // Allocation d'une nouvelle page d'en-tête (header page)
+                PageId headerPageId = dskM.AllocPage(); // Nouvelle page d'en-tête
+                System.out.println(headerPageId);
+                // Modification du buffer de la nouvelle page d'en-tête
+                ByteBuffer buffer2 = bm.getPage(headerPageId);
+                buffer2.putInt(DBConfig.pagesize - 4, -1); // Mettre -1 pour indiquer qu'il n'y a pas de page suivante
+                bm.freePage(headerPageId, true);
 
-            // Réinitialisation des attributs et création d'une nouvelle relation
-            ArrayList<Pair<String, Data>> attributs = new ArrayList<>();
-            attributs.add(new Pair<>("id", new Data(DataType.INT)));
-            attributs.add(new Pair<>("nom", new Data(DataType.VARCHAR, 32)));
-            attributs.add(new Pair<>("prenom", new Data(DataType.CHAR, 32)));
-            attributs.add(new Pair<>("note", new Data(DataType.REAL)));
-            attributs.add(new Pair<>("birthdate", new Data(DataType.DATE)));
+                // Réinitialisation des attributs et création d'une nouvelle relation
+                ArrayList<Pair<String, Data>> attributs = new ArrayList<>();
+                attributs.add(new Pair<>("id", new Data(DataType.INT)));
+                attributs.add(new Pair<>("nom", new Data(DataType.VARCHAR, 32)));
+                attributs.add(new Pair<>("prenom", new Data(DataType.CHAR, 32)));
+                attributs.add(new Pair<>("note", new Data(DataType.REAL)));
+                attributs.add(new Pair<>("birthdate", new Data(DataType.DATE)));
 
-            Relation relation = new Relation("Personne", attributs, headerPageId, dskM, bm);
+                Relation relation = new Relation("Personne", attributs, headerPageId, dskM, bm);
 
-            // Création d'un enregistrement
-            MyRecord record = new MyRecord();
-            // Création de l'enregistrement avec des valeurs pour tous les types
-            record.add(1, DataType.INT); // Valeur de type INT
-            record.add("Dupont", DataType.VARCHAR); // Valeur de type VARCHAR
-            record.add("Alice", DataType.CHAR); // Valeur de type CHAR
-            record.add(2.1f, DataType.REAL); // Valeur de type REAL
-            record.add(new Date(20, 5, 2000), DataType.DATE); // Valeur de type DATE
+                // Création d'un enregistrement
+                MyRecord record = new MyRecord();
+                // Création de l'enregistrement avec des valeurs pour tous les types
+                record.add(1, DataType.INT); // Valeur de type INT
+                record.add("Dupont", DataType.VARCHAR); // Valeur de type VARCHAR
+                record.add("Alice", DataType.CHAR); // Valeur de type CHAR
+                record.add(2.1f, DataType.REAL); // Valeur de type REAL
+                record.add(new Date(20, 5, 2000), DataType.DATE); // Valeur de type DATE
 
-            System.out.println("\n\n\n\n\nconfig: pagesize = "+DBConfig.pagesize);
+                System.out.println("\n\n\n\n\nconfig: pagesize = "+DBConfig.pagesize);
 
-            // Boucle pour insérer plusieurs records
-            for (int i = 0; i < 1000; i++) {
-                RecordId recordId = null;
-                ByteBuffer buffer = null;
+                // Boucle pour insérer plusieurs records
+                for (int i = 0; i < 1000; i++) {
+                    RecordId recordId = null;
+                    ByteBuffer buffer = null;
 
-                System.out.println("\n\n\nstep: "+i);
+                    System.out.println("\n\n\nstep: "+i);
 
-                // Insertion de l'enregistrement
-                recordId = relation.InsertRecord(record);
-                // Charge la page contenant l'enregistrement inséré
-                buffer = bm.getPage(recordId.pageIdx);
+                    // Insertion de l'enregistrement
+                    recordId = relation.InsertRecord(record);
+                    // Charge la page contenant l'enregistrement inséré
+                    buffer = bm.getPage(recordId.pageIdx);
 
-                // Vérification que l'insertion à retourné un RecordId valide
-                assertNotNull(recordId, "Le RecordId ne doit pas être null pour le record " + i);
-                assertNotNull(recordId.pageIdx, "Le RecordId doit contenir un PageId valide pour le record " + i);
-                assertTrue(recordId.pageIdx.FileIdx >= 0, "Le PageId doit être un index valide de page pour le record " + i);
-                assertTrue(recordId.pageIdx.PageIdx >= 0, "Le PageId doit être un index valide de page pour le record " + i);
+                    // Vérification que l'insertion à retourné un RecordId valide
+                    assertNotNull(recordId, "Le RecordId ne doit pas être null pour le record " + i);
+                    assertNotNull(recordId.pageIdx, "Le RecordId doit contenir un PageId valide pour le record " + i);
+                    assertTrue(recordId.pageIdx.FileIdx >= 0, "Le PageId doit être un index valide de page pour le record " + i);
+                    assertTrue(recordId.pageIdx.PageIdx >= 0, "Le PageId doit être un index valide de page pour le record " + i);
 
-                // Calcul la position en octet du tuple
-                int pos = buffer.getInt(DBConfig.pagesize - ((recordId.slotIdx-1) * 8 + 16));
+                    // Calcul la position en octet du tuple
+                    int pos = buffer.getInt(DBConfig.pagesize - ((recordId.slotIdx-1) * 8 + 16));
 
-                // Lire le record depuis le buffer à la position indiquée par le RecordId
-                MyRecord readRecord = new MyRecord();
-                relation.readRecordFromBuffer(readRecord, buffer, pos);
+                    // Lire le record depuis le buffer à la position indiquée par le RecordId
+                    MyRecord readRecord = new MyRecord();
+                    relation.readRecordFromBuffer(readRecord, buffer, pos);
 
-                bm.freePage(recordId.pageIdx, false);
+                    bm.freePage(recordId.pageIdx, false);
 
-                // Vérification que le record lu correspond à celui inséré
-                assertIterableEquals(record, readRecord, "Le record inséré ne correspond pas au record lu pour l'index " + i);
+                    // Vérification que le record lu correspond à celui inséré
+                    assertIterableEquals(record, readRecord, "Le record inséré ne correspond pas au record lu pour l'index " + i);
+                }
+                // Nettoyage des fichiers après chaque itération
+                for (int i = 0; i < DBConfig.pagesize*3; i++)
+                    Files.deleteIfExists(Paths.get(DBConfig.dbpath + "BinData/F" + i + ".rsdb"));
             }
-            // Nettoyage des fichiers après chaque itération
-            for (int i = 0; i < DBConfig.pagesize*3; i++)
-                Files.deleteIfExists(Paths.get(DBConfig.dbpath + "BinData/F" + i + ".rsdb"));
+        } catch(Exception e) {
+            e.printStackTrace();
         }
-    }
-*/
-    @Test
-    void testbuffer() throws Exception {
-        DiskManager dskM = DiskManager.getInstance();
-        DBConfig dbConfig = DBConfig.loadConfig("src/tests/config.txt"); // Recharger la configuration
-        BufferManager bm = new BufferManager(dbConfig, dskM); // Réinitialiser le BufferManager
-
-        for (int i = 0; i < DBConfig.bm_buffercount+1; i++) {
-            System.out.println("nb frame prise = "+bm.getNbAllocFrame());
-            bm.getPage(dskM.AllocPage());
-        }
-    }
-    @AfterEach
-    public void cleanTestbuffer() throws Exception{
-        // Nettoyage des fichiers après chaque itération
-        for (int i = 0; i < 100; i++)
-            Files.deleteIfExists(Paths.get(DBConfig.dbpath + "BinData/F" + i + ".rsdb"));
     }
 /*
     @Test

@@ -459,7 +459,7 @@ public class SGBD {
             for (int i = 0; i < relation.getNbAttribut(); i++)
                 attributesToPrint.add(i);  // Ajouter tous les indices des attributs
         }
-        else{
+        else {
             // Séparer les attributs par des virgules
             String[] attrb = param.split(",");
             HashMap<String, Integer> fromNameToIndex = new HashMap<>();
