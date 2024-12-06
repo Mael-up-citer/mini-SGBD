@@ -37,11 +37,12 @@ public class DBManager {
      */
     public void CreateDatabase(String databaseName) throws IllegalArgumentException{
 		// Vérifie que le bd n'existe pas deja
-		if (listeDatabase.containsKey(databaseName))
+		if (listeDatabase.containsKey(databaseName.toUpperCase())) {
 			throw new IllegalArgumentException("Duplicate data base "+databaseName);
+		}
 
     	// Crée une nouvelle Database et l'ajoute dans la liste des database crées
-        listeDatabase.put(databaseName, new HashMap<>());
+        listeDatabase.put(databaseName.toUpperCase(), new HashMap<>());
     }
 
     /**
@@ -51,11 +52,12 @@ public class DBManager {
      */
     public void SetCurrentDatabase(String databaseName) throws IllegalArgumentException {
 		// Vérifie que la base de donnée existe
-    	if(!listeDatabase.containsKey(databaseName))
+    	if(!listeDatabase.containsKey(databaseName.toUpperCase())) {
     		throw new IllegalArgumentException("La base de donnée " + databaseName + " n'existe pas");
+    	}
 
     	// Charge la database demandée dans current
-        this.current = listeDatabase.get(databaseName);
+        this.current = listeDatabase.get(databaseName.toUpperCase());
     }
 
     /**
@@ -64,13 +66,29 @@ public class DBManager {
      * @param tab Table à ajouter
      */
     public void AddTableToCurrentDatabase(Relation tab) throws IllegalArgumentException{
-    	if(current == null)
+    	if(current == null) {
     		throw new IllegalArgumentException("La Base de Données de travail n'a pas été définie");
+    	}
 
     	// Ajoute la table à la BDD current
         current.put(tab.getRelationName(), tab);
         // Informe l'utilisateur de la réussite de l'opération
         System.out.println("Table " + tab.getRelationName() + " ajoutée à la base de données actuelle.");
+    }
+    
+    public void InsertIntoCurrentDatabase(String nomTable, String[] valeurs) throws Exception{
+    	if(current == null) {
+    		throw new IllegalArgumentException("La Base de Données de travail n'a pas été définie");
+    	}
+    	Relation rel = GetTableFromCurrentDatabase(nomTable);
+    	if(valeurs.length != rel.getNbAttribut()) {
+    		throw new IllegalArgumentException("Le nombre d'arguments n'est pas égal au nombre requis pour cette table : " + rel.getNbAttribut());
+    	}
+    	MyRecord rec = new MyRecord();
+    	for(int i = 0; i<rel.getNbAttribut(); i++) {
+    		rec.add(valeurs[i], rel.getType(i));
+    	}
+    	rel.InsertRecord(rec);
     }
     
     /**
@@ -83,11 +101,11 @@ public class DBManager {
     	if(current == null) {
     		throw new IllegalArgumentException("La Base de Données de travail n'a pas été définie");
     	}
-    	if(!current.containsKey(nomTable)) {
+    	if(!current.containsKey(nomTable.toUpperCase())) {
     		throw new IllegalArgumentException("La table " + nomTable + "n'existe pas");
     	}
     	// Demande la table en question à current
-    	return current.get(nomTable);
+    	return current.get(nomTable.toUpperCase());
     }
 
     /**
@@ -96,14 +114,16 @@ public class DBManager {
      * @param nomTable nom de la table à supprimer
      */
     public void RemoveTableFromCurrentDatabase(String nomTable) throws IllegalArgumentException {
-    	if(current == null)
+    	if(current == null) {
     		throw new IllegalArgumentException("La Base de Données de travail n'a pas été définie");
+    	}
 
-    	if(!current.containsKey("nomTable"))
+    	if(!current.containsKey(nomTable.toUpperCase())) {
     		throw new IllegalArgumentException("La table " + nomTable + "n'existe pas");
+    	}
 
     	// Supprime la table de current
-        current.remove(nomTable);
+        current.remove(nomTable.toUpperCase());
     }
     
     /**
@@ -112,19 +132,21 @@ public class DBManager {
      * @param databaseName nom de la Base de Données à supprimer
      */
     public void RemoveDatabase(String databaseName) throws IllegalArgumentException {
-    	if(!listeDatabase.containsKey(databaseName))
+    	if(!listeDatabase.containsKey(databaseName.toUpperCase())) {
     		throw new IllegalArgumentException("La base de donnée " + databaseName + " n'existe pas");
+    	}
 
         // Supprime la BDD de la liste de BDD existantes
-        listeDatabase.remove(databaseName);
+        listeDatabase.remove(databaseName.toUpperCase());
     }
     
     /**
      * Supprime toutes les tables de la Base de Données courante
      */
     public void RemoveTablesFromCurrentDatabase() throws IllegalArgumentException {
-    	if(current == null)
+    	if(current == null) {
     		throw new IllegalArgumentException("La Base de Données de travail n'a pas été définie");
+    	}
 
     	// Vide la BDD courante
     	current.clear();
@@ -155,13 +177,30 @@ public class DBManager {
      * Affiche la liste des tables de la Base de Données courante
      */
     public void ListTablesInCurrentDatabase() throws IllegalArgumentException {
-    	if(current == null)
+    	if(current == null) {
     		throw new IllegalArgumentException("La Base de Données de travail n'a pas été définie");
+    	}
 
     	System.out.println("Les tables de cette base de données sont :");
+    	StringBuilder database = new StringBuilder();
 		// Parcourt la liste de tables et affiche ses clés, ce sont les noms des tables
-        for(String i : current.keySet()) {
-        	System.out.println(i);
+        for(String tableNom : current.keySet()) {
+        	database.append(tableNom).append(" (");
+        	Relation rel = current.get(tableNom);
+        	for(int i = 0; i < rel.getNbAttribut(); i++) {
+        		if(i!=0) {
+        			database.append(",");
+        		}
+        		database.append(rel.getNameAttribut(i));
+        		database.append(":");
+        		database.append(rel.getType(i));
+        		database.append("(");
+        		database.append(rel.getLength(i));
+        		database.append(")");
+        	}
+        	database.append(")");
+        	System.out.println(database.toString());
+        	database.setLength(0);
         }
     }
 
@@ -219,8 +258,9 @@ public class DBManager {
     	Relation RelationEnCours = null;
         String save = readSave();
 
-        if(save == null)
+        if(save == null) {
         	throw new IOException("La sauvegarde est vide");
+        }
         else {
         	String[] lines = save.split("\n");
         	for(String line : lines) {
@@ -305,9 +345,10 @@ public class DBManager {
 	 * @throws IllegalArgumentException Si la base de données courante n'a pas été définie.
 	 */
 	public boolean tableExiste(String str) throws IllegalArgumentException{
-		if (current == null)
+		if (current == null) {
 			// Si aucune base de données courante n'a été définie, retourner false
 			throw new IllegalArgumentException("La Base de Données de travail n'a pas été définie");
+		}
 
 		// Vérifie si la table existe dans la base de données courante
 		return current.containsKey(str);

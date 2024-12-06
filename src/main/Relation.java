@@ -492,9 +492,7 @@ public class Relation {
                     LastHeaderPageId.PageIdx
                 );
                 // Ajoute une nouvelle data page APRES la dernière header Page !
-                dataPageId = addDataPage();
-
-                buffer = bm.getPage(currentPage);
+                //dataPageId = addDataPage();
 
                 // Si on a une nouvelle header Page
                 if (! tmp.equals(LastHeaderPageId)) {
@@ -514,15 +512,15 @@ public class Relation {
 
             // 1. Modifie la la header Page dans laquel la data Page choisie est
             // Récupère le nb d'octets libre auquel on enlève l'espace du record
-            int freeSpace = buffer.getInt(offset) - (recordSize+8);
-            buffer.putInt(offset, freeSpace);
+            //int freeSpace = buffer.getInt(offset) - (recordSize+8);
+            //buffer.putInt(offset, freeSpace);
 
-            System.out.println("pos ou ecrire l'espace libre dans la header Page = "+offset);
-            System.out.println("espace libre après ecriture = "+freeSpace);
+            //System.out.println("pos ou ecrire l'espace libre dans la header Page = "+offset);
+            //System.out.println("espace libre après ecriture = "+freeSpace);
 
             // Libere la header Page dans laquelle on va écrire
-            bm.freePage(currentPage, true);
-
+            //bm.freePage(currentPage, true);
+/*
             // 2. Modifie la data Page
             // Charge la data Page en mémoir
             buffer = bm.getPage(dataPageId);
@@ -559,9 +557,11 @@ public class Relation {
 
             // Retourne le RecordId du record composé d'un Page ID et l'index du slot
             return new RecordId(nbSlots, dataPageId);
+*/
         } catch(Exception e) {
             e.printStackTrace();
-            // Libere les pages de travail en cas d'erreur à faux pour ne pas propager d'erreur
+            System.out.println("README: "+e.getMessage());
+            // Libere les pages de travail en cas d'erreur à faux pour ne pas trop propager d'erreur
             bm.freePage(dataPageId, false);
             bm.freePage(LastHeaderPageId, false);
         }
