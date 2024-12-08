@@ -55,6 +55,7 @@ public class SGBD {
 
         COMMANDMAP.put("SELECT", this::processSELECTCommand);
         COMMANDMAP.put("INSERT INTO", this::processINSERTCommand);
+        COMMANDMAP.put("BULKINSERT INTO", this::processBULKINSERTCommand);	
 
         COMMANDMAP.put("QUIT", unused -> processQUITCommand());
     }
@@ -290,6 +291,8 @@ public class SGBD {
             String attName = parts[0].trim(); // Nom de l'attribut
             String typePart = parts[1].trim(); // Type de l'attribut
             
+            System.out.println(typePart);
+
             // Extraire le type (avant la parenthèse si elle existe)
             DataType type = DataType.valueOf(typePart.split("\\(")[0].trim());
     
@@ -380,6 +383,7 @@ public class SGBD {
     	String[] parts = param.split("VALUES", 2);
     	String nomTable = parts[0].trim();
     	String values = parts[1].trim();
+
     	if (values.startsWith("(") && values.endsWith(")")) {
             values = values.substring(1, values.length() - 1).trim();
             // Sépare la chaîne principale par les virgules
@@ -394,8 +398,21 @@ public class SGBD {
             }catch(Exception e){
             	e.printStackTrace();
             }
-    	}else {
+    	}
+        else
     		System.out.println("Format d'Insert non respecté");
+    }
+
+    private void processBULKINSERTCommand(String param) {
+    	// Sépare la ligne de commande entre le nom de la table et le nom du fichier
+    	String[] parts = param.split(" ", 2);
+    	// Retire les espaces inutiles
+    	String nomTable = parts[0].trim();
+    	String nomFichier = parts[1].trim();
+    	try {
+        	dbM.BulkInsertIntoCurrentDatabase(nomTable, nomFichier);
+    	}catch(Exception e) {
+    		e.printStackTrace();
     	}
     }
 
@@ -404,17 +421,18 @@ public class SGBD {
      * @param param Commande SQL sans le mot-clé "SELECT".
      */
     private void processSELECTCommand(String param) {
+        // TODO revoir le patern
         // Expression régulière pour valider et extraire les parties de la commande
         String selectReg = String.join("",
-            "(\\*|[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+", // '*' ou aliasRel.col1
-            "(\\s*,\\s*[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+)*)", // , aliasRel.col2, ...
-            "\\s+FROM\\s+", // FROM obligatoire
-            "([a-zA-Z0-9_]+)\\s+([a-zA-Z0-9_]+)", // nomRelation aliasRel
-            "(\\s+WHERE\\s+", // WHERE optionnel
-            "([a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+\\s*(<|>|<=|>=|=|!=)\\s*[a-zA-Z0-9_'\"]+)", // aliasRel.col OP value
-            "(\\s+AND\\s+[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+\\s*(<|>|<=|>=|=|!=)\\s*[a-zA-Z0-9_'\"]+)*", // AND aliasRel.col OP value
-            ")?$" // WHERE est optionnel
-        );
+        "^(\\*|(?:[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+", // Début : * ou alias.colonne
+        "(?:\\s*,\\s*[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+)*))", // Colonnes supplémentaires séparées par des virgules
+        "\\s+FROM\\s+", // FROM obligatoire
+        "([a-zA-Z0-9_]+\\s+[a-zA-Z0-9_]+", // Table principale avec alias
+        "(?:\\s*,\\s*[a-zA-Z0-9_]+\\s+[a-zA-Z0-9_]+)*)", // Autres tables avec alias (optionnelles)
+        "(?:\\s+WHERE\\s+", // WHERE optionnel
+        "([a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+\\s*(<|>|<=|>=|=|<>)\\s*[a-zA-Z0-9_'\"-]+", // Première condition
+        "(?:\\s+AND\\s+[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+\\s*(<|>|<=|>=|=|<>)\\s*[a-zA-Z0-9_'\"-]+)*)?)?$" // Conditions AND supplémentaires
+    );
 
         // Compiler la regex
         Pattern pattern = Pattern.compile(selectReg, Pattern.CASE_INSENSITIVE);
@@ -422,41 +440,57 @@ public class SGBD {
 
         // Si la commande correspond à la regex, extraire les informations
         if (matcher.matches()) {
-            String attributs = matcher.group(1); // Attributs sélectionnés
-            String tableName = matcher.group(3);  // Nom de la table
-            String alias = matcher.group(4);     // Alias de la table
-            String whereConditions = matcher.group(6); // Conditions dans WHERE (optionnel)
+            String attributs = matcher.group(1); // Attributs sélectionnés (par exemple "*", "r.col1")
+            String tables = matcher.group(2);  // Tables et alias dans FROM
+            String whereConditions = matcher.group(3); // Conditions dans WHERE (optionnel)
 
-            // Charger la relation (table) de la base de données
-            Relation relation = extractRelation(tableName);
-            if (relation == null) { 
-                System.out.println("La table " + tableName + " n'existe pas dans la base de donnée courrante");
+            ArrayList<Relation> relations = new ArrayList<>();
+
+            // Afficher les résultats extractions
+            System.out.println("Attributs : " + attributs);
+            System.out.println("Relation et allias : " + tables);
+            System.out.println("Conditions : " + whereConditions);
+
+            // Associe le nom d'une relation à son allias
+            Pair<HashMap<String, String>, HashMap<String, String>> pair = extractRelation(tables, relations);
+
+            // Vérifie si il y a eu un problème avec les relations
+            if (pair == null) { 
+                System.out.println("Problème sur l'une des tables: " + tables + " elles doivent toute exister dans la base de donnée courrante");
                 return; // Quitter la méthode si la table n'existe pas
             }
+            HashMap<String, String> assocNomToAllais = pair.getFirst();
+            HashMap<String, String> assocAlliasToNom = pair.getSecond();
 
             // Extraire les indices des attributs à afficher
-            ArrayList<Integer> attrbToPrint = extractAttribut(attributs, relation);
-
-            // Extraire les conditions
+            ArrayList<Integer> attrbToPrint = extractAttribut(attributs, assocNomToAllais);
+            // Liste des conditions
             ArrayList<Condition> conditions = new ArrayList<>();
-            if (whereConditions != null)
-                conditions = extractCondition(whereConditions);
 
-            // Afficher les résultats extraits
+            // Si on a des conditions
+            if (whereConditions != null)
+                conditions = extractCondition(whereConditions, assocAlliasToNom);  // Extraire les conditions
+
+            // Afficher les résultats extractions
             System.out.println("Attributs : " + attrbToPrint);
-            System.out.println("Relation : " + relation.getRelationName());
+            System.out.println("Relation et allias : " + assocNomToAllais);
             System.out.println("Conditions : " + conditions);
 
             // Exécuter la commande avec les opérateurs relationnels
             try {
-                RelationScanner scanner = new RelationScanner(relation, bm, conditions);
-                ProjectOperator projOp = new ProjectOperator(scanner, attrbToPrint);
-                RecordPrinter rp = new RecordPrinter(projOp);
+                // Si c'est une requete monotable
+                if (relations.size() == 1) {
+                    //RelationScanner scanner = new RelationScanner(relations.get(0), bm, conditions);
+                    //ProjectOperator projOp = new ProjectOperator(scanner, attrbToPrint);
+                    //RecordPrinter rp = new RecordPrinter(projOp);
 
-                rp.printAllRecord();
+                    //rp.printAllRecord();
+                }
+                else {
+
+                }
             } catch(Exception e){
-                System.out.println("Erreur lors de l'exécution de la commande");
-                e.printStackTrace();
+                System.out.println("Erreur lors de l'exécution de la commande "+e.getMessage());
             }
         }
         else
@@ -466,52 +500,123 @@ public class SGBD {
     /**
      * Méthode pour extraire une relation (table et alias) à partir du paramètre.
      */
-    private Relation extractRelation(String tableName) {
+    private Pair<HashMap<String, String>, HashMap<String, String>> extractRelation(String listeTableName, ArrayList<Relation> relations) {
         // Accéder à la base de données courante pour récupérer la table
         HashMap<String, Relation> db = dbM.getCurrentDatabase();
+        // Liste des relations qu'on extrait sous forme nom -> allias
+        HashMap<String, String> assocNomToAllias = new HashMap<>();
+        // Liste des relations qu'on extrait sous forme allias -> nom
+        HashMap<String, String> assocAlliasToNom = new HashMap<>();
+        // Chaque case contient une relarion et son allias
+        String[] name = listeTableName.split("\\s+,\\s+");
 
-        // Si la base de donné courrante est pas défini
-        if (db != null)
-            return db.get(tableName);
+        // Si la base de donné courrante est défini
+        if (db != null) {
+            // Parcour le tableau
+            for (String tableName : name) {
+                // Split la chaine par l'espace chaque case contient nomR allias
+                String[] str = tableName.split("\\s+");
+                Relation r = db.get(str[0]);    // Récupere la relation depuis la bd
+
+                // Test si la relation existe dans la bd courrante
+                if (r != null) {
+                    relations.add(r);
+                    assocNomToAllias.put(str[0], str[1]);  // Insère dans la map le couple
+                    assocAlliasToNom.put(str[1], str[0]);  // Insère dans la map le couple
+                }
+                else
+                    return null;
+            }
+            return new Pair<HashMap<String,String>,HashMap<String,String>>(assocNomToAllias, assocAlliasToNom);
+        }
         // Sinon retourne null
         return null;
     }
 
     /**
-     * Méthode pour extraire les attributs à afficher.
-     * @param param Partie des attributs (ex. "aliasRel.col1, aliasRel.col2").
-     * @param relation Relation contenant les attributs.
-     * @return Liste des indices des attributs dans la relation.
+     * Méthode pour extraire les indices absolus des attributs à afficher dans le record fusionné.
+     * Cette méthode prend en compte soit tous les attributs d'une relation (avec `*`), 
+     * soit des attributs spécifiques (format "aliasRelation.nomAttribut").
+     *
+     * L'index absolu d'un attribut est déterminé par l'ordre des relations dans le `FROM` et la 
+     * position de l'attribut au sein de sa relation respective. 
+     * 
+     * @param param Liste des attributs demandés dans la clause SELECT (ex. "aliasRel.col1, aliasRel.col2").
+     *              Si `*`, tous les attributs des relations sont sélectionnés.
+     * @param assocAlliasToNom Association des alias de relations aux noms réels des relations.
+     * 
+     * @return Liste des indices absolus des attributs dans le record fusionné. L'ordre des indices
+     *         correspond à l'ordre dans lequel les attributs apparaissent dans la clause SELECT.
+     * @throws IllegalArgumentException Si un alias ou une colonne est mal formé ou inexistant.
      */
-    private ArrayList<Integer> extractAttribut(String param, Relation relation) {
+    private ArrayList<Integer> extractAttribut(String param, HashMap<String, String> assocAlliasToNom) {
         ArrayList<Integer> attributesToPrint = new ArrayList<>();
+        int globalOffset = 0;  // Décalage cumulatif qui sera ajouté à chaque index pour obtenir l'index absolu
 
-         // Si à '*' on les prends tous
-         if ("*".equals(param.trim())) {
-            // Si l'utilisateur veut tous les attributs
-            for (int i = 0; i < relation.getNbAttribut(); i++)
-                attributesToPrint.add(i);  // Ajouter tous les indices des attributs
-        }
+        // Si on a '*', on prend tous les attributs dans l'ordre des relations
+        if ("*".equals(param.trim())) {
+            // Parcours des relations dans l'ordre des alias
+            for (String alias : assocAlliasToNom.keySet()) {
+                String relationName = assocAlliasToNom.get(alias);
+                Relation relation = dbM.getCurrentDatabase().get(relationName);
+
+                // Ajouter les indices absolus pour tous les attributs de cette relation
+                for (int i = 0; i < relation.getNbAttribut(); i++) {
+                    attributesToPrint.add(globalOffset);  // Ajoute l'index absolu
+                    globalOffset++;  // Incrémente le décalage pour la relation suivante
+                }
+            }
+        } 
         else {
-            // Séparer les attributs par des virgules
-            String[] attrb = param.split(",");
-            HashMap<String, Integer> fromNameToIndex = new HashMap<>();
+            // Si on a des attributs spécifiques dans le SELECT
+            String[] attrbs = param.split(",");
 
-            // Associer chaque attribut de la relation à son index
-            for (int i = 0; i < relation.getNbAttribut(); i++)
-                fromNameToIndex.put(relation.getNameAttribut(i), i);
+            // Map pour garder les décalages des relations
+            HashMap<String, Integer> relationOffsets = new HashMap<>();
 
-            // Valider et récupérer les indices
-            for (String attr : attrb) {
-                attr = attr.trim();
-                String[] parts = attr.split("\\."); // Séparer l'alias et le nom de colonne
+            // Calculer les décalages globaux pour chaque relation
+            for (String alias : assocAlliasToNom.keySet()) {
+                String relationName = assocAlliasToNom.get(alias);
+                Relation relation = dbM.getCurrentDatabase().get(relationName);
+                relationOffsets.put(alias, globalOffset);
+                globalOffset += relation.getNbAttribut();  // Met à jour le décalage global pour la prochaine relation
+            }
 
-                // Récupérer l'index de la colonne
-                if (fromNameToIndex.containsKey(parts[1]))
-                    attributesToPrint.add(fromNameToIndex.get(parts[1]));
+            // Traitement des attributs spécifiques dans le SELECT
+            for (String attrb : attrbs) {
+                attrb = attrb.trim();
+                String[] parts = attrb.split("\\.");  // Séparer l'alias et le nom de la colonne
 
-                else 
-                    throw new IllegalArgumentException("Colonne inexistante : " + parts[1]);
+                // Vérification que l'attribut est bien formé sous le format alias.colonne
+                if (parts.length != 2)
+                    throw new IllegalArgumentException("Attribut mal formé : " + attrb);
+
+                String alias = parts[0];
+                String columnName = parts[1];
+
+                // Vérifier que l'alias correspond à une relation dans le FROM
+                if (!assocAlliasToNom.containsKey(alias))
+                    throw new IllegalArgumentException("Alias inconnu : " + alias);
+
+                String relationName = assocAlliasToNom.get(alias);
+                Relation relation = dbM.getCurrentDatabase().get(relationName);
+
+                // Trouver l'index relatif de la colonne dans la relation
+                int relativeIndex = -1;
+                for (int i = 0; i < relation.getNbAttribut(); i++) {
+                    if (relation.getNameAttribut(i).equals(columnName)) {
+                        relativeIndex = i;  // Trouvé l'index relatif
+                        break;
+                    }
+                }
+
+                // Si la colonne n'existe pas dans la relation, lancer une exception
+                if (relativeIndex == -1)
+                    throw new IllegalArgumentException("Colonne inconnue : " + columnName);
+
+                // Calculer l'index absolu en ajoutant le décalage global de la relation
+                int absoluteIndex = relationOffsets.get(alias) + relativeIndex;
+                attributesToPrint.add(absoluteIndex);
             }
         }
         return attributesToPrint;
@@ -522,26 +627,44 @@ public class SGBD {
      * @param param Partie WHERE (ex. "aliasRel.col1 = 10 AND aliasRel.col2 > 20").
      * @return Liste des conditions extraites.
      */
-    private ArrayList<Condition> extractCondition(String param) {
+    private ArrayList<Condition> extractCondition(String param, HashMap<String, String> assocAlliasToNom) {
+        // Tableau ou chaque case contient une condition
         String[] conditions = param.split("\\s+AND\\s+");
+        // Liste ou on stock les conditons extrait
         ArrayList<Condition> res = new ArrayList<>();
-        String regex = "([a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+)(<|>|<=|>=|=|!=)([a-zA-Z0-9_'\"]+)";
+        // Regex pour capturer le patern d'une condition
+        String regex = "(?:([a-zA-Z0-9_]+)\\.)?([a-zA-Z0-9_]+)\\s*(<|>|<=|>=|=|!=)\\s*(?:([a-zA-Z0-9_]+\\.)?([a-zA-Z0-9_]+|'[a-zA-Z0-9_\\s]+'))";
         Pattern pattern = Pattern.compile(regex);
 
+        // Parcour le tableau des conditions
         for (String cond : conditions) {
+            // Applique le patern à chaque conditions
             Matcher matcher = pattern.matcher(cond);
-            if (matcher.matches()) {
-                String terme1 = matcher.group(1).trim();
-                String operateur = matcher.group(2).trim();
-                String terme2 = matcher.group(3).trim();
-                res.add(new Condition(terme1, operateur, terme2));
-            } else {
-                throw new IllegalArgumentException("Condition invalide : " + cond);
-            }
-        }
 
+            // Si on à un match
+            if (matcher.matches()) {
+                // Récupère les groupes correspondants
+                String alias1 = matcher.group(1);   // Alias du premier terme (peut être null)
+                String colonne1 = matcher.group(2); // Colonne du premier terme
+                String operateur = matcher.group(3); // Opérateur
+                String alias2 = matcher.group(4);   // Alias du second terme (peut être null)
+                String colonne2 = matcher.group(5); // Colonne ou valeur du second terme
+
+                Relation r1 = dbM.getCurrentDatabase().get(assocAlliasToNom.get(alias1));
+                Relation r2 = dbM.getCurrentDatabase().get(assocAlliasToNom.get(alias2));
+
+                Pair<String, Relation> p1 = new Pair<String,Relation>(colonne1, r1);
+                Pair<String, Relation> p2 = new Pair<String,Relation>(colonne2, r2);
+
+                res.add(new Condition(p1, operateur, p2));
+            }
+            // Sinon c'est un problème dans la commande
+            else
+                throw new IllegalArgumentException("Condition invalide : " + cond);
+        }
         return res;
     }
+
     /**
      * Vérifie la validité d'une requête SQL
      *

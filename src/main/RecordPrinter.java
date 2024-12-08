@@ -14,5 +14,6 @@ public class RecordPrinter {
             cpt++;  // Incrémente le compteur
         }
         System.out.println("Total records="+cpt);
+        recordIterator.Close();
     }
 }

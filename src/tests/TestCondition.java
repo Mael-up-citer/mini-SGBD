@@ -3,11 +3,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
 
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.ArrayList;
-import java.nio.ByteBuffer;
 
 public class TestCondition {
 
@@ -18,10 +17,10 @@ public class TestCondition {
     public void setUp() throws Exception {
         // Initialisation des objets nécessaires pour les tests
         DiskManager dskM = DiskManager.getInstance();
-        DBConfig dbConfig = DBConfig.loadConfig("src/tests/config.txt"); // Recharger la configuration
-        BufferManager bm = new BufferManager(dbConfig, dskM); // Réinitialiser le BufferManager
+        DBConfig dbConfig = DBConfig.loadConfig("src/tests/config.txt"); // Charger la configuration
+        BufferManager bm = new BufferManager(dbConfig, dskM); // Initialiser le BufferManager
 
-        // Allocation d'une nouvelle page d'en-tête (header page)
+        // Allocation d'une nouvelle page d'en-tête
         PageId headerPageId = dskM.AllocPage(); // Nouvelle page d'en-tête
 
         // Modification du buffer de la nouvelle page d'en-tête
@@ -29,7 +28,7 @@ public class TestCondition {
         buffer.putInt(DBConfig.pagesize - 4, -1); // Mettre -1 pour indiquer qu'il n'y a pas de page suivante
         bm.freePage(headerPageId, true);
 
-        // Réinitialisation des attributs et création d'une nouvelle relation
+        // Initialisation des attributs et création de la relation
         ArrayList<Pair<String, Data>> attributs = new ArrayList<>();
         attributs.add(new Pair<>("id", new Data(DataType.INT)));
         attributs.add(new Pair<>("nom", new Data(DataType.VARCHAR, 32)));
@@ -47,7 +46,7 @@ public class TestCondition {
     }
 
     @AfterEach
-    public void clean() throws Exception{
+    public void clean() throws Exception {
         // Nettoyage des fichiers après chaque itération
         for (int i = 0; i < 100; i++)
             Files.deleteIfExists(Paths.get(DBConfig.dbpath + "BinData/F" + i + ".rsdb"));
@@ -68,30 +67,44 @@ public class TestCondition {
         "nom, =, \"'Doe'\", true",    // Test égalité pour nom ('Doe' == 'Doe')
         "nom, =, \"'Smith'\", false", // Test égalité pour nom ('Doe' != 'Smith')
         "nom, <>, \"'Smith'\", true", // Test différent pour nom ('Doe' != 'Smith')
-        "nom, <>, \"'Doe'\", false"  // Test différent pour nom ('Doe' != 'Doe')
+        "nom, <>, \"'Doe'\", false"   // Test différent pour nom ('Doe' != 'Doe')
     })
-    public void testEvaluateOperatorWithAllTypes(String attribute, String operator, String value, boolean expectedResult) throws Exception {            
-        // Si la valeur est une chaîne (comprise entre guillemets doubles), enlever les guillemets externes
+    public void testEvaluateOperatorWithAllTypes(String attribute, String operator, String value, boolean expectedResult) throws Exception {
+        // Retirer les guillemets doubles externes pour récupérer la vraie constante
         if (value.startsWith("\"") && value.endsWith("\""))
-            value = value.substring(1, value.length() - 1); // Supprimer les guillemets externes
-        // Affichage de la valeur modifiée pour débogage
-        System.out.println("Attribut: " + attribute + ", Valeur: " + value);
-        
-        // Créer la condition et l'évaluer
-        Condition condition = new Condition(attribute, operator, value);
-        boolean result = condition.evaluate(relation, record);
-        
+            value = value.substring(1, value.length() - 1); // Supprimer les guillemets doubles externes
+
+        // Créer les termes pour la condition
+        Pair<String, Relation> terme1 = new Pair<>(attribute, relation);
+        Pair<String, Relation> terme2;
+
+        // Si la valeur est une constante string (commence et se termine par des quotes simples)
+        if (value.startsWith("'") && value.endsWith("'"))
+            terme2 = new Pair<>(value, null); // Constante string
+        else
+            terme2 = new Pair<>(value, null); // Constante numérique ou autre
+
+        // Créer la condition
+        Condition condition = new Condition(terme1, operator, terme2);
+
+        // Évaluer la condition
+        boolean result = condition.evaluate(record, record);
+
         // Assertion du résultat attendu
         assertEquals(expectedResult, result, "L'opération " + operator + " pour l'attribut " + attribute + " avec la valeur " + value + " a échoué.");
-    }        
+    }
 
     @Test
     public void testEvaluateRealComparison() throws Exception {
-        // Tester une comparaison pour le type réel
-        Condition condition = new Condition("note", ">", "10.0");
-        assertTrue(condition.evaluate(relation, record), "La condition '> 10.0' doit être vraie.");
+        // Teste une comparaison pour le type réel
+        Pair<String, Relation> terme1 = new Pair<>("note", relation);
+        Pair<String, Relation> terme2 = new Pair<>("10.0", null); // Constante
 
-        condition = new Condition("note", "<", "20.0");
-        assertTrue(condition.evaluate(relation, record), "La condition '< 20.0' doit être vraie.");
+        Condition condition = new Condition(terme1, ">", terme2);
+        assertTrue(condition.evaluate(record, record), "La condition '> 10.0' doit être vraie.");
+
+        terme2 = new Pair<>("20.0", null); // Constante
+        condition = new Condition(terme1, "<", terme2);
+        assertTrue(condition.evaluate(record, record), "La condition '< 20.0' doit être vraie.");
     }
 }

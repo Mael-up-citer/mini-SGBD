@@ -215,7 +215,6 @@ class TestRelation {
 
                 // Allocation d'une nouvelle page d'en-tête (header page)
                 PageId headerPageId = dskM.AllocPage(); // Nouvelle page d'en-tête
-                System.out.println(headerPageId);
                 // Modification du buffer de la nouvelle page d'en-tête
                 ByteBuffer buffer2 = bm.getPage(headerPageId);
                 buffer2.putInt(DBConfig.pagesize - 4, -1); // Mettre -1 pour indiquer qu'il n'y a pas de page suivante

@@ -76,19 +76,57 @@ public class DBManager {
         System.out.println("Table " + tab.getRelationName() + " ajoutée à la base de données actuelle.");
     }
     
+    /**
+     * Insère une ligne dans la table
+     * 
+     * @param nomTable nom de la table à ammender
+     * @param valeurs liste des valeurs de la ligne
+     */
     public void InsertIntoCurrentDatabase(String nomTable, String[] valeurs) throws Exception{
+    	// Vérifie si la Base de Données courante est définie
     	if(current == null) {
     		throw new IllegalArgumentException("La Base de Données de travail n'a pas été définie");
     	}
+    	// Récupère la table à modifier
     	Relation rel = GetTableFromCurrentDatabase(nomTable);
+    	// Vérifie qu'il y a le bon nombre de valeur à ajouter
     	if(valeurs.length != rel.getNbAttribut()) {
     		throw new IllegalArgumentException("Le nombre d'arguments n'est pas égal au nombre requis pour cette table : " + rel.getNbAttribut());
     	}
+    	// Initialise le record à insérer
     	MyRecord rec = new MyRecord();
+    	// Ajoute chaque valeur et le son type attendu dans le record
     	for(int i = 0; i<rel.getNbAttribut(); i++) {
     		rec.add(valeurs[i], rel.getType(i));
     	}
+    	//Insère le record
     	rel.InsertRecord(rec);
+    }
+    
+    /**
+     * Insère toutes les lignes du fichiers dans la table donnée
+     * 
+     * @param nomTable nom de la table à ammender
+     * @param nomFichier nom de fichier contenant les valeurs à ajouter
+     */
+    public void BulkInsertIntoCurrentDatabase(String nomTable, String nomFichier) throws Exception{
+    	// Lis le fichier contenant les données
+    	String insert = readFichier(DBConfig.dbpath + nomFichier);
+    	// Sépare les données en lignes
+    	String[] lines = insert.split("\n");
+    	// Chaque ligne représente un insert
+    	for(String line : lines) {
+    		// Retire les espaces en trop 
+    		line = line.trim();
+    		// Extrait les valeurs séparées par des virgules
+    		String[] valeurs = line.split("\\s*,\\s*");
+    		// Traite les valeurs à insérer une par une
+            for (String valeur : valeurs) {
+                valeur = valeur.trim(); // Enlever les espaces superflus autour de chaque attribut
+            }
+            // Insert la ligne
+            InsertIntoCurrentDatabase(nomTable, valeurs);
+    	}
     }
     
     /**
@@ -256,7 +294,7 @@ public class DBManager {
     public void loadState() throws IOException{
     	HashMap<String, Relation> DatabaseEnCours = null;
     	Relation RelationEnCours = null;
-        String save = readSave();
+        String save = readFichier(DBConfig.dbpath + "/databases.save");
 
         if(save == null) {
         	throw new IOException("La sauvegarde est vide");
@@ -320,9 +358,9 @@ public class DBManager {
      * 
      * @return Une chaîne de caractère contenant la sauvegarde
      */
-    public String readSave() throws IOException{
+    public String readFichier(String chemin) throws IOException{
     	// Lire tout le contenu du fichier et le retourner sous forme de chaîne
-        return new String(Files.readAllBytes(Paths.get(DBConfig.dbpath + "/databases.save")));
+        return new String(Files.readAllBytes(Paths.get(chemin)));
     }
 
     /**

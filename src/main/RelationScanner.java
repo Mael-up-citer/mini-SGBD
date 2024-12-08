@@ -51,7 +51,6 @@ public class RelationScanner implements IRecordIterator {
 
                 // Si tous les enregistrements d'une page ont été lus.
                 if (cpt > nbRecord) {
-                    System.out.println("end page");
                     bm.freePage(dataPageId.get(index - 1), false); // Libère la page précédente.
                     offset = 0; // Réinitialise l'offset.
                     index++; // Passe à la page suivante.
@@ -59,7 +58,6 @@ public class RelationScanner implements IRecordIterator {
 
                 // Si offset est à 0, une nouvelle page est chargée.
                 if (offset == 0) {
-                    System.out.println("start page");
                     buffer = bm.getPage(dataPageId.get(index)); // Charge la nouvelle page dans le buffer.
                     nbRecord = buffer.getInt(DBConfig.pagesize - 8); // Lit le nombre total d'enregistrements dans la page.
                 }
@@ -83,19 +81,17 @@ public class RelationScanner implements IRecordIterator {
      * @return true si toutes les conditions sont satisfaites, sinon false.
      */
     private boolean satifyConditions(MyRecord record, Relation relation) {
-        boolean flag = true; // Indicateur pour détecter les violations de conditions.
-
         // Parcourt toutes les conditions.
         for (Condition cond : conditions) {
             try {
                 // Si une condition n'est pas satisfaite, marque comme invalide.
-                if (!cond.evaluate(relation, record))
-                    flag = false;
+//                if (!cond.evaluate(relation, record))
+                    return false;
             } catch (Exception e) {
                 return false; // Retourne false en cas d'exception pendant l'évaluation.
             }
         }
-        return flag; // Retourne true si toutes les conditions sont valides.
+        return true; // Retourne true si toutes les conditions sont valides.
     }
 
     /**

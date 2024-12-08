@@ -4,9 +4,9 @@
  */
 public class Condition {
 
-    private final String terme1; // Premier terme de la condition (ex: 'age')
+    private final Pair<String, Relation> terme1; // Premier terme de la condition (ex: 'age')
     private final String operateur; // L'opérateur de comparaison (ex: '=', '>', '<', etc.)
-    private final String terme2; // Deuxième terme de la condition (ex: '30' ou 'John')
+    private final Pair<String, Relation> terme2; // Deuxième terme de la condition (ex: '30' ou 'John')
 
     /**
      * Constructeur de la classe Condition.
@@ -15,10 +15,12 @@ public class Condition {
      * @param operateur L'opérateur de comparaison (ex: '=', '<', etc.).
      * @param terme2 Le deuxième terme de la condition (peut être une constante ou un attribut).
      */
-    public Condition(String terme1, String operateur, String terme2) {
-        this.terme1 = terme1.toUpperCase();  // Convertir le terme1 en majuscules pour normaliser la casse
+    public Condition(Pair<String, Relation> terme1, String operateur, Pair<String, Relation> terme2) {
+        this.terme1 = terme1;
+        this.terme2 = terme2;
+        this.terme1.setFirst(terme1.getFirst().toUpperCase());  // Convertir le terme1 en majuscules pour normaliser la casse
         this.operateur = operateur;  // Affecter l'opérateur
-        this.terme2 = terme2.toUpperCase();  // Convertir le terme2 en majuscules pour normaliser la casse
+        this.terme2.setFirst(terme2.getFirst().toUpperCase());  // Convertir le terme1 en majuscules pour normaliser la casse
     }
 
     /**
@@ -29,10 +31,10 @@ public class Condition {
      * @return true si la condition est satisfaite, sinon false.
      * @throws Exception Si une erreur survient lors de l'évaluation de la condition.
      */
-    public boolean evaluate(Relation relation, MyRecord record) throws Exception {
+    public boolean evaluate(MyRecord record1, MyRecord record2) throws Exception {
         // Récupérer les valeurs des termes 1 et 2 de la condition
-        Pair<Object, DataType> value1 = getValue(terme1, relation, record);
-        Pair<Object, DataType> value2 = getValue(terme2, relation, record);
+        Pair<Object, DataType> value1 = getValue(terme1, record1);
+        Pair<Object, DataType> value2 = getValue(terme2, record2);
 
         // Comparer les deux valeurs avec le type de données du premier terme
         return compare(value1.getFirst(), value2.getFirst(), value1.getSecond());
@@ -48,21 +50,22 @@ public class Condition {
      * @return La valeur du terme et son type associé.
      * @throws Exception Si le terme n'est pas trouvé ou ne peut pas être évalué.
      */
-    private Pair<Object, DataType> getValue(String terme, Relation relation, MyRecord record) throws Exception {
-        // Vérifier si c'est un attribut dans la relation
-        Pair<Object, DataType> value = isAttrb(terme, relation, record);
+    private Pair<Object, DataType> getValue(Pair<String, Relation> terme, MyRecord record) throws IllegalArgumentException {
+        // Crée une paire qui contient la valeur et le type du terme
+        Pair<Object, DataType> value;
 
+        // Si le terme est associé à aucune relation
+        if (terme.getSecond() == null) 
+            value = parseConstant(terme.getFirst());    // Récupère la valeur de la constante
+        else
+            value = getAttrb(terme, record); // Récupère la valuer du l'attribut
+
+        // Si c'est un arrtibut ou une constante
         if (value != null)
-            return value;  // Si c'est un attribut, retourner la valeur correspondante
-
-        // Si ce n'est pas un attribut, tenter de le traiter comme une constante
-        value = parseConstant(terme);
-
-        if (value != null)
-            return value;  // Si c'est une constante, retourner sa valeur
+            return value;
 
         // Si ce n'est ni un attribut ni une constante, lever une exception
-        throw new Exception("Valeur ou attribut non trouvé : " + terme);
+        throw new IllegalArgumentException("Valeur ou attribut non trouvé : " + terme);
     }
 
     /**
@@ -73,15 +76,15 @@ public class Condition {
      * @param record L'enregistrement contenant les valeurs des attributs.
      * @return La paire (valeur, type) de l'attribut si trouvé, sinon null.
      */
-    private Pair<Object, DataType> isAttrb(String terme, Relation relation, MyRecord record) {
-        // Parcourir tous les attributs de la relation pour vérifier si le terme correspond à un nom d'attribut
-        for (int i = 0; i < relation.getAttribut().size(); i++)
-            // Test si le terme vaut l'attribut courrant dans la relation
-            if (terme.equalsIgnoreCase(relation.getNameAttribut(i)))
-                // Retourner la valeur de l'attribut et son type associé
-                return new Pair<>(record.getValue(i), record.getType(i));
+    private Pair<Object, DataType> getAttrb(Pair<String, Relation> terme, MyRecord record) {
+        // Parcour la relation pour trouvé l'index de l'attribut qui correspond
+        for (int i = 0; i < terme.getSecond().getNbAttribut(); i++)
+            // Si le therme à le meme nom qu'un attribut de la reltion le match est fzit
+            if (terme.getFirst().equalsIgnoreCase(terme.getSecond().getNameAttribut(i)))
+                return record.get(i);   // Retourne l'objet équivalent dans le record
 
-        return null;  // Retourner null si ce n'est pas un attribut
+        // Si on trouve aucun correpsondance
+        throw new IllegalArgumentException("aucun attribut n'a le nom de "+terme.getFirst()+" dans la relation "+terme.getSecond().getRelationName());
     }
 
     /**
@@ -91,22 +94,22 @@ public class Condition {
      * @return La paire (valeur, type) correspondant à la constante.
      * @throws Exception Si le terme ne peut pas être parsé comme une constante valide.
      */
-    private Pair<Object, DataType> parseConstant(String terme) throws Exception {
+    private Pair<Object, DataType> parseConstant(String terme) throws IllegalArgumentException {
         // Si le terme commence et finit par des guillemets, c'est une chaîne de caractères
         if (terme.startsWith("'") && terme.endsWith("'"))
             return new Pair<>(terme.substring(1, terme.length() - 1), DataType.VARCHAR);  // Chaîne de caractères
 
         try {
             // Si le terme est un nombre entier
-            if (terme.matches("-?\\d+")) {
+            if (terme.matches("-?\\d+"))
                 return new Pair<>(Integer.parseInt(terme), DataType.INT);  // Entier
-            }
+
             // Si le terme est un nombre réel
-            else if (terme.matches("-?\\d*\\.\\d+")) {
+            else if (terme.matches("-?\\d*\\.\\d+"))
                 return new Pair<>(Float.parseFloat(terme), DataType.REAL);  // Réel
-            }
+
         } catch (NumberFormatException e) {
-            throw new Exception("Impossible de parser la constante : " + terme);
+            throw new IllegalArgumentException("Impossible de parser la constante : " + terme);
         }
         return null;  // Retourner null si ce n'est pas une chaîne, un entier, ou un réel
     }
@@ -147,5 +150,10 @@ public class Condition {
             case "<>": return comp1.compareTo(comp2) != 0;  // différent
             default: throw new UnsupportedOperationException("Opérateur non supporté: " + operateur);
         }
+    }
+
+    @Override
+    public String toString() {
+        return terme1.toString()+""+operateur+""+terme2.toString();
     }
 }

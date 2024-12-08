@@ -1,5 +1,5 @@
 dbpath = src/tests/db/
-pagesize = 450
-dm_maxfilesize = 900
-bm_buffercount = 8
+pagesize = 200
+dm_maxfilesize = 600
+bm_buffercount = 256
 bm_policy = "MRU"

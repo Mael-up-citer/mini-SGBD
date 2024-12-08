@@ -114,6 +114,7 @@ public class Relation {
 
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         return 0;  // En cas d'erreur, retourne 0
     }
@@ -249,7 +250,7 @@ public class Relation {
             buffer.putInt(offset, id.FileIdx);      // Fichier de la nouvelle page
             buffer.putInt(offset + 4, id.PageIdx);  // Index de la nouvelle page
             buffer.putInt(offset + 8, DBConfig.pagesize - 8);  // octets libre -8 pour page directory
-
+            
             // Libère la dernière header page avec indication de modification
             bm.freePage(LastHeaderPageId, true);
 
@@ -391,7 +392,7 @@ public class Relation {
         return pageIds;
     }
 
-/**
+    /**
      * Insère un enregistrement dans la table. Si une page de données
      * avec suffisamment d'espace est trouvée, l'enregistrement est inséré dans celle-ci.
      * Sinon, une nouvelle page est ajoutée à la base de données.
@@ -420,15 +421,13 @@ public class Relation {
         int offset = 12;
 
         try {
-            /*
-
             // Charge la 1er Header Page en mémoire
             ByteBuffer buffer = bm.getPage(headerPageId);
             // Récupère le nombre de data Page
             int nbDataPage = buffer.getInt(0);
             int cpt = 0;    // Compte combien de data Page on été essayé
 
-            System.out.println("nombre de data Page =  "+nbDataPage);
+            System.out.println("\n\nnombre de data Page =  "+nbDataPage);
             System.out.println("1rst header Page =  "+headerPageId);
             System.out.println("last header Page =  "+LastHeaderPageId+"\n");
 
@@ -468,9 +467,9 @@ public class Relation {
                 // Si il y a du chainage
                 if (tempNextPage.PageIdx != -1) {
                     // Libère la header Page courante
-                    //bm.freePage(currentPage, false);
+                    bm.freePage(currentPage, false);
                     // charge la header page chainé suivante
-                    //buffer = bm.getPage(tempNextPage);
+                    buffer = bm.getPage(tempNextPage);
                     currentPage = tempNextPage;
 
                     System.out.println("switch header Page: "+currentPage);
@@ -478,10 +477,6 @@ public class Relation {
                     offset = 8; // RAZ l'offset
                 }
             }
-
-            */
-            ByteBuffer buffer = null;
-
             // Si aucune data page n'a suffisamment d'espace, en ajouter une nouvelle
             if (dataPageId == null) {
                 System.out.println("add new data Page");
@@ -492,7 +487,7 @@ public class Relation {
                     LastHeaderPageId.PageIdx
                 );
                 // Ajoute une nouvelle data page APRES la dernière header Page !
-                //dataPageId = addDataPage();
+                dataPageId = addDataPage();
 
                 // Si on a une nouvelle header Page
                 if (! tmp.equals(LastHeaderPageId)) {
@@ -512,25 +507,26 @@ public class Relation {
 
             // 1. Modifie la la header Page dans laquel la data Page choisie est
             // Récupère le nb d'octets libre auquel on enlève l'espace du record
-            //int freeSpace = buffer.getInt(offset) - (recordSize+8);
-            //buffer.putInt(offset, freeSpace);
+            int freeSpace = buffer.getInt(offset) - (recordSize+8);
+            buffer.putInt(offset, freeSpace);
 
-            //System.out.println("pos ou ecrire l'espace libre dans la header Page = "+offset);
-            //System.out.println("espace libre après ecriture = "+freeSpace);
+            System.out.println("pos ou ecrire l'espace libre dans la header Page = "+offset);
+            System.out.println("espace libre après ecriture = "+freeSpace);
 
             // Libere la header Page dans laquelle on va écrire
-            //bm.freePage(currentPage, true);
-/*
+            bm.freePage(currentPage, true);
+
             // 2. Modifie la data Page
             // Charge la data Page en mémoir
             buffer = bm.getPage(dataPageId);
+            bm.freePage(dataPageId, false);
 
             // Insére le record dans la page sélectionnée
             int recordPos = buffer.getInt(DBConfig.pagesize - 4); // Position de l'espace libre
 
             System.out.println("\npage d'écriture = "+dataPageId);
             System.out.println("pos ecriture = "+recordPos);
- 
+
             // Écrire le record dans le buffer et si on écrit pas exactement la taille du record c'est un échec
             if (writeRecordToBuffer(record, buffer, recordPos) != recordSize)
                 throw new Exception("échec de l'écriture du record dans le buffer");
@@ -557,7 +553,7 @@ public class Relation {
 
             // Retourne le RecordId du record composé d'un Page ID et l'index du slot
             return new RecordId(nbSlots, dataPageId);
-*/
+
         } catch(Exception e) {
             e.printStackTrace();
             System.out.println("README: "+e.getMessage());
