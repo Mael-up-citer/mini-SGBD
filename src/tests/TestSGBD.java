@@ -63,7 +63,7 @@ public class TestSGBD {
     }
 
     @Test
-    void testCreateAndManageDatabasesAndTables() {
+    void testCreateAndManageDatabasesAndTables() throws Exception {
         // Commande 1: CREATE DATABASE Db1
         String createDb1 = "CREATE DATABASE Db1";
         sgbd.assocQuery(createDb1);

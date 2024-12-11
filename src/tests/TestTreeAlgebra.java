@@ -1,7 +1,6 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -67,36 +66,19 @@ public class TestTreeAlgebra {
         HashMap<String, ArrayList<Condition>> innerConditions = new HashMap<>();
         ArrayList<Condition> conditions = new ArrayList<>();
 
-        conditions.add(new Condition(new Pair<>("value", 2), "=", new Pair<>("10", -1))); // La colonne "value" a un indice de 2
-        innerConditions.put("Relation1", conditions);
+        int index2 = relations.get(1).getNbAttribut();
+        int index3 = index2+relations.get(2).getNbAttribut();
+
+        conditions.add(new Condition(new Pair<>("id", 0), ">", new Pair<>("5", -1)));
+        innerConditions.put("RELATION2", conditions);
 
         ArrayList<Condition> joinConditions = new ArrayList<>();
-        ArrayList<Integer> attbToPrint = new ArrayList<>(List.of(0, 1, 2));
-        ArrayList<String> attrbName = new ArrayList<>(List.of("id", "name", "value"));
+        joinConditions.add(new Condition(new Pair<>("id", 0), "=", new Pair<>("id", index2)));
+
+        ArrayList<Integer> attbToPrint = new ArrayList<>(List.of(0, index2, index3));
+        ArrayList<String> attrbName = new ArrayList<>(List.of("R1.id", "R2.id", "R3.id"));
 
         treeAlgebra tree = new treeAlgebra(relations, joinConditions, innerConditions, attbToPrint, attrbName, bm);
         tree.execute(); // Vérifie si l'exécution filtre correctement les résultats
     }
-/*
-    @Test
-    void testMultipleRelationsWithJoinConditionsAndIndices() throws Exception {
-        // Tester avec plusieurs relations et des conditions de jointure en utilisant des indices absolus
-        List<Relation> relations = List.of(relation1, relation2, relation3);
-
-        HashMap<String, ArrayList<Pair<String, Integer>>> innerConditions = new HashMap<>();
-        ArrayList<Pair<String, Integer>> conditionsRelation1 = new ArrayList<>();
-        conditionsRelation1.add(new Pair<>("id", 0)); // La colonne "id" dans relation1 a un indice de 0
-        innerConditions.put("Relation1", conditionsRelation1);
-
-        ArrayList<Pair<Integer, Integer>> joinConditions = new ArrayList<>();
-        // La colonne "id" de relation1 correspond à l'indice 0 absolu, et celle de relation2 à l'indice 3 (décalage de 3 attributs)
-        joinConditions.add(new Pair<>(0, 3)); 
-
-        ArrayList<Integer> attbToPrint = new ArrayList<>(List.of(0, 1, 2, 3, 4, 5));
-        ArrayList<String> attrbName = new ArrayList<>(List.of("id", "name", "value", "id2", "name2", "value2"));
-
-        treeAlgebra tree = new treeAlgebra(relations, joinConditions, innerConditions, attbToPrint, attrbName, bm);
-        tree.execute(); // Vérifie si l'exécution applique correctement les jointures et les conditions
-    }
-*/
 }

@@ -44,6 +44,9 @@ public class selectOperator implements IRecordIterator {
      */
     @Override
     public MyRecord GetNextRecord() {
+        // Si la relation est vide, retourne null immédiatement
+        if (tupleIterator == null) return null;
+
         MyRecord record;
 
         do {
@@ -68,7 +71,7 @@ public class selectOperator implements IRecordIterator {
                     record = tupleIterator.GetNextRecord();
                 }
             } catch (Exception e) {
-                // Relève une exception en cas d'erreur.
+                // Lève une exception en cas d'erreur.
                 throw new RuntimeException(e.getMessage());
             }
         } while (!satifyConditions(record)); // Continue tant que les conditions ne sont pas satisfaites.
@@ -106,13 +109,22 @@ public class selectOperator implements IRecordIterator {
     public void Reset() {
         // Réinitialise l'itérateur de pages.
         pageIterator.Reset();
+
         // Charge la première page et initialise un itérateur pour ses enregistrements.
         PageId id = pageIterator.GetNextDataPageId();
-        try {
-            tupleIterator = new DataPageHoldRecordIterator(relation, bm.getPage(id), bm, id);
-        } catch (Exception e) {
-            // Relève une exception si une erreur se produit pendant l'initialisation.
-            throw new RuntimeException("Erreur lors de la création de l'itérateur de tuple");
+
+        // Si la relation est vide
+        if (id == null)
+            tupleIterator = null;   // Pas d'iterateur de tuple sur une relation vide
+        else {
+            try {
+                // Crée un nouvel itérateur pour les enregistrements de la première page.
+                tupleIterator = new DataPageHoldRecordIterator(relation, bm.getPage(id), bm, id);
+            } catch (Exception e) {
+                // Si une erreur survient, l'itérateur de tuples est nul.
+                tupleIterator = null;
+                throw new RuntimeException("Erreur lors de la création de l'itérateur de tuple: " + e.getMessage());
+            }
         }
     }
 
@@ -121,9 +133,8 @@ public class selectOperator implements IRecordIterator {
      */
     @Override
     public void Close() {
-        // Ferme l'itérateur de tuples.
-        tupleIterator.Close();
-        // Ferme l'itérateur de pages.
-        pageIterator.Close();
+        // Vérifie si on a un itérateur de tuple
+        if (tupleIterator != null) tupleIterator.Close();
+            pageIterator.Close();
     }
 }
