@@ -27,7 +27,14 @@ public class Pair<T1, T2> {
         this.second = second;
     }
 
-        /**
+    /**
+     * Constructeur vide de la classe Pair.
+     * 
+     */
+    public Pair(){
+    }
+
+    /**
      * Méthode equals pour comparer deux objets Pair.
      * Deux paires sont considérées égales si leurs valeurs (first et second) sont égales.
      *
@@ -69,7 +76,7 @@ public class Pair<T1, T2> {
      */
     @Override
     public String toString() {
-        return "Pair{" + "first=" + first + ", second=" + second + '}';
+        return first + "\t" + second;
     }
 
     /**

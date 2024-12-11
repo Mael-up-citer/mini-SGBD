@@ -4,9 +4,9 @@
  */
 public class Condition {
 
-    private final Pair<String, Relation> terme1; // Premier terme de la condition (ex: 'age')
+    private final Pair<String, Integer> terme1; // Premier terme de la condition (ex: 'age')
     private final String operateur; // L'opérateur de comparaison (ex: '=', '>', '<', etc.)
-    private final Pair<String, Relation> terme2; // Deuxième terme de la condition (ex: '30' ou 'John')
+    private final Pair<String, Integer> terme2; // Deuxième terme de la condition (ex: '30' ou 'John')
 
     /**
      * Constructeur de la classe Condition.
@@ -15,7 +15,7 @@ public class Condition {
      * @param operateur L'opérateur de comparaison (ex: '=', '<', etc.).
      * @param terme2 Le deuxième terme de la condition (peut être une constante ou un attribut).
      */
-    public Condition(Pair<String, Relation> terme1, String operateur, Pair<String, Relation> terme2) {
+    public Condition(Pair<String, Integer> terme1, String operateur, Pair<String, Integer> terme2) {
         this.terme1 = terme1;
         this.terme2 = terme2;
         this.terme1.setFirst(terme1.getFirst().toUpperCase());  // Convertir le terme1 en majuscules pour normaliser la casse
@@ -31,10 +31,10 @@ public class Condition {
      * @return true si la condition est satisfaite, sinon false.
      * @throws Exception Si une erreur survient lors de l'évaluation de la condition.
      */
-    public boolean evaluate(MyRecord record1, MyRecord record2) throws Exception {
+    public boolean evaluate(MyRecord record) throws Exception {
         // Récupérer les valeurs des termes 1 et 2 de la condition
-        Pair<Object, DataType> value1 = getValue(terme1, record1);
-        Pair<Object, DataType> value2 = getValue(terme2, record2);
+        Pair<Object, DataType> value1 = getValue(terme1, record);
+        Pair<Object, DataType> value2 = getValue(terme2, record);
 
         // Comparer les deux valeurs avec le type de données du premier terme
         return compare(value1.getFirst(), value2.getFirst(), value1.getSecond());
@@ -50,12 +50,12 @@ public class Condition {
      * @return La valeur du terme et son type associé.
      * @throws Exception Si le terme n'est pas trouvé ou ne peut pas être évalué.
      */
-    private Pair<Object, DataType> getValue(Pair<String, Relation> terme, MyRecord record) throws IllegalArgumentException {
+    private Pair<Object, DataType> getValue(Pair<String, Integer> terme, MyRecord record) throws IllegalArgumentException {
         // Crée une paire qui contient la valeur et le type du terme
         Pair<Object, DataType> value;
 
         // Si le terme est associé à aucune relation
-        if (terme.getSecond() == null) 
+        if (terme.getSecond() == -1) 
             value = parseConstant(terme.getFirst());    // Récupère la valeur de la constante
         else
             value = getAttrb(terme, record); // Récupère la valuer du l'attribut
@@ -76,15 +76,13 @@ public class Condition {
      * @param record L'enregistrement contenant les valeurs des attributs.
      * @return La paire (valeur, type) de l'attribut si trouvé, sinon null.
      */
-    private Pair<Object, DataType> getAttrb(Pair<String, Relation> terme, MyRecord record) {
-        // Parcour la relation pour trouvé l'index de l'attribut qui correspond
-        for (int i = 0; i < terme.getSecond().getNbAttribut(); i++)
-            // Si le therme à le meme nom qu'un attribut de la reltion le match est fzit
-            if (terme.getFirst().equalsIgnoreCase(terme.getSecond().getNameAttribut(i)))
-                return record.get(i);   // Retourne l'objet équivalent dans le record
-
-        // Si on trouve aucun correpsondance
-        throw new IllegalArgumentException("aucun attribut n'a le nom de "+terme.getFirst()+" dans la relation "+terme.getSecond().getRelationName());
+    private Pair<Object, DataType> getAttrb(Pair<String, Integer> terme, MyRecord record) {
+        try {
+            return record.get(terme.getSecond());   // Retourne l'objet équivalent dans le record
+        } catch (Exception e) {
+            // Si on trouve aucun correpsondance
+        throw new IllegalArgumentException("aucun attribut n'a le nom de "+terme.getFirst()+" dans la relation "+terme.getSecond());
+        }
     }
 
     /**
@@ -129,6 +127,12 @@ public class Condition {
         if (value1 == null || value2 == null)
             throw new IllegalArgumentException("Les valeurs à comparer ne peuvent pas être nulles.");
 
+        // Si les valeurs sont des instances de Number, convertir en double pour la comparaison
+        if (value1 instanceof Number && value2 instanceof Number) {
+            value1 = ((Number) value1).doubleValue();
+            value2 = ((Number) value2).doubleValue();
+        }
+
         // Vérifier que les valeurs sont du même type
         if (value1.getClass() != value2.getClass())
             throw new IllegalArgumentException("Les valeurs à comparer doivent être du même type.");
@@ -136,9 +140,6 @@ public class Condition {
         // Comparer les valeurs en utilisant la méthode Comparable (les objets doivent être comparables)
         Comparable<Object> comp1 = (Comparable<Object>) value1;
         Comparable<Object> comp2 = (Comparable<Object>) value2;
-
-        System.out.println(comp1+" "+operateur+" "+comp2);
-        System.out.println(comp1.compareTo(comp2)+"\n");
 
         // Exécution de la comparaison en fonction de l'opérateur spécifié
         switch (operateur) {

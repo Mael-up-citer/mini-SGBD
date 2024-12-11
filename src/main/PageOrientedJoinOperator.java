@@ -1,123 +1,108 @@
-import java.util.List;
 import java.util.ArrayList;
 
-/**
- * Cette classe implémente un opérateur de jointure multi-table pour un produit cartésien
- * dynamique de relations, où le nombre de relations n'est pas connu à l'avance.
- * Elle combine les tuples de toutes les relations en générant un produit cartésien sans jointure conditionnelle.
- */
 public class PageOrientedJoinOperator implements IRecordIterator {
-    private List<Relation> relations;         // Liste des relations à joindre
-    private ArrayList<IRecordIterator> iterators;  // Liste des itérateurs pour chaque relation
-    private BufferManager bm;                 // Gestionnaire de buffer
-    private ArrayList<MyRecord> records; // List qui contient 1 record issues de chaque relation
-
+    private Pair<IRecordIterator, IRecordIterator> operateurs; // Les deux relations à joindre représenté par lurs select
+    private ArrayList<Condition> joinConditions;
+    private MyRecord outerRecord; // Le tuple courant de la relation interieur
 
     /**
-     * Constructeur de l'opérateur de jointure multi-table orientée page pour produit cartésien dynamique.
-     * 
-     * @param relations Liste des relations à joindre.
-     * @param bm Le gestionnaire de buffer pour accéder aux pages de données.
-     * @throws Exception Si une erreur survient lors de l'initialisation des itérateurs.
+     * Constructeur de l'opérateur de jointure orientée page pour produit cartésien.
      */
-    public PageOrientedJoinOperator(List<Relation> relations, BufferManager bm) throws Exception {
-        this.relations = relations;
-        this.bm = bm;
-        this.iterators = new ArrayList<>();
+    public PageOrientedJoinOperator(Pair<IRecordIterator, IRecordIterator> operateurs, ArrayList<Condition> conditions) throws Exception {
+        this.operateurs = operateurs; // Initialisation des relations à joindre
+        joinConditions = conditions;
 
-        // Initialisation des itérateurs pour chaque relation
-        for (Relation relation : relations) {
-            PageDirectoryIterator pdi = new PageDirectoryIterator(relation, bm);
-            //PageId pid = pdi.GetNextDataPageId()
-            //iterators.add(new DataPageHoldRecordIterator(relation, bm, relation.getHeaderPageId()));
-        }
+        // Initialise le tuple externe 
+        outerRecord = this.operateurs.getFirst().GetNextRecord();
 
-        for (int i = 0; i < iterators.size(); i++) {
-            MyRecord record = iterators.get(i).GetNextRecord();
-            // Si on n'arrive à extraire 0 record d'une relation
-            if (record == null)
-                throw new Exception("impossible de faire la jointure car un des relation est vide");
-
-            records.add(i, record);
-        }
+        if (outerRecord == null)
+            throw new IllegalStateException("L'une des relations est vide, on ne peut pas faire de produit cartésien");
     }
 
     /**
-     * Récupère le prochain record résultant du produit cartésien des relations.
-     * Cette méthode utilise un algorithme de boucle imbriquée dynamique pour générer un produit cartésien
-     * entre toutes les relations, en incrémentant les indices des itérateurs des relations.
-     * 
-     * @return Le tuple fusionné, ou null s'il n'y a plus de tuples à traiter.
+     * Récupère le prochain tuple résultant du produit cartésien des relations.
      */
     @Override
     public MyRecord GetNextRecord() {
-        // Parcours dynamique des relations pour générer le produit cartésien
-        while (true) {
-            MyRecord record = advance(relations.size());  // Retourne le record fusionné
-        }
-    }
+        MyRecord res;   // Record resultant de la fusion
 
-    private MyRecord advance(int indexIterator) {
-        // Demande le prochain record de la dernière page
-        MyRecord record = iterators.get(indexIterator).GetNextRecord();
-        records.remove(indexIterator);  // On enlève l'ancien record qui était à cette position
-        records.add(indexIterator, record); // Ajoute celui qui vient d'etre donnée
+        do {
+            try {
+                res = new MyRecord();
 
-        // Si on est au bout de l'itérateur
-        if (record == null) {
-            // Si on est au bout du dernier itérateur
-            if (indexIterator == 0) {
-                Close();    // Ferme les itérateurs
-                return null;    // Retourne null pour marquer la fin
+                // Récupère le prochain record de la relation interne
+                MyRecord innerRecord = operateurs.getSecond().GetNextRecord();
+
+                // Si il est null on est au bout de la relation interne
+                if (innerRecord == null) {
+                    // Récupère le record suivant dans la relation externe
+                    outerRecord = operateurs.getFirst().GetNextRecord();
+
+                    // Si il est null on est au bout de la relation externe
+                    if (outerRecord == null) return null;    // Fin de l'iterateur
+
+                    // Si la relation externe n'est pas null reset la relation interne
+                    operateurs.getSecond().Reset();
+                    // Récupère le prochain record de la relation interne
+                    innerRecord = operateurs.getSecond().GetNextRecord();
+                }
+                res.addAll(outerRecord);
+                res.addAll(innerRecord);
+
+            } catch (Exception e) {
+                throw new RuntimeException(e.getMessage());
             }
-            // Sinon reset l'iterateur
-            iterators.get(indexIterator).Reset();
-            advance(indexIterator-1);   // Et on avance dans l'itérateur au dessus
-        }
-        // Ici on sait que le record est non null si il vient du dernier itérateur
-        else if (indexIterator == relations.size()) {
-            return combineRecords();
-        }
-        return advance(indexIterator+1);
+        } while (!satifyConditions(res)); // Continue tant que les conditions ne sont pas satisfaites.
+
+        return res;  // Retourne le record resultat
     }
 
     /**
-     * Combine les records extraits de chaque relation pour créer un nouveau record fusionné,
-     * représentant le produit cartésien de tous les tuples des relations jointes.
+     * Vérifie si un enregistrement satisfait toutes les conditions spécifiées.
      * 
-     * @param records Liste des records extraits de chaque relation.
-     * @return Un record combiné représentant un produit cartésien.
+     * @param record   Enregistrement à vérifier.
+     * @param relation Relation associée à l'enregistrement.
+     * @return true si toutes les conditions sont satisfaites, sinon false.
      */
-    private MyRecord combineRecords() {
-        MyRecord combinedRecord = new MyRecord();
-
-        // Ajouter les attributs de chaque record à celui combiné
-        for (MyRecord record : records)
-            combinedRecord.addAll(record);
-
-        return combinedRecord;
+    private boolean satifyConditions(MyRecord record) {
+        // Parcourt toutes les conditions.
+        for (Condition cond : joinConditions) {
+            try {
+                // Si une condition n'est pas satisfaite, retourne false.
+                if (!cond.evaluate(record))
+                    return false;
+            } catch (Exception e) {
+                // Retourne false en cas d'erreur d'évaluation.
+                return false;
+            }
+        }
+        // Retourne true si toutes les conditions sont satisfaites.
+        return true;
     }
 
     /**
      * Réinitialise l'opérateur de jointure en réinitialisant tous les itérateurs.
-     * Cette méthode est appelée lorsque les itérateurs sont épuisés ou après une nouvelle tentative de génération
-     * du produit cartésien.
      */
     @Override
     public void Reset() {
-        // Réinitialiser tous les itérateurs pour recommencer le produit cartésien
-        for (IRecordIterator iterator : iterators)
-            iterator.Reset();
+        try {
+            operateurs.getFirst().Reset();
+            operateurs.getSecond().Reset();
+            outerRecord = operateurs.getFirst().GetNextRecord();
+        } catch (Exception e) {
+            System.out.println("Erreur lors de la réinitialisation : " + e.getMessage());
+        }
     }
 
     /**
-     * Ferme l'opérateur de jointure en libérant les ressources.
-     * Cette méthode est appelée pour libérer la mémoire et les ressources utilisées par les itérateurs.
+     * Ferme l'opérateur de jointure et libère les ressources utilisées.
+     * Tous les attributs sont également mis à null.
      */
     @Override
     public void Close() {
-        // Fermer tous les itérateurs et libérer les ressources associées
-        for (IRecordIterator iterator : iterators)
-            iterator.Close();
+        operateurs.setFirst(null);; // Les deux relations à joindre représenté par lurs select
+        operateurs.setSecond(null);; // Les deux relations à joindre représenté par lurs select
+        joinConditions = null;
+        outerRecord = null;
     }
 }

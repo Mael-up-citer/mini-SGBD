@@ -210,6 +210,7 @@ class TestRelation {
                 DBConfig dbConfig = DBConfig.loadConfig("src/tests/config.txt"); // Recharger la configuration
                 DBConfig.pagesize = j;
                 DBConfig.dm_maxfilesize = 300;
+                DBConfig.bm_buffercount = 8;
 
                 BufferManager bm = new BufferManager(dbConfig, dskM); // Réinitialiser le BufferManager
 

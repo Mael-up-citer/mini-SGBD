@@ -405,7 +405,7 @@ public class Relation {
         // Calculer la taille du record son offset compris
         int recordSize = record.getSizeOctet(this) + ((attribut.size()+1) * 4);   // taille du record + la taille de son l'offset directory
 
-        System.out.println("le record à inserer occupe "+recordSize+" octets");
+        //System.out.println("le record à inserer occupe "+recordSize+" octets");
 
         // Contient la header Page courante
         PageId currentPage = new PageId();
@@ -427,9 +427,9 @@ public class Relation {
             int nbDataPage = buffer.getInt(0);
             int cpt = 0;    // Compte combien de data Page on été essayé
 
-            System.out.println("\n\nnombre de data Page =  "+nbDataPage);
-            System.out.println("1rst header Page =  "+headerPageId);
-            System.out.println("last header Page =  "+LastHeaderPageId+"\n");
+            //System.out.println("nombre de data Page =  "+nbDataPage);
+            //System.out.println("1rst header Page =  "+headerPageId);
+            //System.out.println("last header Page =  "+LastHeaderPageId+"\n");
 
             // Label pour quitter la boucle en la nommant
             outerLoop:
@@ -448,7 +448,7 @@ public class Relation {
                         dataPageId.FileIdx = buffer.getInt(offset-8);
                         dataPageId.PageIdx = buffer.getInt(offset-4);
 
-                        System.out.println("data Page: "+dataPageId);
+                        //System.out.println("data Page: "+dataPageId);
                         
                         // Quitte la boucle nommé
                         break outerLoop;
@@ -472,14 +472,14 @@ public class Relation {
                     buffer = bm.getPage(tempNextPage);
                     currentPage = tempNextPage;
 
-                    System.out.println("switch header Page: "+currentPage);
+                    //System.out.println("switch header Page: "+currentPage);
 
                     offset = 8; // RAZ l'offset
                 }
             }
             // Si aucune data page n'a suffisamment d'espace, en ajouter une nouvelle
             if (dataPageId == null) {
-                System.out.println("add new data Page");
+                //System.out.println("add new data Page");
 
                 // Met de coter l'ancienne derniere header Page
                 PageId tmp = new PageId(
@@ -492,7 +492,7 @@ public class Relation {
                 // Si on a une nouvelle header Page
                 if (! tmp.equals(LastHeaderPageId)) {
 
-                    System.out.println("new hp");
+                    //System.out.println("new hp");
 
                     bm.freePage(tmp, false);  // Libère l'ancienne header Page
                     currentPage = LastHeaderPageId; // Met a jour current
@@ -510,8 +510,9 @@ public class Relation {
             int freeSpace = buffer.getInt(offset) - (recordSize+8);
             buffer.putInt(offset, freeSpace);
 
-            System.out.println("pos ou ecrire l'espace libre dans la header Page = "+offset);
-            System.out.println("espace libre après ecriture = "+freeSpace);
+            //System.out.println("pos ou ecrire l'espace libre dans la header Page = "+offset);
+            //System.out.println("espace libre après ecriture = "+freeSpace);
+            //System.out.println("id "+dataPageId);
 
             // Libere la header Page dans laquelle on va écrire
             bm.freePage(currentPage, true);
@@ -519,16 +520,19 @@ public class Relation {
             // 2. Modifie la data Page
             // Charge la data Page en mémoir
             buffer = bm.getPage(dataPageId);
-            bm.freePage(dataPageId, false);
 
             // Insére le record dans la page sélectionnée
             int recordPos = buffer.getInt(DBConfig.pagesize - 4); // Position de l'espace libre
 
-            System.out.println("\npage d'écriture = "+dataPageId);
-            System.out.println("pos ecriture = "+recordPos);
+            //System.out.println("\npage d'écriture = "+dataPageId);
+            //System.out.println("pos ecriture = "+recordPos);
+
+            int writeSize = writeRecordToBuffer(record, buffer, recordPos);
+
+            //System.out.println(writeSize+"/"+recordSize);
 
             // Écrire le record dans le buffer et si on écrit pas exactement la taille du record c'est un échec
-            if (writeRecordToBuffer(record, buffer, recordPos) != recordSize)
+            if (writeSize != recordSize)
                 throw new Exception("échec de l'écriture du record dans le buffer");
 
             // Si l'écriture à marché
@@ -540,7 +544,7 @@ public class Relation {
             // récupere la position d'écriture du slotOffset
             int slotOffset = DBConfig.pagesize - 8 - (nbSlots * 8);
 
-            System.out.println("slotOffset = "+slotOffset);
+            //System.out.println("slotOffset = "+slotOffset);
 
             buffer.putInt(slotOffset, recordPos); // Position du record
             buffer.putInt(slotOffset + 4, recordSize); // Taille du record

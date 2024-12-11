@@ -55,6 +55,7 @@ public class BufferManager{
         // Si le noeud est dans l'arbre
         else {
             ByteBuffer buffer = node.buffer; // Récupère le buffer associé au noeud
+            node.pin_count++;   // Incrémente le compteur d'utilisation
         	// Si la page était dans junkFile, on l'enlève
             if(node.pointeurListe != null) {
                 suppJunk(node.pointeurListe); // Retire de junkFile

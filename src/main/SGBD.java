@@ -444,14 +444,14 @@ public class SGBD {
             String tables = matcher.group(2);  // Tables et alias dans FROM
             String whereConditions = matcher.group(3); // Conditions dans WHERE (optionnel)
 
-            ArrayList<Relation> relations = new ArrayList<>();
-
             // Afficher les résultats extractions
             System.out.println("Attributs : " + attributs);
             System.out.println("Relation et allias : " + tables);
             System.out.println("Conditions : " + whereConditions);
 
-            // Associe le nom d'une relation à son allias
+            // Liste qui contient les relations
+            ArrayList<Relation> relations = new ArrayList<>();
+            // 1er element associe le nom d'une relation à son allias, le 2nd l'inverse
             Pair<HashMap<String, String>, HashMap<String, String>> pair = extractRelation(tables, relations);
 
             // Vérifie si il y a eu un problème avec les relations
@@ -462,15 +462,22 @@ public class SGBD {
             HashMap<String, String> assocNomToAllais = pair.getFirst();
             HashMap<String, String> assocAlliasToNom = pair.getSecond();
 
-            // Extraire les indices des attributs à afficher
+            // Extraire les indices des attributs à afficher, les indices sont calculé dans le tuple fusionné resultant
             ArrayList<Integer> attrbToPrint = extractAttribut(attributs, assocNomToAllais);
-            // Liste des conditions
-            ArrayList<Condition> conditions = new ArrayList<>();
+
+            // Pair qui contient en 1 les conditions interne des tables et en second les conditions de jointures
+            Pair<HashMap<String, ArrayList<Condition>>, ArrayList<Condition>> conditions = new Pair<>(); 
+            // Liste des conditions interne à une table
+            HashMap<String, ArrayList<Condition>> internConditions = new HashMap<>();
+            // Liste des conditions de jointures entre 2 éléments
+            ArrayList<Condition> joinConditions = new ArrayList<>();
 
             // Si on a des conditions
-            if (whereConditions != null)
+            if (whereConditions != null) {
                 conditions = extractCondition(whereConditions, assocAlliasToNom);  // Extraire les conditions
-
+                internConditions = conditions.getFirst();
+                joinConditions = conditions.getSecond();
+            }
             // Afficher les résultats extractions
             System.out.println("Attributs : " + attrbToPrint);
             System.out.println("Relation et allias : " + assocNomToAllais);
@@ -478,17 +485,7 @@ public class SGBD {
 
             // Exécuter la commande avec les opérateurs relationnels
             try {
-                // Si c'est une requete monotable
-                if (relations.size() == 1) {
-                    //RelationScanner scanner = new RelationScanner(relations.get(0), bm, conditions);
-                    //ProjectOperator projOp = new ProjectOperator(scanner, attrbToPrint);
-                    //RecordPrinter rp = new RecordPrinter(projOp);
-
-                    //rp.printAllRecord();
-                }
-                else {
-
-                }
+                //treeAlgebra planExec = new treeAlgebra(relations, joinConditions, internConditions, attrbToPrint, bm);
             } catch(Exception e){
                 System.out.println("Erreur lors de l'exécution de la commande "+e.getMessage());
             }
@@ -557,7 +554,9 @@ public class SGBD {
         if ("*".equals(param.trim())) {
             // Parcours des relations dans l'ordre des alias
             for (String alias : assocAlliasToNom.keySet()) {
+                // Récupère le nom de la relation
                 String relationName = assocAlliasToNom.get(alias);
+                // Récupère l'objet relation associé
                 Relation relation = dbM.getCurrentDatabase().get(relationName);
 
                 // Ajouter les indices absolus pour tous les attributs de cette relation
@@ -569,28 +568,35 @@ public class SGBD {
         } 
         else {
             // Si on a des attributs spécifiques dans le SELECT
+            // Chaque case contient allais.attrbName
             String[] attrbs = param.split(",");
 
             // Map pour garder les décalages des relations
             HashMap<String, Integer> relationOffsets = new HashMap<>();
 
-            // Calculer les décalages globaux pour chaque relation
+            // Calculer les décalages globaux pour chaque relation en fonction de l'ordre d'apparition de la relation dans le 'FROM'
             for (String alias : assocAlliasToNom.keySet()) {
+                // Récupère le nom de la relation
                 String relationName = assocAlliasToNom.get(alias);
+                // Récupere la relation associé
                 Relation relation = dbM.getCurrentDatabase().get(relationName);
+                // Met dans la map pour cette alias il faut ce décalge
                 relationOffsets.put(alias, globalOffset);
-                globalOffset += relation.getNbAttribut();  // Met à jour le décalage global pour la prochaine relation
+                // Met à jour le décalage global pour la prochaine relation
+                globalOffset += relation.getNbAttribut();
             }
 
             // Traitement des attributs spécifiques dans le SELECT
             for (String attrb : attrbs) {
                 attrb = attrb.trim();
+                // La case 0 contient l'allias et la case 1 son NameAttrbut
                 String[] parts = attrb.split("\\.");  // Séparer l'alias et le nom de la colonne
 
                 // Vérification que l'attribut est bien formé sous le format alias.colonne
                 if (parts.length != 2)
                     throw new IllegalArgumentException("Attribut mal formé : " + attrb);
 
+                // Récupère les composants
                 String alias = parts[0];
                 String columnName = parts[1];
 
@@ -598,15 +604,21 @@ public class SGBD {
                 if (!assocAlliasToNom.containsKey(alias))
                     throw new IllegalArgumentException("Alias inconnu : " + alias);
 
+                // Récupère le nom de la relation lié à cette allias
                 String relationName = assocAlliasToNom.get(alias);
+                // Récupère la relation associé
                 Relation relation = dbM.getCurrentDatabase().get(relationName);
 
                 // Trouver l'index relatif de la colonne dans la relation
                 int relativeIndex = -1;
+
+                // Parcour les attributs dans une relation pour chercher l'index de l'attribut
                 for (int i = 0; i < relation.getNbAttribut(); i++) {
+                    // Si on le trouve
                     if (relation.getNameAttribut(i).equals(columnName)) {
-                        relativeIndex = i;  // Trouvé l'index relatif
-                        break;
+                        // Garde son index relatif
+                        relativeIndex = i;
+                        break;  // Quitte la boucle
                     }
                 }
 
@@ -627,11 +639,14 @@ public class SGBD {
      * @param param Partie WHERE (ex. "aliasRel.col1 = 10 AND aliasRel.col2 > 20").
      * @return Liste des conditions extraites.
      */
-    private ArrayList<Condition> extractCondition(String param, HashMap<String, String> assocAlliasToNom) {
+    private Pair<HashMap<String, ArrayList<Condition>>, ArrayList<Condition>> extractCondition(String param, HashMap<String, String> assocAlliasToNom) {
         // Tableau ou chaque case contient une condition
         String[] conditions = param.split("\\s+AND\\s+");
         // Liste ou on stock les conditons extrait
-        ArrayList<Condition> res = new ArrayList<>();
+        Pair<HashMap<String, ArrayList<Condition>>, ArrayList<Condition>> res = new Pair<>();
+        res.setFirst(new HashMap<>());
+        res.setSecond(new ArrayList<>());
+
         // Regex pour capturer le patern d'une condition
         String regex = "(?:([a-zA-Z0-9_]+)\\.)?([a-zA-Z0-9_]+)\\s*(<|>|<=|>=|=|!=)\\s*(?:([a-zA-Z0-9_]+\\.)?([a-zA-Z0-9_]+|'[a-zA-Z0-9_\\s]+'))";
         Pattern pattern = Pattern.compile(regex);
@@ -650,13 +665,99 @@ public class SGBD {
                 String alias2 = matcher.group(4);   // Alias du second terme (peut être null)
                 String colonne2 = matcher.group(5); // Colonne ou valeur du second terme
 
-                Relation r1 = dbM.getCurrentDatabase().get(assocAlliasToNom.get(alias1));
-                Relation r2 = dbM.getCurrentDatabase().get(assocAlliasToNom.get(alias2));
+                // Index de l'attribut dans la relation -1 = abscent
+                int index1 = -1;
+                int index2 = -1;
 
-                Pair<String, Relation> p1 = new Pair<String,Relation>(colonne1, r1);
-                Pair<String, Relation> p2 = new Pair<String,Relation>(colonne2, r2);
+                // Si c'est une condition sur la même table
+                if ((alias1 == null) || (alias2 == null) || (alias1.equals(alias2))) {
+                    // Contient le nom de la relation
+                    String relationName;
 
-                res.add(new Condition(p1, operateur, p2));
+                    // Extrait le nom de la relation
+                    // L'un des 2 alias est null donc on test
+                    if (alias1 != null) relationName = assocAlliasToNom.get(alias1);
+                    else if (alias2 != null) relationName = assocAlliasToNom.get(alias2);
+                    else throw new IllegalArgumentException("erreur dans la condition: "+cond);
+
+                    // Récupère la relation
+                    Relation relation = dbM.getCurrentDatabase().get(relationName);
+
+                    // Itère sur chaque attribut
+                    for (int i = 0; i < relation.getNbAttribut(); i++ ) {
+                        // Si le nom correspond a celui qu'on cherche on garde i
+                        if (relation.getAttribut(i).getFirst().equals(colonne1)) index1 = i;
+                        if (relation.getAttribut(i).getFirst().equals(colonne2)) index2 = i;
+                    }
+                    // Crée les pair de terme
+                    Pair<String, Integer> p1 = new Pair<String,Integer>(colonne1, index1);
+                    Pair<String, Integer> p2 = new Pair<String,Integer>(colonne2, index2);
+    
+                    // Ajouter une nouvelle condition à la liste associée à 'alias1'
+                    res.getFirst().computeIfAbsent(alias1, k -> new ArrayList<>()).add(new Condition(p1, operateur, p2));
+                }
+                // Sinon c'est une condition de jointure
+                else {
+                    // Nom des relations conserné
+                    String relationName1;
+                    String relationName2;
+
+                    // Extrait le nom des relations
+                    relationName1 = assocAlliasToNom.get(alias1);
+                    relationName2 = assocAlliasToNom.get(alias2);
+
+                    // Extrait les relations
+                    Relation relation1 = dbM.getCurrentDatabase().get(relationName1);
+                    Relation relation2 = dbM.getCurrentDatabase().get(relationName1);
+
+                    // Map pour garder les décalages des relations
+                    HashMap<String, Integer> relationOffsets = new HashMap<>();
+                    int globalOffset = 0;
+
+                    // Calculer les décalages globaux pour chaque relation en fonction de l'ordre d'apparition de la relation dans le 'FROM'
+                    for (String alias : assocAlliasToNom.keySet()) {
+                        // Récupère le nom de la relation
+                        String relationName = assocAlliasToNom.get(alias);
+                        // Récupere la relation associé
+                        Relation relation = dbM.getCurrentDatabase().get(relationName);
+                        // Met dans la map pour cette alias il faut ce décalge
+                        relationOffsets.put(alias, globalOffset);
+                        // Met à jour le décalage global pour la prochaine relation
+                        globalOffset += relation.getNbAttribut();
+                    }
+
+                    // Parcour les attributs dans une relation pour chercher l'index de l'attribut
+                    for (int i = 0; i < relation1.getNbAttribut(); i++) {
+                        // Si on le trouve
+                        if (relation1.getNameAttribut(i).equals(colonne1)) {
+                            // Garde son index relatif
+                            index1 = i;
+                            break;  // Quitte la boucle
+                        }
+                    }
+                    // Parcour les attributs dans une relation pour chercher l'index de l'attribut
+                    for (int i = 0; i < relation2.getNbAttribut(); i++) {
+                        // Si on le trouve
+                        if (relation2.getNameAttribut(i).equals(colonne2)) {
+                            // Garde son index relatif
+                            index2 = i;
+                            break;  // Quitte la boucle
+                        }
+                    }
+
+                    // Si la colonne n'existe pas dans la relation, lancer une exception
+                    if (index1 == -1 || index2 == -1)
+                        throw new IllegalArgumentException("Colonne inconnue : " + colonne1+" Ou "+colonne2);
+
+                    // Calculer l'index absolu en ajoutant le décalage global de la relation
+                    index1 = relationOffsets.get(alias1) + index1;
+                    index2 = relationOffsets.get(alias2) + index2;
+
+                    Pair<String, Integer> p1 = new Pair<String,Integer>(colonne1, index1);
+                    Pair<String, Integer> p2 = new Pair<String,Integer>(colonne2, index2);
+    
+                    res.getSecond().add(new Condition(p1, operateur, p2));
+                }
             }
             // Sinon c'est un problème dans la commande
             else
@@ -694,14 +795,12 @@ public class SGBD {
             return false;
 
         // Vérifie que le nom ne contient que des lettres, des chiffres et des underscores
-        if (!name.matches("^[a-zA-Z0-9_]+$")) {
+        if (!name.matches("^[a-zA-Z0-9_]+$"))
             return false;
-        }
 
         // Vérifie que le nom ne dépasse pas 64 caractères (exemple de limite de MySQL)
-        if (name.length() > 64) {
+        if (name.length() > 64)
             return false;
-        }
 
         // Liste des mots réservés sous forme d'ArrayList
         ArrayList<String> reservedWords = new ArrayList<>(Arrays.asList(
@@ -711,7 +810,6 @@ public class SGBD {
 
         return !reservedWords.contains(name);  // Vérifie que le nom n'est pas un mot réservé
     }
-
 
     /**
      * Valide une valeur avant de l'ajouter au tuple.
@@ -790,8 +888,39 @@ public class SGBD {
     }
     */
 
-    public DBManager getDBManager() {
-        return dbM;
+    /**
+     * Obtient l'instance de la configuration de la base de données.
+     *
+     * @return l'instance de {@link DBConfig}.
+     */
+    public DBConfig getDbc() {
+        return dbc;
     }
 
+    /**
+     * Obtient l'instance du gestionnaire de disque.
+     *
+     * @return l'instance de {@link DiskManager}.
+     */
+    public DiskManager getDskM() {
+        return dskM;
+    }
+
+    /**
+     * Obtient l'instance du gestionnaire de buffers.
+     *
+     * @return l'instance de {@link BufferManager}.
+     */
+    public BufferManager getBm() {
+        return bm;
+    }
+
+    /**
+     * Obtient l'instance du gestionnaire de la base de données.
+     *
+     * @return l'instance de {@link DBManager}.
+     */
+    public DBManager getDbM() {
+        return dbM;
+    }
 }

@@ -186,9 +186,26 @@ public class MyRecord extends ArrayList<Pair<Object, DataType>> {
     @Override
     public String toString() {
         StringBuilder res = new StringBuilder();
+
         // Parcours le record et construit la chaîne
         for (int i = 0; i < this.size(); i++)
             res.append("Value = " + getValue(i) + "     Type = " + getType(i) + "\n");
+
+        return res.toString();
+    }
+
+    /**
+     * Retourne une représentation sous forme de chaîne de caractères des valeurs d'un record.
+     * Cette méthode construit une chaîne contenant les valeurs toutes les paires
+     *
+     * @return Une chaîne représentant les valeurs des paires.
+     */
+    public String printValue() {
+        StringBuilder res = new StringBuilder();
+
+        // Parcours le record et construit la chaîne
+        for (int i = 0; i < this.size(); i++)
+            res.append(getValue(i)+"\t");
 
         return res.toString();
     }

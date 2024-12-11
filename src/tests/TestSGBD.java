@@ -1,16 +1,65 @@
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
 
 public class TestSGBD {
+    private DBConfig dbConfig;
+    private SGBD sgbd;
 
-    private DBManager dbM; // Instance réelle de DBManager
-    private SGBD sgbd; // Instance du SGBD à tester
+    private ArrayList<Relation> relations;
 
     @BeforeEach
-    void setUp() throws Exception{
-        // Initialisation des objets nécessaires à chaque test
-        DBConfig dbc = DBConfig.loadConfig("src/tests/config.txt");
-        sgbd = new SGBD(dbc); // Instanciation du SGBD
-        dbM = sgbd.getDBManager();
+    void setup() throws Exception {
+        // Initialisation des gestionnaires simulés ou mockés
+        dbConfig = DBConfig.loadConfig("src/tests/config.txt");
+        DBConfig.pagesize = 2500;
+        DBConfig.dm_maxfilesize = 5000;
+        DBConfig.bm_buffercount = 1028;
+        sgbd = new SGBD(dbConfig);
+
+        // Création des deux relations avec 10 tuples chacune
+        relations.add(createRelation("Relation1"));
+        addTuplesToRelation(relations.get(0), 100);
+
+        relations.add(createRelation("Relation2"));
+        addTuplesToRelation(relations.get(1), 100);
+    }
+
+    private Relation createRelation(String relationName) throws Exception {
+        // Allocation d'une page d'en-tête pour la relation
+        PageId headerPageId = sgbd.getDskM().AllocPage();
+        ByteBuffer buffer = sgbd.getBm().getPage(headerPageId);
+        buffer.putInt(DBConfig.pagesize - 4, -1); // Indique qu'il n'y a pas de page suivante
+        sgbd.getBm().freePage(headerPageId, true);
+
+        // Définition des attributs de la relation
+        ArrayList<Pair<String, Data>> attributes = new ArrayList<>();
+        attributes.add(new Pair<>("id", new Data(DataType.INT)));
+        attributes.add(new Pair<>("name", new Data(DataType.VARCHAR, 32)));
+        attributes.add(new Pair<>("value", new Data(DataType.REAL)));
+
+        // Création et retour de la relation
+        return new Relation(relationName, attributes, headerPageId, sgbd.getDskM(), sgbd.getBm());
+    }
+
+    private void addTuplesToRelation(Relation relation, int numTuples) throws Exception {
+        for (int i = 1; i <= numTuples; i++) {
+            MyRecord record = new MyRecord();
+
+            record.add(i, DataType.INT); // ID
+            record.add("Name" + i, DataType.VARCHAR); // Name
+            record.add((float) i * 1.1f, DataType.REAL); // Value
+            relation.InsertRecord(record);
+        }
+    }
+
+    @Test
+    void testProcessSELECTCommand(){
+        
     }
 
     @Test

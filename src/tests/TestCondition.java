@@ -54,57 +54,75 @@ public class TestCondition {
 
     @ParameterizedTest
     @CsvSource({
-        "id, =, 1, true",         // Test égalité pour ID (1 == 1)
-        "id, =, 2, false",        // Test égalité pour ID (1 != 2)
-        "note, >, 10.0, true",    // Test supérieur pour note (15.5 > 10)
-        "note, >, 20.0, false",   // Test supérieur pour note (15.5 !> 20)
-        "note, <, 20.0, true",    // Test inférieur pour note (15.5 < 20)
-        "note, <, 10.0, false",   // Test inférieur pour note (15.5 !< 10)
-        "note, <=, 15.5, true",   // Test inférieur ou égal pour note (15.5 <= 15.5)
-        "note, <=, 10.0, false",  // Test inférieur ou égal pour note (15.5 !<= 10)
-        "note, >=, 15.5, true",   // Test supérieur ou égal pour note (15.5 >= 15.5)
-        "note, >=, 20.0, false",  // Test supérieur ou égal pour note (15.5 !>= 20)
-        "nom, =, \"'Doe'\", true",    // Test égalité pour nom ('Doe' == 'Doe')
-        "nom, =, \"'Smith'\", false", // Test égalité pour nom ('Doe' != 'Smith')
-        "nom, <>, \"'Smith'\", true", // Test différent pour nom ('Doe' != 'Smith')
-        "nom, <>, \"'Doe'\", false"   // Test différent pour nom ('Doe' != 'Doe')
+        // Comparaisons entre attributs et constantes
+        "id, =, 1, 0, -1, true",         // Attribut (colonne 0) = constante
+        "id, =, 2, 0, -1, false",        // Attribut (colonne 0) != constante
+        "note, >, note, 3, 3, false",    // Comparaison entre attributs (note à colonne 3)
+        "note, >, 10, 3, -1, true",    // Attribut > constante
+        "note, <, 20, 3, -1, true",    // Attribut < constante
+        "note, <=, 15.5, 3, -1, true",   // Attribut <= constante
+        "note, >=, 15.5, 3, -1, true",   // Attribut >= constante
+        "note, >=, 20, 3, -1, false",  // Attribut >= constante
+        "nom, =, \"'Doe'\", 1, -1, true",    // Attribut = constante (nom)
+        "nom, =, \"'Smith'\", 1, -1, false", // Attribut != constante (nom)
+        "nom, <>, \"'Smith'\", 1, -1, true", // Attribut != constante (nom)
+        "prenom, =, \"'John'\", 2, -1, true",   // Attribut = constante (prenom)
+        "prenom, =, \"'Doe'\", 2, -1, false",   // Attribut != constante (prenom)
+        "note, =, 15.5, 3, -1, true",    // Attribut = constante (note)
+    
+        // Comparaison entre deux attributs
+        "nom, =, prenom, 1, 2, false",    // Comparaison entre attributs (nom == prenom)
+        "prenom, <, nom, 2, 1, false",     // Comparaison entre attributs (prenom < nom)
+        "prenom, >, nom, 2, 1, true",     // Comparaison entre attributs (prenom < nom)
+    
+        // Comparaison avec des doubles
+        "note, =, 15.5, 3, -1, true",     // Attribut = constante (double)
+        "note, >, 10.5, 3, -1, true",     // Attribut > constante (double)
+        "note, <, 20.5, 3, -1, true",     // Attribut < constante (double)
+        "note, <=, 15.5, 3, -1, true",    // Attribut <= constante (double)
+        "note, >=, 15.5, 3, -1, true",    // Attribut >= constante (double)
+        "note, >=, 20, 3, -1, false",   // Attribut >= constante (double)
     })
-    public void testEvaluateOperatorWithAllTypes(String attribute, String operator, String value, boolean expectedResult) throws Exception {
+    public void testEvaluateOperatorWithAllTypes(String attribute, String operator, String value, int term1Index, int term2Index, boolean expectedResult) throws Exception {
         // Retirer les guillemets doubles externes pour récupérer la vraie constante
         if (value.startsWith("\"") && value.endsWith("\""))
             value = value.substring(1, value.length() - 1); // Supprimer les guillemets doubles externes
-
+    
         // Créer les termes pour la condition
-        Pair<String, Relation> terme1 = new Pair<>(attribute, relation);
-        Pair<String, Relation> terme2;
-
-        // Si la valeur est une constante string (commence et se termine par des quotes simples)
-        if (value.startsWith("'") && value.endsWith("'"))
-            terme2 = new Pair<>(value, null); // Constante string
-        else
-            terme2 = new Pair<>(value, null); // Constante numérique ou autre
-
+        Pair<String, Integer> terme1 = new Pair<>(attribute, term1Index); // Attribut en tant que terme1
+    
+        // Vérifier si la valeur est une constante (chaîne ou numérique) ou un attribut
+        Pair<String, Integer> terme2;
+        if (value.startsWith("'") && value.endsWith("'")) {
+            // Constante string (les guillemets simples indiquent que c'est une chaîne)
+            terme2 = new Pair<>(value, term2Index); // Constante string
+        } else {
+            // Sinon, c'est soit un attribut, soit une constante numérique
+            terme2 = new Pair<>(value, term2Index); // Constante numérique ou attribut
+        }
+    
         // Créer la condition
         Condition condition = new Condition(terme1, operator, terme2);
-
+    
         // Évaluer la condition
-        boolean result = condition.evaluate(record, record);
-
+        boolean result = condition.evaluate(record);
+    
         // Assertion du résultat attendu
         assertEquals(expectedResult, result, "L'opération " + operator + " pour l'attribut " + attribute + " avec la valeur " + value + " a échoué.");
-    }
+    }    
 
     @Test
     public void testEvaluateRealComparison() throws Exception {
         // Teste une comparaison pour le type réel
-        Pair<String, Relation> terme1 = new Pair<>("note", relation);
-        Pair<String, Relation> terme2 = new Pair<>("10.0", null); // Constante
+        Pair<String, Integer> terme1 = new Pair<>("note", 3);
+        Pair<String, Integer> terme2 = new Pair<>("10.0", -1); // Constante
 
         Condition condition = new Condition(terme1, ">", terme2);
-        assertTrue(condition.evaluate(record, record), "La condition '> 10.0' doit être vraie.");
+        assertTrue(condition.evaluate(record), "La condition '> 10.0' doit être vraie.");
 
-        terme2 = new Pair<>("20.0", null); // Constante
+        terme2 = new Pair<>("20.0", -1); // Constante
         condition = new Condition(terme1, "<", terme2);
-        assertTrue(condition.evaluate(record, record), "La condition '< 20.0' doit être vraie.");
+        assertTrue(condition.evaluate(record), "La condition '< 20.0' doit être vraie.");
+
     }
 }

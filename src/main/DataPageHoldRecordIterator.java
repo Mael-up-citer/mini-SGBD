@@ -42,6 +42,7 @@ public class DataPageHoldRecordIterator implements IRecordIterator {
 
         // Extrait le nombre de records dans la page
         nbRecord = buffer.getInt(DBConfig.pagesize-8);
+
     }
 
     /**
@@ -60,7 +61,6 @@ public class DataPageHoldRecordIterator implements IRecordIterator {
         MyRecord res = new MyRecord();  // Variable pour stocker le record extrait
 
         offsetRecord += relation.readRecordFromBuffer(res, buffer, offsetRecord);
-
         nbRecord--;
 
         return res; // La méthode retourne actuellement null; ici, vous devez extraire les données et retourner le record

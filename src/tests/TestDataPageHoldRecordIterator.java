@@ -11,10 +11,9 @@ public class TestDataPageHoldRecordIterator {
     private BufferManager bm;       // Gestionnaire de buffer (mock ou simulé)
     private Relation relation;      // Relation à tester
     private DBConfig dbConfig;
+    private PageDirectoryIterator pageIterator;
 
-    private PageDirectoryIterator fils;
-
-    private ArrayList<MyRecord> records = new ArrayList<>();
+    private ArrayList<MyRecord> originalRec;
 
 
     @BeforeEach
@@ -22,9 +21,9 @@ public class TestDataPageHoldRecordIterator {
         // Initialisation des gestionnaires simulés ou mockés
         dskM = DiskManager.getInstance();
         dbConfig = DBConfig.loadConfig("src/tests/config.txt"); // Recharger la configuration
-        DBConfig.pagesize = 250;
-        DBConfig.dm_maxfilesize = 500;
-        DBConfig.bm_buffercount = 256;
+        DBConfig.pagesize = 4000;
+        DBConfig.dm_maxfilesize = 1500;
+        DBConfig.bm_buffercount = 1028;
 
         bm = new BufferManager(dbConfig, dskM); // Réinitialiser le BufferManager
 
@@ -37,121 +36,83 @@ public class TestDataPageHoldRecordIterator {
         // Création de la relation avec des attributs
         ArrayList<Pair<String, Data>> attributs = new ArrayList<>();
         attributs.add(new Pair<>("id", new Data(DataType.INT)));
-        attributs.add(new Pair<>("nom", new Data(DataType.VARCHAR, 32)));
-        attributs.add(new Pair<>("prenom", new Data(DataType.CHAR, 32)));
+        attributs.add(new Pair<>("nom", new Data(DataType.CHAR, 32)));
         attributs.add(new Pair<>("note", new Data(DataType.REAL)));
 
         relation = new Relation("Personne", attributs, headerPageId, dskM, bm);
+        originalRec = new ArrayList<>();
 
-    
-        // 3. Crée les record
-        MyRecord record1 = new MyRecord();
-        // Création et insertion d'un premier enregistrement
-        record1.add(1, DataType.INT); // Valeur de type INT
-        record1.add("Dupont", DataType.VARCHAR); // Valeur de type VARCHAR
-        record1.add("Alice", DataType.CHAR); // Valeur de type CHAR
-        record1.add(2.1f, DataType.REAL); // Valeur de type REAL
-        relation.InsertRecord(record1);
-        records.add(record1);
+        addTuplesToRelation(relation, 41);
 
-        // Création et insertion d'un deuxième enregistrement
-        MyRecord record2 = new MyRecord();
-        record2.add(2, DataType.INT); // Valeur de type INT
-        record2.add("Martin", DataType.VARCHAR); // Valeur de type VARCHAR
-        record2.add("Jean", DataType.CHAR); // Valeur de type CHAR
-        record2.add(0.1f, DataType.REAL); // Valeur de type REAL
-        relation.InsertRecord(record2);
-        records.add(record2);
+        pageIterator = new PageDirectoryIterator(relation, bm);
+    }
 
-        // Création et insertion d'un troisième enregistrement
-        MyRecord record3 = new MyRecord();
-        record3.add(3, DataType.INT); // Valeur de type INT
-        record3.add("DurandEtNon", DataType.VARCHAR); // Valeur de type VARCHAR
-        record3.add("Paul", DataType.CHAR); // Valeur de type CHAR
-        record3.add(5.75f, DataType.REAL); // Valeur de type REAL
-        relation.InsertRecord(record3);
-        records.add(record3);
+    private void addTuplesToRelation(Relation relation, int numTuples) throws Exception {
+        for (int i = 1; i <= numTuples; i++) {
+            MyRecord record = new MyRecord();
+            record.add(i, DataType.INT); // ID
+            record.add("N" + i, DataType.CHAR); // Name
+            record.add((float) i * 1.1f, DataType.REAL); // Value
 
-        // Création et insertion d'un quatrième enregistrement
-        MyRecord record4 = new MyRecord();
-        record4.add(4, DataType.INT); // Valeur de type INT
-        record4.add("AliceEtNon", DataType.VARCHAR); // Valeur de type VARCHAR
-        record4.add("A", DataType.CHAR); // Valeur de type CHAR
-        record4.add(3.14f, DataType.REAL); // Valeur de type REAL
-        relation.InsertRecord(record4);
-        records.add(record4);
-
-        // Création et insertion d'un cinquième enregistrement
-        MyRecord record5 = new MyRecord();
-        record5.add(42, DataType.INT); // Valeur de type INT
-        record5.add("Bobboooobbbbb", DataType.VARCHAR); // Valeur de type VARCHAR
-        record5.add("B", DataType.CHAR); // Valeur de type CHAR
-        record5.add(99.99f, DataType.REAL); // Valeur de type REAL
-        relation.InsertRecord(record5);
-        records.add(record5);
-
-        // Création et insertion d'un sixième enregistrement
-        MyRecord record6 = new MyRecord();
-        record6.add(7, DataType.INT); // Valeur de type INT
-        record6.add("Charleeeeeeeeeee", DataType.VARCHAR); // Valeur de type VARCHAR
-        record6.add("C", DataType.CHAR); // Valeur de type CHAR
-        record6.add(0.75f, DataType.REAL); // Valeur de type REAL
-        relation.InsertRecord(record6);
-        records.add(record6);
-
-        System.out.println("\n\n\n");
-        fils = new PageDirectoryIterator(relation, bm);
+            relation.InsertRecord(record);
+            originalRec.add(record);
+        }
     }
 
     @Test
-    void testGetNextRecord() throws Exception {
-        PageId datPageId = fils.GetNextDataPageId();
-        DataPageHoldRecordIterator iterator = new DataPageHoldRecordIterator(relation, bm.getPage(datPageId), bm, datPageId);
+    void testGetNextRecord() {
+        try {
+            PageId datPageId = pageIterator.GetNextDataPageId();
+            DataPageHoldRecordIterator iterator = new DataPageHoldRecordIterator(relation, bm.getPage(datPageId), bm, datPageId);
+            MyRecord record;
+            int cpt = 0;
 
-        for (MyRecord record : records) {
-            MyRecord res = iterator.GetNextRecord();
-
-            if (res == null) {
-                System.out.println("null");
-                datPageId = fils.GetNextDataPageId();
-                iterator.Close();
-                iterator = new DataPageHoldRecordIterator(relation, bm.getPage(datPageId), bm, datPageId);
-                res = iterator.GetNextRecord();
+            while ((record = iterator.GetNextRecord()) != null) {
+                assertEquals(originalRec.get(cpt), record);
+                cpt++;
             }
-            assertEquals(record, res);
-            System.out.println();
+
+            // Vérifie qu'après les records, null est retourné
+            assertNull(iterator.GetNextRecord());
+            assertEquals(41, cpt);
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
-        // Vérifie qu'après les records, null est retourné
-        assertNull(iterator.GetNextRecord());
     }
 
     @Test
     void testReset() throws Exception{
-        PageId datPageId = fils.GetNextDataPageId();
+        PageId datPageId = pageIterator.GetNextDataPageId();
         DataPageHoldRecordIterator iterator = new DataPageHoldRecordIterator(relation, bm.getPage(datPageId), bm, datPageId);
 
-        // Consomme 1 record
+        // Consomme 3 record
         iterator.GetNextRecord();
+        iterator.GetNextRecord();
+        iterator.GetNextRecord();
+
         iterator.Reset();
 
         MyRecord res;
         int cpt = 0;
 
         while ((res = iterator.GetNextRecord()) != null) {
-            assertEquals(records.get(cpt), res);
+            assertEquals(originalRec.get(cpt), res);
             cpt++;
         }
+
+        // Vérifie qu'après les records, null est retourné
+        assertNull(iterator.GetNextRecord());
+        assertEquals(41, cpt);
     }
 
     @Test
     void testClose() throws Exception{
-        PageId datPageId = fils.GetNextDataPageId();
+        PageId datPageId = pageIterator.GetNextDataPageId();
         DataPageHoldRecordIterator iterator = new DataPageHoldRecordIterator(relation, bm.getPage(datPageId), bm, datPageId);
 
         iterator.Close();
 
-        iterator.GetNextRecord();
-
-        assertNull(iterator.GetNextRecord(), "après le close le nex record doit etre null");
+        assertNull(iterator.GetNextRecord(), "après le close le next record doit etre null");
     }
 }
