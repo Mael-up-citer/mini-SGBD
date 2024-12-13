@@ -49,13 +49,11 @@ public class BufferManager{
             dskM.ReadPage(id, tmp);
             cadre.insert(new AVLNode(id, tmp)); // Insère le nouveau noeud dans l'arbre
             nbAllocFrame++; // L'AVL à une frame de plus
-            System.out.println("get nb alloc "+ nbAllocFrame+"\n\n");
 
             return tmp;
         }
         // Si le noeud est dans l'arbre
         else {
-            System.out.println("do nothing "+nbAllocFrame);
             ByteBuffer buffer = node.buffer; // Récupère le buffer associé au noeud
             node.pin_count++;   // Incrémente le compteur d'utilisation
         	// Si la page était dans junkFile, on l'enlève
@@ -86,7 +84,6 @@ public class BufferManager{
         // Si plus personne ne l'utilise, on l'ajoute à la junkFile
         if(noeud.pin_count == 0) {
             nbAllocFrame--; // Une frame de moins qui ne peut pas etre enlevé
-            System.out.println("free nb alloc = "+nbAllocFrame+"\n\n");
             ajoutJunk(noeud);   // L'ajoute à la junkFile
         }
         // Si tout c'est bien passé return true
