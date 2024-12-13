@@ -121,6 +121,7 @@ public class selectOperator implements IRecordIterator {
                 // Crée un nouvel itérateur pour les enregistrements de la première page.
                 tupleIterator = new DataPageHoldRecordIterator(relation, bm.getPage(id), bm, id);
             } catch (Exception e) {
+                e.printStackTrace();
                 // Si une erreur survient, l'itérateur de tuples est nul.
                 tupleIterator = null;
                 throw new RuntimeException("Erreur lors de la création de l'itérateur de tuple: " + e.getMessage());

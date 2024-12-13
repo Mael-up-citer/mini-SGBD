@@ -1,8 +1,11 @@
-import java.nio.Buffer;
 import java.util.ArrayList;
 
-import javax.management.RuntimeErrorException;
-
+/**
+ * Classe représentant un opérateur de jointure orientée page, utilisé pour effectuer
+ * une jointure entre deux relations (une externe et une interne), en parcourant les pages
+ * et les tuples à l'aide d'itérateurs de pages et de tuples.
+ * Cet opérateur est conçu pour supporter des conditions de jointure sur les tuples.
+ */
 public class PageOrientedJoinOperator implements IRecordIterator {
     BufferManager bm;
 
@@ -17,7 +20,7 @@ public class PageOrientedJoinOperator implements IRecordIterator {
     private DataPageHoldRecordIterator innerTupleIt;
 
     private ArrayList<Condition> joinConditions;
-    private MyRecord outerRecord; // Le tuple courant de la relation interieur
+    private MyRecord outerRecord; // Le tuple courant de la relation extérieur
 
     /**
      * Constructeur de l'opérateur de jointure orientée page pour produit cartésien.
@@ -30,55 +33,63 @@ public class PageOrientedJoinOperator implements IRecordIterator {
         // Récupère le bm
         this.bm = innerPageIt.getBm();
 
-        PageId outerId = outerPageIt.GetNextDataPageId();
-        PageId innerId = innerPageIt.GetNextDataPageId();
-
-        if (outerId == null || innerId == null)
-            throw new IllegalStateException("l'une des 2 relations est vide");
-
-        // Initialise les itérateurs de tuple externe
-        outerTupleIt = new DataPageHoldRecordIterator(outerPageIt.getRelation(), bm.getPage(outerId), bm, outerId);
-        innerTupleIt = new DataPageHoldRecordIterator(innerPageIt.getRelation(), bm.getPage(innerId), bm, innerId);
+        Reset();
     }
 
-    /*
-     * Récupère le prochain enregistrement qui satisfait les conditions.
+    /**
+     * Récupère le prochain enregistrement satisfaisant les conditions de jointure.
      * 
-     * @return Le prochain enregistrement valide ou null s'il n'y en a plus.
+     * Cette méthode parcourt les tuples externes et internes pour trouver la première
+     * correspondance valide selon les conditions de jointure.
+     * 
+     * @return Le prochain enregistrement valide, ou null si aucun enregistrement
+     *         valide n'est trouvé.
      */
     @Override
     public MyRecord GetNextRecord() {
-        MyRecord record = null;
-/*
-        do {
-            try {
-                // Tente de récupérer le prochain enregistrement.
-                record = tupleIterator.GetNextRecord();
+        MyRecord res = new MyRecord();
 
-                // Si aucun enregistrement n'est disponible dans l'itérateur actuel.
-                if (record == null) {
-                    // Passe à la page suivante.
-                    PageId id = pageIterator.GetNextDataPageId();
+        try {
+            // Boucle principale pour trouver le prochain enregistrement qui satisfait les conditions
+            do {
+                MyRecord innRecord = innerTupleIt.GetNextRecord();
 
-                    // Si aucune page suivante n'est disponible, retourne null.
-                    if (id == null)
-                        return null;
+                // Si on est au bout d'une data Page de la relation interne
+                if (innRecord == null) {
+                    PageId id2 = innerPageIt.GetNextDataPageId();
 
-                    // Ferme l'itérateur actuel et crée un nouvel itérateur pour la nouvelle page.
-                    tupleIterator.Close();
-                    tupleIterator = new DataPageHoldRecordIterator(relation, bm.getPage(id), bm, id);
+                    // Si on est au bout de la relation interne
+                    if (id2 == null) {
+                        outerRecord = outerTupleIt.GetNextRecord();
 
-                    // Tente de récupérer le premier enregistrement de la nouvelle page.
-                    record = tupleIterator.GetNextRecord();
+                        // Si on est au bout de la data Page externe
+                        if (outerRecord == null) {
+                            PageId id1 = outerPageIt.GetNextDataPageId();
+
+                            // Si on est au bout de la relation externe
+                            if (id1 == null)
+                                return null;
+
+                            outerTupleIt.Close();
+                            outerTupleIt = new DataPageHoldRecordIterator(outerPageIt.getRelation(), bm.getPage(id1), bm, id1);
+                            outerRecord = outerTupleIt.GetNextRecord();
+                        }
+                        innerPageIt.Reset();
+                        id2 = innerPageIt.GetNextDataPageId();
+                    }
+                    innerTupleIt.Close();
+                    innerTupleIt = new DataPageHoldRecordIterator(innerPageIt.getRelation(), bm.getPage(id2), bm, id2);
+                    innRecord = innerTupleIt.GetNextRecord();
                 }
-            } catch (Exception e) {
-                // Lève une exception en cas d'erreur.
-                throw new RuntimeException(e.getMessage());
-            }
-        } while (!satifyConditions(record)); // Continue tant que les conditions ne sont pas satisfaites.
-*/
-        return record;  // Retourne le record resultat
+                res.addAll(outerRecord);
+                res.addAll(innRecord);
 
+            } while(!satifyConditions(res));
+        } catch (Exception e) {
+            // Gestion centralisée des erreurs
+            throw new RuntimeException("Erreur dans GetNextRecord : " + e.getMessage());
+        }
+        return res;
     }
 
     /**
@@ -96,7 +107,7 @@ public class PageOrientedJoinOperator implements IRecordIterator {
                 if (!cond.evaluate(record))
                     return false;
             } catch (Exception e) {
-                // Retourne false en cas d'erreur d'évaluation.
+                System.out.println("erreur dans l'évaluation des conditions "+e.getMessage());
                 return false;
             }
         }
@@ -104,33 +115,54 @@ public class PageOrientedJoinOperator implements IRecordIterator {
         return true;
     }
 
-    /**
+/**
      * Réinitialise l'opérateur de jointure en réinitialisant tous les itérateurs.
      */
     @Override
     public void Reset() {
-/*
         try {
-            operateurs.getFirst().Reset();
-            operateurs.getSecond().Reset();
-            outerRecord = operateurs.getFirst().GetNextRecord();
+            // Reset les opérateurs de data Page
+            outerPageIt.Reset();
+            innerPageIt.Reset();
+
+            // Charge les 1er data Page Id
+            PageId outerId = outerPageIt.GetNextDataPageId();
+            PageId innerId = innerPageIt.GetNextDataPageId();
+
+            // Si on a une null c'est une erreur
+            if (outerId == null || innerId == null)
+                throw new IllegalStateException("l'une des 2 relations est vide");
+
+            // Initialise les itérateurs de tuple
+            outerTupleIt = new DataPageHoldRecordIterator(outerPageIt.getRelation(), bm.getPage(outerId), bm, outerId);
+            innerTupleIt = new DataPageHoldRecordIterator(innerPageIt.getRelation(), bm.getPage(innerId), bm, innerId);
+
+            // Initialise le 1er tuple externe
+            outerRecord = outerTupleIt.GetNextRecord();
+
         } catch (Exception e) {
-            System.out.println("Erreur lors de la réinitialisation : " + e.getMessage());
+            throw new RuntimeException("Erreur lors de la réinitialisation : " + e.getMessage());
         }
-*/
     }
 
-    /**
+     /**
      * Ferme l'opérateur de jointure et libère les ressources utilisées.
      * Tous les attributs sont également mis à null.
      */
     @Override
     public void Close() {
-/*
-        operateurs.setFirst(null);; // Les deux relations à joindre représenté par lurs select
-        operateurs.setSecond(null);; // Les deux relations à joindre représenté par lurs select
-        joinConditions = null;
-        outerRecord = null;
-*/
+        try {
+            outerPageIt.Close();
+            innerPageIt.Close();
+        
+            outerTupleIt.Close();
+            innerTupleIt.Close();
+        
+            joinConditions = null;
+            outerRecord = null;
+            bm = null;
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur lors de la fermeture : " + e.getMessage());
+        }
     }
 }

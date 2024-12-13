@@ -8,7 +8,7 @@ public class PageDirectoryIterator {
     private Relation relation;              // Instance de la relation pour laquelle on parcourt les pages
     private BufferManager bm;               // Instance du gestionnaire de buffer pour accéder aux pages en mémoire
 
-    private PageId currentPageId;          // PageId de la header page courante
+    private PageId currentPageId = new PageId();          // PageId de la header page courante
     private int offsetDataPage = 4;        // Décalage pour accéder aux pages de données dans les entêtes
     private int nbDataPage;                 // Nombre total de pages de données
     private int cptDataPage;                // compteur pages de données déjà traité
@@ -24,7 +24,10 @@ public class PageDirectoryIterator {
     PageDirectoryIterator(Relation rela, BufferManager bm) throws Exception {
         relation = rela;             // Assignation de la relation
         this.bm = bm;                // Assignation du gestionnaire de buffer
-        currentPageId = relation.getHeaderPageId(); // Récupère l'@ de la première hearder Page
+
+        PageId tmp = relation.getHeaderPageId();    // Récupère l'@ de la première hearder Page
+        currentPageId.FileIdx = tmp.FileIdx;
+        currentPageId.PageIdx = tmp.PageIdx;
 
         nbDataPage = bm.getPage(relation.getHeaderPageId()).getInt(0);  // Récupération du nombre de pages de données
         bm.freePage(relation.getHeaderPageId(), false);
@@ -49,10 +52,6 @@ public class PageDirectoryIterator {
                 buffer.getInt(offsetDataPage),
                 buffer.getInt(offsetDataPage+4)
             );
-
-            //System.out.println("id hp "+currentPageId);
-            //System.out.println("offset "+offsetDataPage+"/"+DBConfig.pagesize);
-            //System.out.println("id "+res+"\n");
 
             cptDataPage --; // Décrémente le compteur de page de données a parcourir
             offsetDataPage += 12;  // Augmente le décalage pour passer à la page de données suivante
@@ -80,7 +79,10 @@ public class PageDirectoryIterator {
      * Réinitialise l'itérateur pour recommencer à partir de la première page d'entête.
      */
     public void Reset() {
-        currentPageId = relation.getHeaderPageId();    // Réinitialisation du compteur de pages d'entêtes
+        PageId tmp = relation.getHeaderPageId();
+        currentPageId.FileIdx = tmp.FileIdx;    // Réinitialisation du compteur de pages d'entêtes
+        currentPageId.PageIdx = tmp.PageIdx;    // Réinitialisation du compteur de pages d'entêtes
+
         offsetDataPage = 4;  // Réinitialisation du décalage pour les pages de données
         cptDataPage = nbDataPage;
     }

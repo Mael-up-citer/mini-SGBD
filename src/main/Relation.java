@@ -530,12 +530,12 @@ public class Relation {
             // Insére le record dans la page sélectionnée
             int recordPos = buffer.getInt(DBConfig.pagesize - 4); // Position de l'espace libre
 
-            System.out.println("\npage d'écriture = "+dataPageId);
-            System.out.println("pos ecriture = "+recordPos);
+            //System.out.println("\npage d'écriture = "+dataPageId);
+            //System.out.println("pos ecriture = "+recordPos);
 
             int writeSize = writeRecordToBuffer(record, buffer, recordPos);
 
-            System.out.println(writeSize+"/"+recordSize);
+            //System.out.println(writeSize+"/"+recordSize);
 
             // Écrire le record dans le buffer et si on écrit pas exactement la taille du record c'est un échec
             if (writeSize != recordSize)
@@ -777,6 +777,9 @@ public class Relation {
         attribut.add(elmts);    // L'ajoute dans le schéma de la relation
     }
 */
+    /**
+     * @return l'@ de la 1er header Page
+     */
     public PageId getHeaderPageId(){
         return headerPageId;
     }

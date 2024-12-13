@@ -131,7 +131,6 @@ public class TestJoinOperator {
         // Ferme l'opérateur
         joinOperator.Close();
 
-        // Vérifie que toutes les ressources ont été libérées
-        assertThrows(Exception.class, joinOperator::GetNextRecord);
+        assertNull(joinOperator.GetNextRecord());
     }
 }

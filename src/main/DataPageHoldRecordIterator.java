@@ -42,7 +42,6 @@ public class DataPageHoldRecordIterator implements IRecordIterator {
 
         // Extrait le nombre de records dans la page
         nbRecord = buffer.getInt(DBConfig.pagesize-8);
-
     }
 
     /**

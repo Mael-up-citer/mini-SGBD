@@ -422,7 +422,8 @@ public class SGBD {
      * @param param Commande SQL sans le mot-clé "SELECT".
      */
     private void processSELECTCommand(String param) {
-        if (dbM.getCurrentDatabase() == null) System.out.println("erreur aucune data base n'est défini");
+        if (dbM.getCurrentDatabase() == null)
+            System.out.println("erreur aucune data base n'est défini");
         else {
             String selectReg = String.join("",
                 "^(\\*|", // Sélectionne tout (*)
@@ -513,36 +514,29 @@ public class SGBD {
      * Méthode pour extraire une relation (table et alias) à partir du paramètre.
      */
     private Pair<HashMap<String, String>, HashMap<String, String>> extractRelation(String listeTableName, ArrayList<Relation> relations) {
-        // Accéder à la base de données courante pour récupérer la table
         HashMap<String, Relation> db = dbM.getCurrentDatabase();
-        // Liste des relations qu'on extrait sous forme nom -> allias
         HashMap<String, String> assocNomToAllias = new HashMap<>();
-        // Liste des relations qu'on extrait sous forme allias -> nom
         HashMap<String, String> assocAlliasToNom = new HashMap<>();
+
         // Chaque case contient une relation et son allias
         String[] name = listeTableName.split("\\s*,\\s*");
 
-        // Si la base de donné courrante est défini
-        if (db != null) {
-            // Parcour le tableau
-            for (String tableNameAndAlias : name) {
-                // Split la chaine par l'espace chaque case contient nomR allias
-                String[] str = tableNameAndAlias.split("\\s+");
-                Relation r = db.get(str[0]);    // Récupere la relation depuis la bd
+        // Parcour le tableau
+        for (String tableNameAndAlias : name) {
+            // Split la chaine par l'espace [0] = nomRelation [1] = alias
+            String[] str = tableNameAndAlias.split("\\s+");
+            Relation r = db.get(str[0]);    // Récupere la relation depuis la bd
 
-                // Test si la relation existe dans la bd courrante
-                if (r != null) {
-                    relations.add(r);
-                    assocNomToAllias.put(str[0], str[1]);  // Insère dans la map le couple
-                    assocAlliasToNom.put(str[1], str[0]);  // Insère dans la map le couple
-                }
-                else
-                    return null;
+            // Test si la relation existe dans la bd courrante
+            if (r != null) {
+                relations.add(r);
+                assocNomToAllias.put(str[0], str[1]);  // Insère dans la map le couple
+                assocAlliasToNom.put(str[1], str[0]);  // Insère dans la map le couple
             }
-            return new Pair<HashMap<String,String>,HashMap<String,String>>(assocNomToAllias, assocAlliasToNom);
+            else
+                return null;
         }
-        // Sinon retourne null
-        return null;
+        return new Pair<HashMap<String,String>,HashMap<String,String>>(assocNomToAllias, assocAlliasToNom);
     }
 
     /**

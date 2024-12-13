@@ -27,11 +27,12 @@ public class TestSelectOperator {
 
         bm = new BufferManager(dbConfig, dskM); // Initialiser le BufferManager
 
-        // Création de la relation et ajout de tuples
-        relation = createRelation("TestRelation");
         originalRec = new ArrayList<>();
 
+        // Création de la relation et ajout de tuples
+        relation = createRelation("TestRelation");
         addTuplesToRelation(relation, 100);
+
     }
 
     private Relation createRelation(String relationName) throws Exception {
@@ -104,9 +105,6 @@ public class TestSelectOperator {
             int id = (int) selectedRecord.get(0).getFirst();
             float value = (float) selectedRecord.get(2).getFirst();
 
-            System.out.println("id = "+id);
-            System.out.println("value = "+value);
-
             assertTrue(id > 10, "L'ID devrait être supérieur à 10");
             assertTrue(value < 15.5f, "La valeur devrait être inférieure à 15.5");
         }
@@ -135,25 +133,21 @@ public class TestSelectOperator {
         // Initialisation de l'opérateur de sélection
         selectOperator = new selectOperator(new PageDirectoryIterator(relation, bm), relation, new ArrayList<>(), bm);
 
-        MyRecord[] records = new MyRecord[1000];
         MyRecord record;
-        int cpt = 0;
 
-        while ((record = selectOperator.GetNextRecord()) != null) {
-            records[cpt] = record;
-            cpt++;
-        }
+        while ((record = selectOperator.GetNextRecord()) != null);
 
         // Réinitialiser l'opérateur
         selectOperator.Reset();
 
-        cpt = 0;
+        int cpt = 0;
 
         while ((record = selectOperator.GetNextRecord()) != null) {
             // Parcourir à nouveau et vérifier que les enregistrements sont relus depuis le début
-            assertEquals(records[cpt], record, "Le premier enregistrement après réinitialisation devrait être identique au premier enregistrement initial");
+            assertTrue(originalRec.contains(record), "Les enregistrements après réinitialisation devrait être identique aux enregistrements initiaux: itération: "+cpt);
             cpt++;
         }
+        assertTrue(originalRec.size() == cpt, "Les listes devraient faire la meme taille");
     }
 
     @Test

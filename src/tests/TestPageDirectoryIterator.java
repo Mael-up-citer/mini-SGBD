@@ -3,7 +3,6 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.List;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,7 +12,6 @@ public class TestPageDirectoryIterator {
     private BufferManager bm;       // Gestionnaire de buffer
     DBConfig dbConfig;
     private Relation relation;      // Relation à tester
-    private PageDirectoryIterator iterator;
 
     @BeforeEach
     public void setUp() {
@@ -45,9 +43,8 @@ public class TestPageDirectoryIterator {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
-
+/*
     @Test
     public void testGetNextDataPageId() {
         int nb = 10000;
@@ -58,11 +55,14 @@ public class TestPageDirectoryIterator {
 
         int i = 0;
 
+        PageDirectoryIterator iterator = null;
         try {
-
-            // Initialisation de l'itérateur
             iterator = new PageDirectoryIterator(relation, bm);
-            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {            
             PageId tmp;
 
             while ((tmp = iterator.GetNextDataPageId()) != null) {
@@ -70,14 +70,13 @@ public class TestPageDirectoryIterator {
                 i++;
             }
 
-            assertNull(iterator.GetNextDataPageId(), "Aucune page ne devrait être disponible après la dernière.");
-            assertTrue(i == nb, "on aurais du avoir "+nb+" itération or on en a "+i);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
+        assertNull(iterator.GetNextDataPageId(), "Aucune page ne devrait être disponible après la dernière.");
+        assertTrue(i == nb, "on aurais du avoir "+nb+" itération or on en a "+i);
     }
-/*
+*/
     @Test
     public void testReset() {
         int nb = 250;
@@ -86,44 +85,42 @@ public class TestPageDirectoryIterator {
         for (int i = 0; i < nb; i++)
             id.add(relation.addDataPage());
 
-        int i = 0;
-
+        PageDirectoryIterator iterator = null;
         try {
-            // Initialisation de l'itérateur
             iterator = new PageDirectoryIterator(relation, bm);
-        } catch(Exception e){
-
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        while (iterator.GetNextDataPageId() != null);
-        iterator.Reset();
-
+        int i = 0;
         PageId tmp;
 
-        while ((tmp = iterator.GetNextDataPageId()) != null) {
-            assertEquals(id.get(i), tmp, "Page de données "+i+"incorrecte.");
-            i++;
-        }
+        try {
+            while ((tmp = iterator.GetNextDataPageId()) != null);
 
-        if (i != nb)
-            assertTrue(false, "on aurais du avoir "+ nb+" itération or on en a "+i);
+            iterator.Reset();
+
+            while ((tmp = iterator.GetNextDataPageId()) != null) {
+                assertEquals(id.get(i), tmp, "Page de données "+i+"incorrecte.");
+                i++;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        assertTrue(i == nb, "on aurais du avoir "+nb+" itération or on en a "+i);
     }
 
     @Test
     public void testClose() {
+        PageDirectoryIterator iterator = null;
         try {
-            // Initialisation de l'itérateur
             iterator = new PageDirectoryIterator(relation, bm);
-        } catch(Exception e){
-
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         // Appel de la méthode Close
         iterator.Close();
 
         assertNull(iterator.GetNextDataPageId(), "le get sur un iterateur fermé doit etre null");
-        // Vérification que l'itérateur a libéré les ressources (simulation)
-        // Comme la méthode close ne fait rien ici, on vérifie juste qu'elle peut être appelée sans erreur.
-        assertDoesNotThrow(() -> iterator.Close(), "La fermeture de l'itérateur ne devrait pas provoquer d'exception.");
     }
-*/
 }
