@@ -5,12 +5,14 @@ import java.nio.ByteBuffer;
  * en parcourant les pages d'entêtes et en extrayant les identifiants des pages de données.
  */
 public class PageDirectoryIterator {
-    int numHeaderPage = 1;          // Compteur pour le nombre de pages d'entêtes parcourues (initialisé à 1)
-    int offsetDataPage = 4;        // Décalage pour accéder aux pages de données dans les entêtes
-    int nbDataPage;                 // Nombre total de pages de données
-    int cptDataPage;                // compteur pages de données déjà traité
-    Relation relation;              // Instance de la relation pour laquelle on parcourt les pages
-    BufferManager bm;               // Instance du gestionnaire de buffer pour accéder aux pages en mémoire
+    private Relation relation;              // Instance de la relation pour laquelle on parcourt les pages
+    private BufferManager bm;               // Instance du gestionnaire de buffer pour accéder aux pages en mémoire
+
+    private PageId currentPageId;          // PageId de la header page courante
+    private int offsetDataPage = 4;        // Décalage pour accéder aux pages de données dans les entêtes
+    private int nbDataPage;                 // Nombre total de pages de données
+    private int cptDataPage;                // compteur pages de données déjà traité
+
 
     /**
      * Constructeur de la classe PageDirectoryIterator.
@@ -22,6 +24,7 @@ public class PageDirectoryIterator {
     PageDirectoryIterator(Relation rela, BufferManager bm) throws Exception {
         relation = rela;             // Assignation de la relation
         this.bm = bm;                // Assignation du gestionnaire de buffer
+        currentPageId = relation.getHeaderPageId(); // Récupère l'@ de la première hearder Page
 
         nbDataPage = bm.getPage(relation.getHeaderPageId()).getInt(0);  // Récupération du nombre de pages de données
         bm.freePage(relation.getHeaderPageId(), false);
@@ -38,76 +41,46 @@ public class PageDirectoryIterator {
         if (cptDataPage == 0)
             return null;
 
-        // Récupère l'@ de la 1er header Page
-        PageId current = new PageId(
-            relation.getHeaderPageId().FileIdx,
-            relation.getHeaderPageId().PageIdx
-        );
-
         try {
             // Charge la première header Page
-            ByteBuffer buffer = bm.getPage(current);
+            ByteBuffer buffer = bm.getPage(currentPageId);
 
-            // Si nous sommes sur une autre header Page plus loin dans le chaînage
-            if (numHeaderPage > 1) {
-                int cpt = numHeaderPage;  // Compteur pour gérer le chaînage des pages d'entêtes
-
-                // Avance jusqu'à la page d'entête correcte
-                while (cpt > 1) {
-                    // Extraction des identifiants de page à partir de la page d'entête actuelle
-                    PageId tmp = new PageId(
-                        buffer.getInt(DBConfig.pagesize - 8),       // Récupère le fileIdx de la header Page suivante
-                        buffer.getInt(DBConfig.pagesize - 4)   // Récupère le pageIdx de la header Page suivante
-                    );
-                    // Si un chaînage existe
-                    if (tmp.PageIdx != -1) {
-                        // Libère la page courante
-                        bm.freePage(current, false);
-                        // Redefini current
-                        current.FileIdx = tmp.FileIdx;
-                        current.PageIdx = tmp.PageIdx;
-                        // Charge la page suivante dans le buffer
-                        buffer = bm.getPage(current);
-                    }
-                    cpt--;
-                }
-            }
-            // Extrait l'identifiant de la page de données à partir de la page d'entête
             PageId res = new PageId(
                 buffer.getInt(offsetDataPage),
-                buffer.getInt(offsetDataPage + 4)
+                buffer.getInt(offsetDataPage+4)
             );
 
-            //System.out.println("nb hp "+numHeaderPage);
+            //System.out.println("id hp "+currentPageId);
             //System.out.println("offset "+offsetDataPage+"/"+DBConfig.pagesize);
-            //System.out.println("id "+res);
+            //System.out.println("id "+res+"\n");
 
+            cptDataPage --; // Décrémente le compteur de page de données a parcourir
             offsetDataPage += 12;  // Augmente le décalage pour passer à la page de données suivante
+
+            // Libère la page d'entête courante
+            bm.freePage(currentPageId, false);
 
             // Si le décalage dépasse la taille restante de la page d'entête, on passe à la page suivante
             if (offsetDataPage > (DBConfig.pagesize - (8 + 12))) {
-                //System.out.println("here");
                 offsetDataPage = 0;      // Réinitialisation du décalage
-                numHeaderPage++;          // Passage à la page d'entête suivante
+                currentPageId.FileIdx = buffer.getInt(DBConfig.pagesize-8); // Passage à la page d'entête suivante
+                currentPageId.PageIdx = buffer.getInt(DBConfig.pagesize-4);  // Passage à la page d'entête suivante
             }
-            cptDataPage --; // Décrémente le compteur de page de données a parcourir
-            // Libère la page d'entête courante
-            bm.freePage(current, false);
             return res;  // Retourne l'identifiant de la page de données trouvée
+
         } catch (Exception e) {
             e.printStackTrace();
             // En cas d'exception, on libère la page d'entête courante
-            bm.freePage(current, false);
+            bm.freePage(currentPageId, false);
         }
         return null;  // Retourne null en cas d'erreur
-
     }
 
     /**
      * Réinitialise l'itérateur pour recommencer à partir de la première page d'entête.
      */
     public void Reset() {
-        numHeaderPage = 1;    // Réinitialisation du compteur de pages d'entêtes
+        currentPageId = relation.getHeaderPageId();    // Réinitialisation du compteur de pages d'entêtes
         offsetDataPage = 4;  // Réinitialisation du décalage pour les pages de données
         cptDataPage = nbDataPage;
     }
@@ -121,9 +94,17 @@ public class PageDirectoryIterator {
         bm = null;
 
         // Réinitialisation des variables internes
-        numHeaderPage = 1;
+        currentPageId = null;
         offsetDataPage = 4;
         nbDataPage = 0; // Indiquer qu'il n'y a plus de pages à parcourir
         cptDataPage = 0;
+    }
+
+    public BufferManager getBm() {
+        return bm;
+    }
+
+    public Relation getRelation() {
+        return relation;
     }
 }

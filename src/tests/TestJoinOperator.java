@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
-public class TestPageOrientedJoinOperator {
+public class TestJoinOperator {
     private DiskManager dskM;
     private BufferManager bm;
     private DBConfig dbConfig;
@@ -15,7 +15,7 @@ public class TestPageOrientedJoinOperator {
 
     selectOperator select1;
     selectOperator select2;
-    private PageOrientedJoinOperator joinOperator;
+    private JoinOperator joinOperator;
 
     @BeforeEach
     void setup() throws Exception {
@@ -70,7 +70,7 @@ public class TestPageOrientedJoinOperator {
     @Test
     void testTuplesMatchExpected() throws Exception {
         // Création de l'opérateur de jointure
-        joinOperator = new PageOrientedJoinOperator(new Pair<>(select1, select2), new ArrayList<>());
+        joinOperator = new JoinOperator(new Pair<>(select1, select2), new ArrayList<>());
 
         // Crée une liste des tuples attendus en utilisant les itérateurs de select
         ArrayList<MyRecord> expectedTuples = new ArrayList<>();
@@ -108,7 +108,7 @@ public class TestPageOrientedJoinOperator {
 
     @Test
     void testReset() throws Exception {
-        joinOperator = new PageOrientedJoinOperator(new Pair<>(select1, select2), new ArrayList<>());
+        joinOperator = new JoinOperator(new Pair<>(select1, select2), new ArrayList<>());
 
         // Parcours initial des tuples
         while (joinOperator.GetNextRecord() != null);
@@ -127,7 +127,7 @@ public class TestPageOrientedJoinOperator {
 
     @Test
     void testClose() throws Exception{
-        joinOperator = new PageOrientedJoinOperator(new Pair<>(select1, select2), new ArrayList<>());
+        joinOperator = new JoinOperator(new Pair<>(select1, select2), new ArrayList<>());
         // Ferme l'opérateur
         joinOperator.Close();
 

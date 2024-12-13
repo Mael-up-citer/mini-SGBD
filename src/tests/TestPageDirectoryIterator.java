@@ -3,6 +3,8 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.List;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,6 +21,9 @@ public class TestPageDirectoryIterator {
             // Initialisation des gestionnaires simulés ou mockés
             dskM = DiskManager.getInstance();
             dbConfig = DBConfig.loadConfig("src/tests/config.txt"); // Recharger la configuration
+            DBConfig.pagesize = 1000;
+            DBConfig.dm_maxfilesize = 1000;
+
             bm = new BufferManager(dbConfig, dskM); // Réinitialiser le BufferManager
 
             // Création de la structure de la relation
@@ -48,27 +53,26 @@ public class TestPageDirectoryIterator {
         int nb = 10000;
         ArrayList<PageId> id = new ArrayList<>();
 
-        for (int i = 0; i < nb; i++) {
-            PageId pid = relation.addDataPage();
-            id.add(pid);
-        }
+        for (int i = 0; i < nb; i++)
+            id.add(relation.addDataPage());
 
         int i = 0;
 
         try {
+
             // Initialisation de l'itérateur
             iterator = new PageDirectoryIterator(relation, bm);
-        
+            
             PageId tmp;
 
             while ((tmp = iterator.GetNextDataPageId()) != null) {
-                System.out.println(i);
                 assertEquals(id.get(i), tmp, "Page de données "+i+" incorrecte.");
                 i++;
             }
 
             assertNull(iterator.GetNextDataPageId(), "Aucune page ne devrait être disponible après la dernière.");
             assertTrue(i == nb, "on aurais du avoir "+nb+" itération or on en a "+i);
+
         } catch (Exception e) {
             e.printStackTrace();
         }

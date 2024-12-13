@@ -35,29 +35,32 @@ public class BufferManager{
      * @return Le ByteBuffer de la page.
      * @throws Exception Si une erreur survient lors de la récupération de la page.
      */
-    public ByteBuffer getPage(PageId id) throws Exception{
+    public ByteBuffer getPage(PageId id) throws Exception {
         AVLNode node = cadre.search(id); // Recherche si la pageId est présente dans le buffer pool
 
         // Si la page n'est pas dans le buffer pool
         if (node == null) {
         	// Si le cadre est plein, on doit libérer de l'espace selon la politique de remplacement
-            if (emptyBuffer.isEmpty()) {
+            if (emptyBuffer.isEmpty())
                 makeSpace();    // Libère de l'espace
-            }
+
         	// Recupere le dernier buffer vide
             ByteBuffer tmp = emptyBuffer.remove(emptyBuffer.size() - 1);
             dskM.ReadPage(id, tmp);
             cadre.insert(new AVLNode(id, tmp)); // Insère le nouveau noeud dans l'arbre
             nbAllocFrame++; // L'AVL à une frame de plus
+            System.out.println("get nb alloc "+ nbAllocFrame+"\n\n");
 
             return tmp;
         }
         // Si le noeud est dans l'arbre
         else {
+            System.out.println("do nothing "+nbAllocFrame);
             ByteBuffer buffer = node.buffer; // Récupère le buffer associé au noeud
             node.pin_count++;   // Incrémente le compteur d'utilisation
         	// Si la page était dans junkFile, on l'enlève
             if(node.pointeurListe != null) {
+                nbAllocFrame++;
                 suppJunk(node.pointeurListe); // Retire de junkFile
             }
             return buffer;  // Retourne le buffer
@@ -83,6 +86,7 @@ public class BufferManager{
         // Si plus personne ne l'utilise, on l'ajoute à la junkFile
         if(noeud.pin_count == 0) {
             nbAllocFrame--; // Une frame de moins qui ne peut pas etre enlevé
+            System.out.println("free nb alloc = "+nbAllocFrame+"\n\n");
             ajoutJunk(noeud);   // L'ajoute à la junkFile
         }
         // Si tout c'est bien passé return true
@@ -137,7 +141,7 @@ public class BufferManager{
     /**
      * Selon la politique de remplacement, choisit l'élément à supprimer et écrit son buffer si nécessaire.
      */
-    private void makeSpace() throws Exception{
+    private void makeSpace() throws Exception {
         ByteBuffer buffer = null; // Pointeur vers le buffer
         PageId id = null; // Identifiant de la page à éjecter
         AVLNode noeud = null;
@@ -156,6 +160,9 @@ public class BufferManager{
             default:
                 throw new Exception("La politique de remplacement '"+DBConfig.bm_policy+"' n'a pas d'implémentation");
         }
+        // Si on ne trouve aucun noeud libérable
+        if (noeud == null) 
+            throw new IllegalStateException("erreur critique, plus d'espace disponible dans la buffer pool: occupation = "+nbAllocFrame+"/"+DBConfig.bm_buffercount);
 
         buffer = noeud.buffer;
         // Si la page a été modifié

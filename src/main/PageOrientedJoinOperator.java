@@ -1,60 +1,84 @@
+import java.nio.Buffer;
 import java.util.ArrayList;
 
+import javax.management.RuntimeErrorException;
+
 public class PageOrientedJoinOperator implements IRecordIterator {
-    private Pair<IRecordIterator, IRecordIterator> operateurs; // Les deux relations à joindre représenté par lurs select
+    BufferManager bm;
+
+    // Iterateur de data page de la relation extérieur
+    private PageDirectoryIterator outerPageIt;
+    // Iterateur de data page de la relation interne
+    private PageDirectoryIterator innerPageIt;
+
+    // Iterateur de tuple de la relation extérieur
+    private DataPageHoldRecordIterator outerTupleIt;
+    // Iterateur de tuple de la relation interne
+    private DataPageHoldRecordIterator innerTupleIt;
+
     private ArrayList<Condition> joinConditions;
     private MyRecord outerRecord; // Le tuple courant de la relation interieur
 
     /**
      * Constructeur de l'opérateur de jointure orientée page pour produit cartésien.
      */
-    public PageOrientedJoinOperator(Pair<IRecordIterator, IRecordIterator> operateurs, ArrayList<Condition> conditions) throws Exception {
-        this.operateurs = operateurs; // Initialisation des relations à joindre
+    public PageOrientedJoinOperator(PageDirectoryIterator outerPageIt, PageDirectoryIterator innerPageIt, ArrayList<Condition> conditions) throws Exception {
+        this.outerPageIt = outerPageIt; // Initialisation des relations à joindre
+        this.innerPageIt = innerPageIt; // Initialisation des relations à joindre
         joinConditions = conditions;
 
-        // Initialise le tuple externe 
-        outerRecord = this.operateurs.getFirst().GetNextRecord();
+        // Récupère le bm
+        this.bm = innerPageIt.getBm();
 
-        if (outerRecord == null)
-            throw new IllegalStateException("L'une des relations est vide, on ne peut pas faire de produit cartésien");
+        PageId outerId = outerPageIt.GetNextDataPageId();
+        PageId innerId = innerPageIt.GetNextDataPageId();
+
+        if (outerId == null || innerId == null)
+            throw new IllegalStateException("l'une des 2 relations est vide");
+
+        // Initialise les itérateurs de tuple externe
+        outerTupleIt = new DataPageHoldRecordIterator(outerPageIt.getRelation(), bm.getPage(outerId), bm, outerId);
+        innerTupleIt = new DataPageHoldRecordIterator(innerPageIt.getRelation(), bm.getPage(innerId), bm, innerId);
     }
 
-    /**
-     * Récupère le prochain tuple résultant du produit cartésien des relations.
+    /*
+     * Récupère le prochain enregistrement qui satisfait les conditions.
+     * 
+     * @return Le prochain enregistrement valide ou null s'il n'y en a plus.
      */
     @Override
     public MyRecord GetNextRecord() {
-        MyRecord res;   // Record resultant de la fusion
-
+        MyRecord record = null;
+/*
         do {
             try {
-                res = new MyRecord();
+                // Tente de récupérer le prochain enregistrement.
+                record = tupleIterator.GetNextRecord();
 
-                // Récupère le prochain record de la relation interne
-                MyRecord innerRecord = operateurs.getSecond().GetNextRecord();
+                // Si aucun enregistrement n'est disponible dans l'itérateur actuel.
+                if (record == null) {
+                    // Passe à la page suivante.
+                    PageId id = pageIterator.GetNextDataPageId();
 
-                // Si il est null on est au bout de la relation interne
-                if (innerRecord == null) {
-                    // Récupère le record suivant dans la relation externe
-                    outerRecord = operateurs.getFirst().GetNextRecord();
+                    // Si aucune page suivante n'est disponible, retourne null.
+                    if (id == null)
+                        return null;
 
-                    // Si il est null on est au bout de la relation externe
-                    if (outerRecord == null) return null;    // Fin de l'iterateur
+                    // Ferme l'itérateur actuel et crée un nouvel itérateur pour la nouvelle page.
+                    tupleIterator.Close();
+                    tupleIterator = new DataPageHoldRecordIterator(relation, bm.getPage(id), bm, id);
 
-                    // Si la relation externe n'est pas null reset la relation interne
-                    operateurs.getSecond().Reset();
-                    // Récupère le prochain record de la relation interne
-                    innerRecord = operateurs.getSecond().GetNextRecord();
+                    // Tente de récupérer le premier enregistrement de la nouvelle page.
+                    record = tupleIterator.GetNextRecord();
                 }
-                res.addAll(outerRecord);
-                res.addAll(innerRecord);
-
             } catch (Exception e) {
+                // Lève une exception en cas d'erreur.
                 throw new RuntimeException(e.getMessage());
             }
-        } while (!satifyConditions(res)); // Continue tant que les conditions ne sont pas satisfaites.
+        } while (!satifyConditions(record)); // Continue tant que les conditions ne sont pas satisfaites.
+*/
+        return record;  // Retourne le record resultat
 
-        return res;  // Retourne le record resultat
     }
 
     /**
@@ -85,6 +109,7 @@ public class PageOrientedJoinOperator implements IRecordIterator {
      */
     @Override
     public void Reset() {
+/*
         try {
             operateurs.getFirst().Reset();
             operateurs.getSecond().Reset();
@@ -92,6 +117,7 @@ public class PageOrientedJoinOperator implements IRecordIterator {
         } catch (Exception e) {
             System.out.println("Erreur lors de la réinitialisation : " + e.getMessage());
         }
+*/
     }
 
     /**
@@ -100,9 +126,11 @@ public class PageOrientedJoinOperator implements IRecordIterator {
      */
     @Override
     public void Close() {
+/*
         operateurs.setFirst(null);; // Les deux relations à joindre représenté par lurs select
         operateurs.setSecond(null);; // Les deux relations à joindre représenté par lurs select
         joinConditions = null;
         outerRecord = null;
+*/
     }
 }

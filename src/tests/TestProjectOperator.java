@@ -191,7 +191,7 @@ public class TestProjectOperator {
         );
 
         // Création de l'opérateur de jointure entre les deux tables sur la colonne "id"
-        IRecordIterator joinOp = new PageOrientedJoinOperator(
+        IRecordIterator joinOp = new JoinOperator(
             new Pair<>(selectOp1, selectOp2),
             joinConditions
         );

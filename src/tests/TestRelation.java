@@ -201,6 +201,7 @@ class TestRelation {
     void testInsertRecord() throws Exception {
         try {
             DBConfig.dm_maxfilesize = 1000;
+
             DiskManager dskM = DiskManager.getInstance();
 
             for (int j = 150; j < DBConfig.dm_maxfilesize; j++) {
@@ -209,7 +210,7 @@ class TestRelation {
                 // Réinitialisation des objets partagés pour chaque itération
                 DBConfig dbConfig = DBConfig.loadConfig("src/tests/config.txt"); // Recharger la configuration
                 DBConfig.pagesize = j;
-                DBConfig.dm_maxfilesize = 300;
+                DBConfig.dm_maxfilesize = 600;
                 DBConfig.bm_buffercount = 8;
 
                 BufferManager bm = new BufferManager(dbConfig, dskM); // Réinitialiser le BufferManager
@@ -251,9 +252,7 @@ class TestRelation {
 
                     // Insertion de l'enregistrement
                     recordId = relation.InsertRecord(record);
-                    
-                    /*
-
+/*
                     // Charge la page contenant l'enregistrement inséré
                     buffer = bm.getPage(recordId.pageIdx);
 
@@ -274,8 +273,7 @@ class TestRelation {
 
                     // Vérification que le record lu correspond à celui inséré
                     assertIterableEquals(record, readRecord, "Le record inséré ne correspond pas au record lu pour l'index " + i);
-
-                    */
+*/
                 }
                 // Nettoyage des fichiers après chaque itération
                 for (int i = 0; i < DBConfig.pagesize*3; i++)
@@ -284,7 +282,9 @@ class TestRelation {
         } catch(Exception e) {
             e.printStackTrace();
         }
+    
     }
+
 /*
     @Test
     void testGetAllRecords() throws Exception {

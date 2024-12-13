@@ -487,11 +487,18 @@ public class SGBD {
                         internConditions = conditions.getFirst();   // Affecte les conditions interne
                         joinConditions = conditions.getSecond();    // Affecte les conditions de jointure
                     }
-
-                    // Exécuter la commande avec les opérateurs relationnels
-                    treeAlgebra planExec = new treeAlgebra(relations, joinConditions, internConditions, attrbToPrint, nomToPrint, bm);
-                    planExec.execute();   // Exécuter la commande avec les opérateurs relationnels
-
+                    // Utilise l'algo de jointure orienté page sur 2 relations
+                    if (relations.size() == 2 && internConditions == null) {
+                        // Cree pageOrientedJoinOperateur
+                        // Cree la projection
+                        // Cree le recor print
+                    }
+                    // Sinon Utilise le tree d'execution
+                    else {
+                        // Exécuter la commande avec les opérateurs relationnels
+                        treeAlgebra planExec = new treeAlgebra(relations, joinConditions, internConditions, attrbToPrint, nomToPrint, bm);
+                        planExec.execute();   // Exécuter la commande avec les opérateurs relationnels
+                    }
                 } catch(Exception e){
                     e.printStackTrace();
                     System.out.println("Erreur lors de l'exécution de la commande "+e.getMessage());

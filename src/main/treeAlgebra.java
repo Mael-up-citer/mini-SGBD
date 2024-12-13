@@ -138,13 +138,13 @@ public class treeAlgebra {
         // Parcourt les relations restantes pour construire les jointures sauf la dernière
         for (int i = 1; i < selectOperators.size()-1; i++) {
             // Combine l'opérateur de jointure actuel avec le prochain opérateur SELECT.
-            joinOperator = new PageOrientedJoinOperator(
+            joinOperator = new JoinOperator(
                 new Pair<>(joinOperator, selectOperators.get(i)), 
                 new ArrayList<>() // Conditions pour la jointure actuelle.
             );
         }
         // Combine l'opérateur de jointure actuel avec le prochain opérateur SELECT.
-        joinOperator = new PageOrientedJoinOperator(
+        joinOperator = new JoinOperator(
             new Pair<>(joinOperator, selectOperators.get(selectOperators.size()-1)), 
             joinConditions // Conditions pour la jointure actuelle.
         );

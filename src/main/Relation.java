@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.nio.ByteBuffer;
 
@@ -14,6 +15,10 @@ public class Relation {
     private PageId LastHeaderPageId;    // Identifiant de la dernière page d'en-tête de la relation
     private DiskManager dskm;       // Gestionnaire de disque pour l'allocation et la gestion des pages
     private BufferManager bm;       // Gestionnaire de buffer pour la gestion des pages en mémoire
+
+    // Map pour liée le nom d'un attributs à son index dans la liste des attributs
+    private HashMap<String, Integer> nameToIndex;
+    int index = 0;  // Index auquelle un attribut sera mis
 
     /**
      * Constructeur avec initialisation des attributs.
@@ -32,6 +37,7 @@ public class Relation {
             throw new IllegalArgumentException("Impossible de cree l'instance car le nom "+ relationName+"  est invalide");
 
         this.attribut = new ArrayList<>();
+        this.nameToIndex = new HashMap<>();
 
         setAttribut(attribut);  // Appelle le setter pour vérifier et init les attributs
         this.headerPageId = headerPageId;
@@ -524,12 +530,12 @@ public class Relation {
             // Insére le record dans la page sélectionnée
             int recordPos = buffer.getInt(DBConfig.pagesize - 4); // Position de l'espace libre
 
-            //System.out.println("\npage d'écriture = "+dataPageId);
-            //System.out.println("pos ecriture = "+recordPos);
+            System.out.println("\npage d'écriture = "+dataPageId);
+            System.out.println("pos ecriture = "+recordPos);
 
             int writeSize = writeRecordToBuffer(record, buffer, recordPos);
 
-            //System.out.println(writeSize+"/"+recordSize);
+            System.out.println(writeSize+"/"+recordSize);
 
             // Écrire le record dans le buffer et si on écrit pas exactement la taille du record c'est un échec
             if (writeSize != recordSize)
@@ -748,7 +754,10 @@ public class Relation {
         // Si on passe tout les tests on l'ajoute
         // Met en majuscule avant
         attrb.setFirst(attrb.getFirst().toUpperCase());
+
+        nameToIndex.put(attrb.getFirst(), index);
         attribut.add(attrb);
+        index++;
     }
 
     /**
