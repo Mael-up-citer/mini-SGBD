@@ -41,8 +41,7 @@ public class TestDBManager {
 	@Test
 	void testAddAndGetTableToCurrentDatabase() {
 		DBM.CreateDatabase("bddtest");
-		Relation rel = new Relation("test", new ArrayList<Pair<String, Data>>(), new PageId(0, 0), dskM, bm);
-		rel.setRelationName("relTest");
+		Relation rel = new Relation("Reltest", new ArrayList<Pair<String, Data>>(), new PageId(0, 0), dskM, bm);
 		assertThrows(Exception.class, () -> {DBM.AddTableToCurrentDatabase(rel);});
 		assertThrows(Exception.class, () -> {DBM.GetTableFromCurrentDatabase("relTest");});
 		try{
@@ -84,10 +83,8 @@ public class TestDBManager {
 	@Test
 	void testRemoveTableFromCurrentDatabase() {
 		DBM.CreateDatabase("bddtest");
-		Relation rel = new Relation("test", new ArrayList<Pair<String, Data>>(), new PageId(0, 0), dskM, bm);
-		rel.setRelationName("relTest");
-		Relation rel2 = new Relation("tests", new ArrayList<Pair<String, Data>>(), new PageId(0, 0), dskM, bm);
-		rel2.setRelationName("relTestdeux");
+		Relation rel = new Relation("Reltest", new ArrayList<Pair<String, Data>>(), new PageId(0, 0), dskM, bm);
+		Relation rel2 = new Relation("Reltestdeux", new ArrayList<Pair<String, Data>>(), new PageId(0, 0), dskM, bm);
 		assertThrows(Exception.class, () -> {DBM.RemoveTableFromCurrentDatabase("relTest");});
 		try{
 			DBM.SetCurrentDatabase("bddtest");
@@ -106,10 +103,8 @@ public class TestDBManager {
 	@Test
 	void testRemoveTablesFromCurrentDatabase() {
 		DBM.CreateDatabase("bddtest");
-		Relation rel = new Relation("test", new ArrayList<Pair<String, Data>>(), new PageId(0, 0), dskM, bm);
-		rel.setRelationName("relTest");
-		Relation rel2 = new Relation("tests", new ArrayList<Pair<String, Data>>(), new PageId(0, 0), dskM, bm);
-		rel2.setRelationName("relTestdeux");
+		Relation rel = new Relation("Reltest", new ArrayList<Pair<String, Data>>(), new PageId(0, 0), dskM, bm);
+		Relation rel2 = new Relation("Reltestdeux", new ArrayList<Pair<String, Data>>(), new PageId(0, 0), dskM, bm);
 		assertThrows(Exception.class, () -> {DBM.RemoveTablesFromCurrentDatabase();});
 		try{
 			DBM.SetCurrentDatabase("bddtest");
@@ -119,6 +114,52 @@ public class TestDBManager {
 			assertFalse(DBM.getCurrentDatabase().containsKey("relTest"));
 			assertFalse(DBM.getCurrentDatabase().containsKey("relTestdeux"));
 			
+		}catch(Exception e) {
+			e.getMessage();
+		}
+	}
+	
+	@Test
+	void testInsertIntoCurrentDatabase() {
+		DBM.CreateDatabase("bddtest");
+		String[] valuesCourte = {"blabla"};
+		String[] valuesLongue = {"blabla", "12", "22"};
+		String[] valuesCorrecte = {"blabla", "12"};
+		String[] valuesInCorrecte = {"blabla", "hehe"};
+		try{
+			Relation rel = new Relation("relTest", new ArrayList<>(), dskM.AllocPage(), dskM, bm);
+			rel.setOneAttribut(new Pair<>("coltest", new Data(DataType.CHAR, 20)));
+			rel.setOneAttribut(new Pair<>("coltestdeux", new Data(DataType.INT)));
+			assertThrows(IllegalArgumentException.class, ()->{DBM.InsertIntoCurrentDatabase("relTest", valuesCorrecte);});
+			DBM.SetCurrentDatabase("bddtest");
+			DBM.AddTableToCurrentDatabase(rel);
+			assertThrows(IllegalArgumentException.class, ()->{DBM.InsertIntoCurrentDatabase("relTest", valuesCourte);});
+			assertThrows(IllegalArgumentException.class, ()->{DBM.InsertIntoCurrentDatabase("relTest", valuesLongue);});
+			assertThrows(IllegalArgumentException.class, ()->{DBM.InsertIntoCurrentDatabase("relTest", valuesInCorrecte);});
+			assertDoesNotThrow(() -> {DBM.InsertIntoCurrentDatabase("relTest", valuesCorrecte);});
+			Relation relverif = DBM.GetTableFromCurrentDatabase("relTest");
+			assertNotNull(relverif.GetAllRecords());
+		}catch(Exception e) {
+			e.getMessage();
+		}
+	}
+	
+	@Test
+	void testBulkInsertIntoCurrentDatabase() {
+		DBM.CreateDatabase("bddtest");
+		try{
+			Relation rel = new Relation("relTest", new ArrayList<>(), dskM.AllocPage(), dskM, bm);
+			rel.setOneAttribut(new Pair<>("coltest", new Data(DataType.INT)));
+			rel.setOneAttribut(new Pair<>("coltestdeux", new Data(DataType.REAL)));
+			rel.setOneAttribut(new Pair<>("coltesttrois", new Data(DataType.INT)));
+			rel.setOneAttribut(new Pair<>("coltestquatre", new Data(DataType.INT)));
+			rel.setOneAttribut(new Pair<>("coltestcinq", new Data(DataType.INT)));
+			DBM.SetCurrentDatabase("bddtest");
+			DBM.AddTableToCurrentDatabase(rel);
+			assertDoesNotThrow(() -> {DBM.BulkInsertIntoCurrentDatabase("relTest", "S.csv");});
+			Relation relverif = DBM.GetTableFromCurrentDatabase("relTest");
+			assertNotNull(relverif.GetAllRecords());
+			System.out.println(relverif.GetAllRecords());
 		}catch(Exception e) {
 			e.getMessage();
 		}
