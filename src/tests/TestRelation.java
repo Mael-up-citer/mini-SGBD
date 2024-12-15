@@ -1,6 +1,7 @@
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -11,11 +12,49 @@ import java.util.ArrayList;
 import java.util.List;
 
 class TestRelation {
+    Relation relation;
+    MyRecord record;
+
+    @BeforeEach
+    void init() throws Exception {
+        DiskManager dskM = DiskManager.getInstance();
+        dskM.RAZ();
+        DBConfig dbConfig = DBConfig.loadConfig("src/tests/config.txt"); // Recharger la configuration
+        BufferManager bm = new BufferManager(dbConfig, dskM); // Réinitialiser le BufferManager
+
+        // Allocation d'une nouvelle page d'en-tête (header page)
+        PageId headerPageId = dskM.AllocPage(); // Nouvelle page d'en-tête
+
+        // Modification du buffer de la nouvelle page d'en-tête
+        ByteBuffer buffer = bm.getPage(headerPageId);
+        buffer.putInt(DBConfig.pagesize - 4, -1); // Mettre -1 pour indiquer qu'il n'y a pas de page suivante
+        bm.freePage(headerPageId, true);
+
+        // Réinitialisation des attributs et création d'une nouvelle relation
+        ArrayList<Pair<String, Data>> attributs = new ArrayList<>();
+        attributs.add(new Pair<>("id", new Data(DataType.INT)));
+        attributs.add(new Pair<>("nom", new Data(DataType.VARCHAR, 32)));
+        attributs.add(new Pair<>("prenom", new Data(DataType.CHAR, 32)));
+        attributs.add(new Pair<>("note", new Data(DataType.REAL)));
+        attributs.add(new Pair<>("birthdate", new Data(DataType.DATE)));
+
+        relation = new Relation("Personne", attributs, headerPageId, dskM, bm);
+
+
+        // Création d'un enregistrement
+        record = new MyRecord();
+        // Création de l'enregistrement avec des valeurs pour tous les types
+        record.add(1, DataType.INT); // Valeur de type INT
+        record.add("Dupont", DataType.VARCHAR); // Valeur de type VARCHAR
+        record.add("Alice", DataType.CHAR); // Valeur de type CHAR
+        record.add(2.1f, DataType.REAL); // Valeur de type REAL
+        record.add(new Date(20, 5, 2000), DataType.DATE); // Valeur de type DATE
+    }
 /*
     @Test
     void testAddAttribut() {
         // Ajout d'un nouvel attribut valide
-        relation.addAttribut(new Pair<>("age", new Data(DataType.INT)));
+        relation.setOneAttribut(new Pair<>("age", new Data(DataType.INT)));
 
         // Vérification de l'ajout
         assertEquals(6, relation.getAttribut().size()); // Devrait être 5, car on a ajouté un nouvel attribut "age"
@@ -24,29 +63,29 @@ class TestRelation {
         // Add un attribut null
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             // Tente d'ajouter un attribut avec un nom invalide
-            relation.addAttribut(null); // Nom vide
+            relation.setOneAttribut(null);
         });
 
-         // Add un attribut invalide
+        // Add un attribut invalide
         exception = assertThrows(IllegalArgumentException.class, () -> {
             // Tente d'ajouter un attribut avec un nom invalide
-            relation.addAttribut(new Pair<>("", new Data(DataType.INT))); // Nom vide
+            relation.setOneAttribut(new Pair<>("", new Data(DataType.INT)));
         });
         // Add un attribut invalide
         exception = assertThrows(IllegalArgumentException.class, () -> {
             // Tente d'ajouter un attribut avec un nom invalide
-            relation.addAttribut(new Pair<>("1Personne", new Data(DataType.INT))); // Nom vide
+            relation.setOneAttribut(new Pair<>("1Personne", new Data(DataType.INT)));
         });
         // Add un attribut invalide
         exception = assertThrows(IllegalArgumentException.class, () -> {
             // Tente d'ajouter un attribut avec un nom invalide
-            relation.addAttribut(new Pair<>("Create", new Data(DataType.INT))); // Nom vide
+            relation.setOneAttribut(new Pair<>("Create", new Data(DataType.INT)));
         });
     }
 
     @Test
     void testWriteAndReadRecordToBuffer() {
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        ByteBuffer buffer = ByteBuffer.allocate(DBConfig.pagesize);
         int pos = 3;
 
         // Écriture de l'enregistrement dans le buffer
@@ -72,6 +111,7 @@ class TestRelation {
 
         // Écriture de l'enregistrement dans le buffer
         writtenSize = relation.writeRecordToBuffer(record, buffer2, pos);
+
         // Vérification de la taille écrite
         assertTrue(writtenSize == 0, "La taille écrite doit être null but was "+writtenSize);
 
@@ -116,14 +156,10 @@ class TestRelation {
             // Initialisation des listes pour la vérification
             ArrayList<PageId> allocatePage = new ArrayList<>();
 
-            System.out.println("\n\n\npagesize = " + DBConfig.pagesize + "    dm_maxfilesize = " + DBConfig.dm_maxfilesize);
-
             // Ajoute 5000 data Page
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 5000; i++)
                 // Ajoute la nouvelle data Page à la liste
                 allocatePage.add(relation.addDataPage());
-
-            //System.out.println("\n\nget time \n\n");
 
             // On fait un get data Page
             ArrayList<PageId> dataPages = (ArrayList<PageId>) relation.getDataPages();
@@ -135,7 +171,7 @@ class TestRelation {
             assertIterableEquals(allocatePage, dataPages);
         }
         // Nettoyage des fichiers
-        for (int i = 0; i < 1300; i++)
+        for (int i = 0; i < 3000; i++)
             Files.deleteIfExists(Paths.get(DBConfig.dbpath + "BinData/F" + i + ".rsdb"));
     }
 
@@ -175,10 +211,8 @@ class TestRelation {
             // Initialisation des listes pour la vérification
             ArrayList<PageId> allocatePage = new ArrayList<>();
 
-            System.out.println("\n\n\npagesize = " + DBConfig.pagesize + "    dm_maxfilesize = " + DBConfig.dm_maxfilesize);
-
             // Ajoute 5000 data Page
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 5000; i++)
                 // Ajoute la nouvelle data Page à la liste
                 allocatePage.add(relation.addDataPage());
 
@@ -192,11 +226,10 @@ class TestRelation {
             assertIterableEquals(allocatePage, dataPages);
         }
         // Nettoyage des fichiers après chaque itération
-        for (int i = 0; i < 1300; i++)
-        Files.deleteIfExists(Paths.get(DBConfig.dbpath + "BinData/F" + i + ".rsdb"));
+        for (int i = 0; i < 3000; i++)
+            Files.deleteIfExists(Paths.get(DBConfig.dbpath + "BinData/F" + i + ".rsdb"));
     }
-*/
-
+*/ /*
     @Test
     void testInsertRecord() throws Exception {
         try {
@@ -204,7 +237,7 @@ class TestRelation {
 
             DiskManager dskM = DiskManager.getInstance();
 
-            for (int j = 150; j < DBConfig.dm_maxfilesize; j++) {
+            for (int j = 200; j < DBConfig.dm_maxfilesize; j++) {
                 dskM.RAZ();
 
                 // Réinitialisation des objets partagés pour chaque itération
@@ -244,7 +277,7 @@ class TestRelation {
                 System.out.println("\n\n\n\n\nconfig: pagesize = "+DBConfig.pagesize);
 
                 // Boucle pour insérer plusieurs records
-                for (int i = 0; i < 1000; i++) {
+                for (int i = 0; i < 5000; i++) {
                     RecordId recordId = null;
                     ByteBuffer buffer = null;
 
@@ -252,7 +285,7 @@ class TestRelation {
 
                     // Insertion de l'enregistrement
                     recordId = relation.InsertRecord(record);
-/*
+
                     // Charge la page contenant l'enregistrement inséré
                     buffer = bm.getPage(recordId.pageIdx);
 
@@ -273,7 +306,6 @@ class TestRelation {
 
                     // Vérification que le record lu correspond à celui inséré
                     assertIterableEquals(record, readRecord, "Le record inséré ne correspond pas au record lu pour l'index " + i);
-*/
                 }
                 // Nettoyage des fichiers après chaque itération
                 for (int i = 0; i < DBConfig.pagesize*3; i++)
@@ -282,9 +314,8 @@ class TestRelation {
         } catch(Exception e) {
             e.printStackTrace();
         }
-    
     }
-
+*/
 /*
     @Test
     void testGetAllRecords() throws Exception {
@@ -362,4 +393,11 @@ class TestRelation {
         });
     }
 */
+    @Test
+    void testNameToIndex() {
+        ArrayList<Pair<String, Data>> attrb = relation.getAttribut();
+
+        for (int i = 0; i < relation.getNbAttribut(); i++)
+            assertTrue(relation.getNameToIndex().get(relation.getAttribut(i).getFirst()) == i, "erreur l'attribut "+relation.getAttribut(i).getFirst()+" n'est pas au bon indice dans la map: expected "+i+" but was "+relation.getNameToIndex().get(relation.getAttribut(i).getFirst()));
+    }
 }

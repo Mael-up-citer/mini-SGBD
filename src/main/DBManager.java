@@ -294,11 +294,11 @@ public class DBManager {
     public void loadState() throws IOException{
     	HashMap<String, Relation> DatabaseEnCours = null;
     	Relation RelationEnCours = null;
-        String save = readFichier(DBConfig.dbpath + "/databases.save");
+        
+		String save = readFichier(DBConfig.dbpath + "/databases.save");
 
-        if(save == null) {
+        if(save == null)
         	throw new IOException("La sauvegarde est vide");
-        }
         else {
         	String[] lines = save.split("\n");
         	for(String line : lines) {
@@ -358,7 +358,7 @@ public class DBManager {
      * 
      * @return Une chaîne de caractère contenant la sauvegarde
      */
-    public String readFichier(String chemin) throws IOException{
+    public String readFichier(String chemin) throws IOException {
     	// Lire tout le contenu du fichier et le retourner sous forme de chaîne
         return new String(Files.readAllBytes(Paths.get(chemin)));
     }

@@ -24,17 +24,17 @@ public class SGBD {
      * @param dbc La configuration de la base de données.
      * @throws Exception Si une erreur se produit lors de l'initialisation du SGBD.
      */
-    SGBD(DBConfig dbc) throws Exception{
+    SGBD(DBConfig dbc) {
         this.dbc = dbc;
-        dskM = DiskManager.getInstance();  // Initialisation du gestionnaire de disque
         try{
+            dskM = DiskManager.getInstance();  // Initialisation du gestionnaire de disque
+
             dskM.loadState();   // Chargement de l'état du disque
-        } catch(Exception e){
-        }
-        finally{
             bm = new BufferManager(dbc, dskM); // Initialisation du gestionnaire de buffers
             dbM = new DBManager(dbc, dskM, bm);  // Initialisation du gestionnaire de base de données
             dbM.loadState();    // Chargement de l'état des bases de données
+        } catch(Exception e){
+            System.out.println(e.getMessage());
         }
         initializeCOMMANDMAP();
     }
@@ -74,9 +74,7 @@ public class SGBD {
             System.exit(-1);
         }
 
-        DBConfig dbc = DBConfig.loadConfig("config.txt");  // Initialisation de la configuration de la base de données
-
-        DBConfig.dbpath = args[0];          // Affectation du chemin de la base de données
+        DBConfig dbc = DBConfig.loadConfig(args[0]+"config.txt");  // Initialisation de la configuration de la base de données
 
         // Vérification de la validité du chemin de la base de données
         if (!DBConfig.testDbpath()) {
@@ -457,22 +455,24 @@ public class SGBD {
                     // Liste qui contient les relations
                     ArrayList<Relation> relations = new ArrayList<>();
                     // 1er element associe le nom d'une relation à son allias, le 2nd l'inverse
-                    Pair<HashMap<String, String>, HashMap<String, String>> pair = extractRelation(tables, relations);
+                    HashMap<String, String> assocAlliasToNom = extractRelation(tables, relations);
 
-                    // Vérifie si il y a eu un problème avec les relations
-                    if (pair == null) { 
-                        System.out.println("Problème sur l'une des tables: " + tables + " elles doivent toute exister dans la base de donnée courrante");
-                        return; // Quitter la méthode si la table n'existe pas
-                    }
-                    // Map qui asscocie le nom d'une relation à son alias
-                    HashMap<String, String> assocNomToAllais = pair.getFirst();
-                    // Map qui asscocie un alias à sa relation
-                    HashMap<String, String> assocAlliasToNom = pair.getSecond();
-                    // Liste du nom des attributs à afficher
+                    // Liste du nom des attributs à afficher sous la forme alias.nomAtrb
                     ArrayList<String> nomToPrint = new ArrayList<>();
+                    // Map pour garder les décalages des relations
+                    HashMap<String, Integer> relationOffsets = new HashMap<>();
+                    int globalOffset = 0;
 
-                    // Extraire les indices des attributs à afficher, les indices sont calculé dans le tuple fusionné resultant
-                    ArrayList<Integer> attrbToPrint = extractAttribut(attributs, assocAlliasToNom, nomToPrint);
+                    // Calculer les décalages globaux pour chaque relation en fonction de l'ordre d'apparition de la relation dans le 'FROM'
+                    for (String alias : assocAlliasToNom.keySet()) {
+                        String relationName = assocAlliasToNom.get(alias);
+                        Relation relation = dbM.getCurrentDatabase().get(relationName);
+                        relationOffsets.put(alias, globalOffset);
+
+                        globalOffset += relation.getNbAttribut();
+                    }
+                    // Extrait les noms des attributs à afficher et remplie le 
+                    ArrayList<Integer> attrbToPrint = extractAttribut(attributs, assocAlliasToNom, nomToPrint, relationOffsets);
 
                     // Pair qui contient en 1 les conditions interne des tables et en second les conditions de jointures
                     Pair<HashMap<String, ArrayList<Condition>>, ArrayList<Condition>> conditions = new Pair<>(); 
@@ -484,24 +484,35 @@ public class SGBD {
                     // Si on a des conditions
                     if (whereConditions != null) {
                         // Extrait les condition
-                        conditions = extractCondition(whereConditions, assocAlliasToNom);  // Extraire les conditions
+                        conditions = extractCondition(whereConditions, assocAlliasToNom, relationOffsets);  // Extraire les conditions
                         internConditions = conditions.getFirst();   // Affecte les conditions interne
                         joinConditions = conditions.getSecond();    // Affecte les conditions de jointure
                     }
-                    // Utilise l'algo de jointure orienté page sur 2 relations
-                    if (relations.size() == 2 && internConditions == null) {
-                        // Cree pageOrientedJoinOperateur
-                        // Cree la projection
-                        // Cree le recor print
+
+                    //System.out.println("Relations : " + relations);
+                    //System.out.println("AssocAlliasToNom : " + assocAlliasToNom);
+                    //System.out.println("NomToPrint : " + nomToPrint);
+                    //System.out.println("RelationOffsets : " + relationOffsets);
+                    //System.out.println("Attributs à afficher (attrbToPrint) : " + attrbToPrint);
+                    //System.out.println("Conditions internes : " + internConditions);
+                    //System.out.println("Conditions de jointure : " + joinConditions);
+                    
+                    // Utilise l'algo de jointure orienté page sur 2 relations sans conditions interne
+                    if (relations.size() == 2 && internConditions.isEmpty()) {
+                        PageOrientedJoinOperator pageJoin = new PageOrientedJoinOperator(new PageDirectoryIterator(relations.get(0), bm), new PageDirectoryIterator(relations.get(1), bm), joinConditions);
+                        ProjectOperator projecectionOp = new ProjectOperator(pageJoin, attrbToPrint);
+                        RecordPrinter printer = new RecordPrinter(projecectionOp, nomToPrint);
+
+                        printer.printAllRecord();
                     }
                     // Sinon Utilise le tree d'execution
                     else {
                         // Exécuter la commande avec les opérateurs relationnels
-                        treeAlgebra planExec = new treeAlgebra(relations, joinConditions, internConditions, attrbToPrint, nomToPrint, bm);
+                        TreeAlgebra planExec = new TreeAlgebra(relations, joinConditions, internConditions, attrbToPrint, nomToPrint, bm);
                         planExec.execute();   // Exécuter la commande avec les opérateurs relationnels
                     }
                 } catch(Exception e){
-                    e.printStackTrace();
+                    //e.printStackTrace();
                     System.out.println("Erreur lors de l'exécution de la commande "+e.getMessage());
                 }
             }
@@ -513,9 +524,8 @@ public class SGBD {
     /**
      * Méthode pour extraire une relation (table et alias) à partir du paramètre.
      */
-    private Pair<HashMap<String, String>, HashMap<String, String>> extractRelation(String listeTableName, ArrayList<Relation> relations) {
+    private HashMap<String, String> extractRelation(String listeTableName, ArrayList<Relation> relations) {
         HashMap<String, Relation> db = dbM.getCurrentDatabase();
-        HashMap<String, String> assocNomToAllias = new HashMap<>();
         HashMap<String, String> assocAlliasToNom = new HashMap<>();
 
         // Chaque case contient une relation et son allias
@@ -530,14 +540,14 @@ public class SGBD {
             // Test si la relation existe dans la bd courrante
             if (r != null) {
                 relations.add(r);
-                assocNomToAllias.put(str[0], str[1]);  // Insère dans la map le couple
                 assocAlliasToNom.put(str[1], str[0]);  // Insère dans la map le couple
             }
             else
-                return null;
+                throw new IllegalArgumentException("La relation "+str[0]+" n'existe pas dans la base de donnée courante");
         }
-        return new Pair<HashMap<String,String>,HashMap<String,String>>(assocNomToAllias, assocAlliasToNom);
+        return assocAlliasToNom;
     }
+
 
     /**
      * Méthode pour extraire les indices absolus des attributs à afficher dans le record fusionné.
@@ -555,9 +565,10 @@ public class SGBD {
      *         correspond à l'ordre dans lequel les attributs apparaissent dans la clause SELECT.
      * @throws IllegalArgumentException Si un alias ou une colonne est mal formé ou inexistant.
      */
-    private ArrayList<Integer> extractAttribut(String param, HashMap<String, String> assocAlliasToNom, ArrayList<String> nomToPrint) {
+    private ArrayList<Integer> extractAttribut(String param, HashMap<String, String> assocAlliasToNom, ArrayList<String> nomToPrint, HashMap<String, Integer> relationOffsets) {
+        // Liste des index des attributs a afficher pour le dernier projet opérateur
         ArrayList<Integer> attributesToPrint = new ArrayList<>();
-        int globalOffset = 0;  // Décalage cumulatif qui sera ajouté à chaque index pour obtenir l'index absolu
+        int globalOffset = 0;
         // Chaque case contient allais.attrbName
         String[] attrbs = param.split("\\s+,\\s+");        
 
@@ -565,14 +576,13 @@ public class SGBD {
         if ("*".equals(param.trim())) {
             // Parcours des relations dans l'ordre des alias
             for (String alias : assocAlliasToNom.keySet()) {
-                // Récupère le nom de la relation
                 String relationName = assocAlliasToNom.get(alias);
-                // Récupère l'objet relation associé
                 Relation relation = dbM.getCurrentDatabase().get(relationName);
 
                 // Ajouter les indices absolus pour tous les attributs de cette relation
                 for (int i = 0; i < relation.getNbAttribut(); i++) {
-                    attributesToPrint.add(globalOffset);  // Ajoute l'index absolu
+                    // Ajoute l'index absolu
+                    attributesToPrint.add(globalOffset);
                     globalOffset++;  // Incrémente le décalage pour la relation suivante
 
                     // Reconstruit le nom complet alias.nomAttribut
@@ -583,22 +593,8 @@ public class SGBD {
         }
         else {
             // Si on a des attributs spécifiques dans le SELECT
-            // Capture les attributs que l'on veut
+            // Capture les attributs que l'on veut afficher
             nomToPrint.addAll(Arrays.asList(attrbs));
-            // Map pour garder les décalages des relations
-            HashMap<String, Integer> relationOffsets = new HashMap<>();
-
-            // Calculer les décalages globaux pour chaque relation en fonction de l'ordre d'apparition de la relation dans le 'FROM'
-            for (String alias : assocAlliasToNom.keySet()) {
-                // Récupère le nom de la relation
-                String relationName = assocAlliasToNom.get(alias);
-                // Récupere la relation associé
-                Relation relation = dbM.getCurrentDatabase().get(relationName);
-                // Met dans la map pour cette alias il faut ce décalge
-                relationOffsets.put(alias, globalOffset);
-                // Met à jour le décalage global pour la prochaine relation
-                globalOffset += relation.getNbAttribut();
-            }
 
             // Traitement des attributs spécifiques dans le SELECT
             for (String attrb : attrbs) {
@@ -624,20 +620,10 @@ public class SGBD {
                 Relation relation = dbM.getCurrentDatabase().get(relationName);
 
                 // Trouver l'index relatif de la colonne dans la relation
-                int relativeIndex = -1;
-
-                // Parcour les attributs dans une relation pour chercher l'index de l'attribut
-                for (int i = 0; i < relation.getNbAttribut(); i++) {
-                    // Si on le trouve
-                    if (relation.getNameAttribut(i).equals(columnName)) {
-                        // Garde son index relatif
-                        relativeIndex = i;
-                        break;  // Quitte la boucle
-                    }
-                }
+                Integer relativeIndex = relation.getNameToIndex().get(columnName);
 
                 // Si la colonne n'existe pas dans la relation, lancer une exception
-                if (relativeIndex == -1)
+                if (relativeIndex == null)
                     throw new IllegalArgumentException("Colonne inconnue : " + columnName);
 
                 // Calculer l'index absolu en ajoutant le décalage global de la relation
@@ -653,7 +639,7 @@ public class SGBD {
      * @param param Partie WHERE (ex. "aliasRel.col1 = 10 AND aliasRel.col2 > 20").
      * @return Liste des conditions extraites.
      */
-    private Pair<HashMap<String, ArrayList<Condition>>, ArrayList<Condition>> extractCondition(String param, HashMap<String, String> assocAlliasToNom) {
+    private Pair<HashMap<String, ArrayList<Condition>>, ArrayList<Condition>> extractCondition(String param, HashMap<String, String> assocAlliasToNom, HashMap<String, Integer> relationOffsets) {
         // Tableau ou chaque case contient une condition
         String[] conditions = param.split("\\s+AND\\s+");
         // Liste ou on stock les conditons extrait
@@ -679,103 +665,67 @@ public class SGBD {
                 String alias2 = matcher.group(4);   // Alias du second terme (peut être null)
                 String colonne2 = matcher.group(5); // Colonne ou valeur du second terme
 
-                // Index de l'attribut dans la relation -1 = abscent
-                int index1 = -1;
-                int index2 = -1;
-
                 // Si c'est une condition sur la même table
                 if ((alias1 == null) || (alias2 == null) || (alias1.equals(alias2))) {
                     // Contient le nom de la relation
                     String relationName;
 
                     // Extrait le nom de la relation
-                    // L'un des 2 alias est null donc on test
+                    // L'un des 2 alias est null ou c'est le même
                     if (alias1 != null) relationName = assocAlliasToNom.get(alias1);
                     else if (alias2 != null) relationName = assocAlliasToNom.get(alias2);
                     else throw new IllegalArgumentException("erreur dans la condition: "+cond);
 
-                    // Récupère la relation
                     Relation relation = dbM.getCurrentDatabase().get(relationName);
 
-                    // Itère sur chaque attribut
-                    for (int i = 0; i < relation.getNbAttribut(); i++ ) {
-                        // Si le nom correspond a celui qu'on cherche on garde i
-                        if (relation.getAttribut(i).getFirst().equals(colonne1)) index1 = i;
-                        if (relation.getAttribut(i).getFirst().equals(colonne2)) index2 = i;
-                    }
-                    // Crée les pair de terme
-                    Pair<String, Integer> p1 = new Pair<String,Integer>(colonne1, index1);
-                    Pair<String, Integer> p2 = new Pair<String,Integer>(colonne2, index2);
+                    // Trouver l'index relatif de la colonne dans la relation
+                    Integer relativeIndex1 = relation.getNameToIndex().get(colonne1);
+                    Integer relativeIndex2 = relation.getNameToIndex().get(colonne2);
+                    
+                    if (relativeIndex1 == null)
+                        relativeIndex1 = -1;
+
+                    if (relativeIndex2 == null)
+                        relativeIndex2 = -1;
+
+                    // Crée les pairs de terme
+                    Pair<String, Integer> p1 = new Pair<String,Integer>(colonne1, relativeIndex1);
+                    Pair<String, Integer> p2 = new Pair<String,Integer>(colonne2, relativeIndex2);
     
-                    // Ajouter une nouvelle condition à la liste associée à 'alias1'
-                    res.getFirst().computeIfAbsent(alias1, k -> new ArrayList<>()).add(new Condition(p1, operateur, p2));
+                    // Ajoute une nouvelle condition à la liste associée à la relation liée à alias1
+                    res.getFirst().computeIfAbsent(assocAlliasToNom.get(alias1), k -> new ArrayList<>()).add(new Condition(p1, operateur, p2));
                 }
                 // Sinon c'est une condition de jointure
                 else {
-                    // Nom des relations conserné
-                    String relationName1;
-                    String relationName2;
-
                     // Extrait le nom des relations
-                    relationName1 = assocAlliasToNom.get(alias1);
-                    relationName2 = assocAlliasToNom.get(alias2);
+                    String relationName1 = assocAlliasToNom.get(alias1);
+                    String relationName2 = assocAlliasToNom.get(alias2);
 
                     // Extrait les relations
                     Relation relation1 = dbM.getCurrentDatabase().get(relationName1);
-                    Relation relation2 = dbM.getCurrentDatabase().get(relationName1);
+                    Relation relation2 = dbM.getCurrentDatabase().get(relationName2);
 
-                    // Map pour garder les décalages des relations
-                    HashMap<String, Integer> relationOffsets = new HashMap<>();
-                    int globalOffset = 0;
+                    // Trouver l'index relatif de la colonne dans la relation
+                    Integer relativeIndex1 = relation1.getNameToIndex().get(colonne1);
+                    Integer relativeIndex2 = relation2.getNameToIndex().get(colonne2);
 
-                    // Calculer les décalages globaux pour chaque relation en fonction de l'ordre d'apparition de la relation dans le 'FROM'
-                    for (String alias : assocAlliasToNom.keySet()) {
-                        // Récupère le nom de la relation
-                        String relationName = assocAlliasToNom.get(alias);
-                        // Récupere la relation associé
-                        Relation relation = dbM.getCurrentDatabase().get(relationName);
-                        // Met dans la map pour cette alias il faut ce décalge
-                        relationOffsets.put(alias, globalOffset);
-                        // Met à jour le décalage global pour la prochaine relation
-                        globalOffset += relation.getNbAttribut();
-                    }
-
-                    // Parcour les attributs dans une relation pour chercher l'index de l'attribut
-                    for (int i = 0; i < relation1.getNbAttribut(); i++) {
-                        // Si on le trouve
-                        if (relation1.getNameAttribut(i).equals(colonne1)) {
-                            // Garde son index relatif
-                            index1 = i;
-                            break;  // Quitte la boucle
-                        }
-                    }
-                    // Parcour les attributs dans une relation pour chercher l'index de l'attribut
-                    for (int i = 0; i < relation2.getNbAttribut(); i++) {
-                        // Si on le trouve
-                        if (relation2.getNameAttribut(i).equals(colonne2)) {
-                            // Garde son index relatif
-                            index2 = i;
-                            break;  // Quitte la boucle
-                        }
-                    }
-
-                    // Si la colonne n'existe pas dans la relation, lancer une exception
-                    if (index1 == -1 || index2 == -1)
-                        throw new IllegalArgumentException("Colonne inconnue : " + colonne1+" Ou "+colonne2);
+                    // Si l'une des colonnes n'existe pas dans la relation, lancer une exception
+                    if (relativeIndex1 == null || relativeIndex2 == null)
+                        throw new IllegalArgumentException("Colonne inconnue : "+colonne1+" || "+colonne2);
 
                     // Calculer l'index absolu en ajoutant le décalage global de la relation
-                    index1 = relationOffsets.get(alias1) + index1;
-                    index2 = relationOffsets.get(alias2) + index2;
+                    int absoluteIndex1 = relationOffsets.get(alias1) + relativeIndex1;
+                    int absoluteIndex2 = relationOffsets.get(alias2) + relativeIndex2;
 
-                    Pair<String, Integer> p1 = new Pair<String,Integer>(colonne1, index1);
-                    Pair<String, Integer> p2 = new Pair<String,Integer>(colonne2, index2);
+                    Pair<String, Integer> p1 = new Pair<String,Integer>(colonne1, absoluteIndex1);
+                    Pair<String, Integer> p2 = new Pair<String,Integer>(colonne2, absoluteIndex2);
     
                     res.getSecond().add(new Condition(p1, operateur, p2));
                 }
             }
             // Sinon c'est un problème dans la commande
             else
-                throw new IllegalArgumentException("Condition invalide : " + cond);
+                throw new IllegalArgumentException("Condition invalide : "+cond);
         }
         return res;
     }

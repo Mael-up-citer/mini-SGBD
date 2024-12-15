@@ -199,7 +199,7 @@ public class DiskManager {
             }
         } catch (IOException e) {
             System.err.println("Erreur lors de la gestion du fichier : " + cheminFichier);
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 }

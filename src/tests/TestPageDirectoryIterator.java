@@ -44,7 +44,7 @@ public class TestPageDirectoryIterator {
             e.printStackTrace();
         }
     }
-/*
+
     @Test
     public void testGetNextDataPageId() {
         int nb = 10000;
@@ -76,7 +76,7 @@ public class TestPageDirectoryIterator {
         assertNull(iterator.GetNextDataPageId(), "Aucune page ne devrait être disponible après la dernière.");
         assertTrue(i == nb, "on aurais du avoir "+nb+" itération or on en a "+i);
     }
-*/
+
     @Test
     public void testReset() {
         int nb = 250;

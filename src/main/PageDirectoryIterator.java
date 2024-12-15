@@ -45,15 +45,16 @@ public class PageDirectoryIterator {
             return null;
 
         try {
-            // Charge la première header Page
+            // Charge la header Page courrante
             ByteBuffer buffer = bm.getPage(currentPageId);
 
+            // Récupère l'@ de la prochaine data Page
             PageId res = new PageId(
                 buffer.getInt(offsetDataPage),
                 buffer.getInt(offsetDataPage+4)
             );
 
-            cptDataPage --; // Décrémente le compteur de page de données a parcourir
+            cptDataPage --; // Décrémente le compteur de page de données à parcourir
             offsetDataPage += 12;  // Augmente le décalage pour passer à la page de données suivante
 
             // Libère la page d'entête courante

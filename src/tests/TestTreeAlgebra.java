@@ -13,7 +13,6 @@ public class TestTreeAlgebra {
     private DBConfig dbConfig;
     private ArrayList<Relation> relations = new ArrayList<>();
 
-
     @BeforeEach
     void setup() throws Exception {
         // Initialisation des gestionnaires simulés ou mockés
@@ -78,7 +77,7 @@ public class TestTreeAlgebra {
         ArrayList<Integer> attbToPrint = new ArrayList<>(List.of(0, index2, index3));
         ArrayList<String> attrbName = new ArrayList<>(List.of("R1.id", "R2.id", "R3.id"));
 
-        treeAlgebra tree = new treeAlgebra(relations, joinConditions, innerConditions, attbToPrint, attrbName, bm);
+        TreeAlgebra tree = new TreeAlgebra(relations, joinConditions, innerConditions, attbToPrint, attrbName, bm);
         tree.execute(); // Vérifie si l'exécution filtre correctement les résultats
     }
 }

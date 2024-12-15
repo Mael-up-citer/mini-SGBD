@@ -121,4 +121,9 @@ public class TestSGBD {
         // Commande 15: LIST DATABASES
         sgbd.assocQuery(listDatabases);
     }
+
+    @Test
+    void testSelectMonoTable() {
+        
+    }
 }

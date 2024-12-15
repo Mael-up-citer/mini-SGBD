@@ -36,7 +36,7 @@ import java.util.List;
  * <p>En cas de problème lors de la construction de l'arbre (comme une liste de relations vide), 
  * une exception est levée. Toutes les erreurs d'exécution sont capturées et affichées.</p>
  */
-public class treeAlgebra {
+public class TreeAlgebra {
     private RecordPrinter root; // L'opérateur en haut de l'arbre, chargé d'afficher les résultats.
 
     /**
@@ -49,7 +49,7 @@ public class treeAlgebra {
      * @param attrbName      Liste des noms des attributs à afficher.
      * @param bm             Instance du gestionnaire de buffers.
      */
-    public treeAlgebra(
+    public TreeAlgebra(
         ArrayList<Relation> relations, 
         ArrayList<Condition> joinConditions, 
         HashMap<String, ArrayList<Condition>> innerConditions, 

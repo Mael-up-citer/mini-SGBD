@@ -119,10 +119,9 @@ public class Relation {
             return posValue - start; // Retourne la taille totale de l'enregistrement écrit
 
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
+            System.out.println("impossible d'écire dans le buffer "+e);
+            return 0;  // En cas d'erreur, retourne 0
         }
-        return 0;  // En cas d'erreur, retourne 0
     }
 
     /**
@@ -189,9 +188,9 @@ public class Relation {
             return posValue - start; // Retourne la taille totale lue du buffer
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("impossible de lire dans le buffer "+e);
+            return 0;  // En cas d'erreur, retourne 0
         }
-        return 0;  // En cas d'erreur, retourne 0
     }
 
     /**
@@ -741,46 +740,31 @@ public class Relation {
      * @param attribut La nouvelle liste des attributs.
      * @throws IllegalArgumentException Si la liste des attributs est null ou vide.
      */
-    public void setOneAttribut(Pair<String, Data> attrb) throws IllegalArgumentException{
-        // Test l'objet Puis ses composant
+    public void setOneAttribut(Pair<String, Data> attrb) throws IllegalArgumentException {
+        // Test l'objet Puis ses composants
         if (attrb == null || attrb.getFirst() == null || attrb.getSecond() == null)
             throw new IllegalArgumentException("L' attributs ne peut pas être vide.");
+
+        attrb.setFirst(attrb.getFirst().toUpperCase());
 
         // Test le nom
         if (! SGBD.isValidName(attrb.getFirst()))
             throw new IllegalArgumentException("Le nom de l'attribut "+attrb.getFirst() +"  n'est pas valide");
-        
-        // Le type est verifier lors de la construction
-        // Si on passe tout les tests on l'ajoute
-        // Met en majuscule avant
-        attrb.setFirst(attrb.getFirst().toUpperCase());
 
+        // Le type est verifier lors de la construction
         nameToIndex.put(attrb.getFirst(), index);
         attribut.add(attrb);
         index++;
     }
 
     /**
-     * Ajoute un attribut à la liste des attributs de la relation.
-     *
-     * @param elmts Un objet Pair représentant l'attribut (nom, type de données).
-     */ /*
-    public void addAttribut(Pair<String, Data> elmts) throws IllegalArgumentException{
-        if(elmts == null)
-            throw new IllegalArgumentException("Erreur l'attribut ne peut pas etre null");
-
-        elmts.setFirst(elmts.getFirst().toUpperCase());  // Met en majuscule le nom de la colonne
-
-        if(!SGBD.isValidName(elmts.getFirst()))
-            throw new IllegalArgumentException("Erreur le nom de l'attribut: "+elmts.getFirst()+"    est invalide");
-
-        attribut.add(elmts);    // L'ajoute dans le schéma de la relation
-    }
-*/
-    /**
      * @return l'@ de la 1er header Page
      */
     public PageId getHeaderPageId(){
         return headerPageId;
+    }
+
+    public HashMap<String, Integer> getNameToIndex() {
+        return nameToIndex;
     }
 }
