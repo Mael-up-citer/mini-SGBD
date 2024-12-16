@@ -97,7 +97,26 @@ public class DBManager {
     	MyRecord rec = new MyRecord();
     	// Ajoute chaque valeur et le son type attendu dans le record
     	for(int i = 0; i<rel.getNbAttribut(); i++) {
-    		rec.add(valeurs[i], rel.getType(i));
+    		switch(rel.getType(i)) {
+    		case INT:
+                rec.add(Integer.valueOf(valeurs[i]), rel.getType(i));
+                break;
+            case REAL:
+                rec.add(Float.valueOf(valeurs[i]), rel.getType(i));
+                break;
+            case CHAR:
+            case VARCHAR:
+            	if(valeurs[i].startsWith("\"") && valeurs[i].endsWith("\"")) {
+        			valeurs[i] = valeurs[i].substring(1, valeurs[i].length()-2);
+    			}
+            	rec.add(valeurs[i], rel.getType(i));
+            	break;
+            case DATE:
+            	rec.add(Date.toDate(valeurs[i]), rel.getType(i));
+            	break;
+            default:
+               throw new IllegalArgumentException("Ce type de données n'est pas pris en charge par le SGBD");
+    		}
     	}
     	//Insère le record
     	rel.InsertRecord(rec);
@@ -294,11 +313,11 @@ public class DBManager {
     public void loadState() throws IOException{
     	HashMap<String, Relation> DatabaseEnCours = null;
     	Relation RelationEnCours = null;
-        
-		String save = readFichier(DBConfig.dbpath + "/databases.save");
+        String save = readFichier(DBConfig.dbpath + "/databases.save");
 
-        if(save == null)
+        if(save == null) {
         	throw new IOException("La sauvegarde est vide");
+        }
         else {
         	String[] lines = save.split("\n");
         	for(String line : lines) {
@@ -358,7 +377,7 @@ public class DBManager {
      * 
      * @return Une chaîne de caractère contenant la sauvegarde
      */
-    public String readFichier(String chemin) throws IOException {
+    public String readFichier(String chemin) throws IOException{
     	// Lire tout le contenu du fichier et le retourner sous forme de chaîne
         return new String(Files.readAllBytes(Paths.get(chemin)));
     }

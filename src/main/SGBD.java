@@ -410,8 +410,9 @@ public class SGBD {
     	String nomFichier = parts[1].trim();
     	try {
         	dbM.BulkInsertIntoCurrentDatabase(nomTable, nomFichier);
-    	}catch(Exception e) {
-    		e.printStackTrace();
+    	} catch(Exception e) {
+    		//e.printStackTrace();
+            System.out.println(e.getMessage());
     	}
     }
 

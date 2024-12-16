@@ -1,0 +1,9 @@
+create database test
+set database test
+
+
+CREATE TABLE Employes (ID_Employe:INT,Salaire:REAL,Nom:char(30),Poste:char(25),Age:INT)
+CREATE TABLE Clients (ID_Client:INT, Nom:char(40), Email:varchar(50), Telephone:varchar(15), Age:INT)
+CREATE TABLE Produits (ID_Produit:INT, Nom_Produit:char(50), Prix:REAL, Categorie:char(30), Quantite:INT)
+CREATE TABLE Commandes (ID_Commande:INT, ID_Client:INT, Date_Commande:char(20), Montant:REAL, Statut:char(15))
+CREATE TABLE Fournisseurs (ID_Fournisseur:INT, Nom_Fournisseur:char(35), Telephone:varchar(20), Adresse:varchar(50), Ville:char(25))
