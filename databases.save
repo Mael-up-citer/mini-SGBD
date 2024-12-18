@@ -1,5 +1,0 @@
-BDD = TEST
-Table = ETUDIANTS; 0; 0
-Colonne = NUMETU; INT; 4
-Colonne = MOYENNES5; REAL; 4
-Colonne = MOYENNES6; REAL; 4
