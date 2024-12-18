@@ -559,7 +559,6 @@ public class SGBD {
                         planExec.execute();   // Exécuter la commande avec les opérateurs relationnels
                     }
                 } catch(Exception e){
-                    e.printStackTrace();
                     System.out.println("Erreur lors de l'exécution de la commande "+e.getMessage());
                 }
             }
@@ -695,7 +694,7 @@ public class SGBD {
         res.setSecond(new ArrayList<>());
 
         // Regex pour capturer le patern d'une condition
-        String regex = "(?:([a-zA-Z_][a-zA-Z0-9_]*)\\.)?([a-zA-Z_][a-zA-Z0-9_]*)\\s*(<|>|<=|>=|=|<>)\\s*(?:([a-zA-Z_][a-zA-Z0-9_]*)\\.)?([a-zA-Z_][a-zA-Z0-9_]*|'[a-zA-Z0-9_\\sÀ-ÿ]+'|[0-9]+(?:\\.[0-9]+)?)";
+        String regex = "(?:([a-zA-Z_][a-zA-Z0-9_]*)\\.)?([a-zA-Z_][a-zA-Z0-9_]*|'[a-zA-Z0-9_\\sÀ-ÿÀ-Ÿ]*'|[0-9]+(?:\\.[0-9]+)?)\\s*(<|>|<=|>=|=|<>)\\s*(?:([a-zA-Z_][a-zA-Z0-9_]*)\\.)?([a-zA-Z_][a-zA-Z0-9_]*|'[a-zA-Z0-9_\\sÀ-ÿÀ-Ÿ]*'|[0-9]+(?:\\.[0-9]+)?)";
         Pattern pattern = Pattern.compile(regex);
 
         // Parcour le tableau des conditions
@@ -716,11 +715,18 @@ public class SGBD {
                 if ((alias1 == null) || (alias2 == null) || (alias1.equals(alias2))) {
                     // Contient le nom de la relation
                     String relationName;
+                    String alias;
 
                     // Extrait le nom de la relation
                     // L'un des 2 alias est null ou c'est le même
-                    if (alias1 != null) relationName = assocAlliasToNom.get(alias1);
-                    else if (alias2 != null) relationName = assocAlliasToNom.get(alias2);
+                    if (alias1 != null){
+                        alias = alias1;
+                        relationName = assocAlliasToNom.get(alias1);
+                    }
+                    else if (alias2 != null) {
+                        alias = alias2;
+                        relationName = assocAlliasToNom.get(alias2);
+                    }
                     else throw new IllegalArgumentException("erreur dans la condition: "+cond);
 
                     Relation relation = dbM.getCurrentDatabase().get(relationName);
@@ -728,17 +734,23 @@ public class SGBD {
                     // Trouver l'index relatif de la colonne dans la relation
                     Integer relativeIndex1 = relation.getNameToIndex().get(colonne1);
                     Integer relativeIndex2 = relation.getNameToIndex().get(colonne2);
-                    
+
                     if (relativeIndex1 == null) relativeIndex1 = -1;
 
                     if (relativeIndex2 == null) relativeIndex2 = -1;
+
+                    System.out.println("alias = "+alias);
+                    System.out.println("col1 = "+colonne1);
+                    System.out.println("col2 = "+colonne2);
+                    System.out.println("relativeIndex1 = "+relativeIndex1);
+                    System.out.println("relativeIndex2 = "+relativeIndex2);
 
                     // Crée les pairs de terme
                     Pair<String, Integer> p1 = new Pair<String,Integer>(colonne1, relativeIndex1);
                     Pair<String, Integer> p2 = new Pair<String,Integer>(colonne2, relativeIndex2);
     
-                    // Ajoute une nouvelle condition à la liste associée à la relation liée à alias1
-                    res.getFirst().computeIfAbsent(assocAlliasToNom.get(alias1), k -> new ArrayList<>()).add(new Condition(p1, operateur, p2));
+                    // Ajoute une nouvelle condition à la liste associée à la relation liée à alias
+                    res.getFirst().computeIfAbsent(assocAlliasToNom.get(alias), k -> new ArrayList<>()).add(new Condition(p1, operateur, p2));
                 }
                 // Sinon c'est une condition de jointure
                 else {
