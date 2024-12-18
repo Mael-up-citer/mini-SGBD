@@ -35,7 +35,7 @@ public class RecordPrinter {
 
         // Affiche les noms des attributs spécifiés dans nameAttrb
         // Cela imprime la première ligne, les en-têtes des colonnes.
-        for (String name : nameAttrb) System.out.print(name + "\t\t");
+        for (String name : nameAttrb) System.out.print(name + "\t");
 
         // Saute à la ligne après avoir affiché les en-têtes
         System.out.println();

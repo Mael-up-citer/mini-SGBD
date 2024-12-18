@@ -258,7 +258,6 @@ public class SGBD {
 
         } catch(Exception e){
             System.out.println("erreur dans la création de la table "+param);
-            e.printStackTrace();
         }
     }
 
@@ -296,7 +295,7 @@ public class SGBD {
 
             // Extraire le type (avant la parenthèse si elle existe)
             DataType type = DataType.valueOf(typePart.split("\\(")[0].trim());
-    
+
             // Si le type est CHAR ou VARCHAR, nous devons extraire la taille
             if (type == DataType.CHAR || type == DataType.VARCHAR) {
                 // Chercher la taille entre les parenthèses
@@ -374,8 +373,9 @@ public class SGBD {
     private void processDROPTABLESCommand(){
         try {
             dbM.RemoveTablesFromCurrentDatabase();
+            System.out.println("Suppression terminé");
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
     
@@ -398,10 +398,10 @@ public class SGBD {
             }
             try {
             	dbM.InsertIntoCurrentDatabase(nomTable, listeValeur);
-            }catch(Exception e){
-            	e.printStackTrace();
+            } catch(Exception e) {
+            	System.out.println(e.getMessage());
             }
-        	System.out.println("Les valeurs " + listeValeur + " ont été ajoutés à la table " + nomTable);
+        	System.out.println("Les valeurs ont été ajoutés à la table " + nomTable);
     	}
         else
     		System.out.println("Format d'Insert non respecté");
@@ -474,7 +474,7 @@ public class SGBD {
             "([a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+\\s*(?:=|<|>|<=|>=|<>)\\s*" + // Alias1.colonne OP
             "(?:[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+)?" + // Alias2.colonne (optionnel)
             "(?:\\s*(?:'[^']*'|[a-zA-Z0-9_]+))?", // Valeur ou autre colonne (optionnel)
-            
+
             // Support pour plusieurs conditions avec AND
             "(?:\\s+AND\\s+" + 
             "[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+\\s*(?:=|<|>|<=|>=|<>)\\s*" + // Alias1.colonne OP
@@ -559,6 +559,7 @@ public class SGBD {
                         planExec.execute();   // Exécuter la commande avec les opérateurs relationnels
                     }
                 } catch(Exception e){
+                    e.printStackTrace();
                     System.out.println("Erreur lors de l'exécution de la commande "+e.getMessage());
                 }
             }
@@ -694,7 +695,7 @@ public class SGBD {
         res.setSecond(new ArrayList<>());
 
         // Regex pour capturer le patern d'une condition
-        String regex = "(?:([a-zA-Z0-9_]+)\\.)?([a-zA-Z0-9_]+)\\s*(<|>|<=|>=|=|<>)\\s*(?:([a-zA-Z0-9_]+)\\.)?([a-zA-Z0-9_]+|'[a-zA-Z0-9_\\sÀ-ÿ]+')";
+        String regex = "(?:([a-zA-Z_][a-zA-Z0-9_]*)\\.)?([a-zA-Z_][a-zA-Z0-9_]*)\\s*(<|>|<=|>=|=|<>)\\s*(?:([a-zA-Z_][a-zA-Z0-9_]*)\\.)?([a-zA-Z_][a-zA-Z0-9_]*|'[a-zA-Z0-9_\\sÀ-ÿ]+'|[0-9]+(?:\\.[0-9]+)?)";
         Pattern pattern = Pattern.compile(regex);
 
         // Parcour le tableau des conditions
