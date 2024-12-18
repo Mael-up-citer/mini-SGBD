@@ -14,6 +14,7 @@ import java.util.HashMap;
  */
 public class DBManager {
 	private HashMap<String, HashMap<String, Relation>> listeDatabase;
+	private HashMap<String, HashMap<Integer, BPlusTree>> listeIndex;
 	private HashMap<String, Relation> current;
 	private DBConfig dbc;
 	private DiskManager dskm;
@@ -25,6 +26,7 @@ public class DBManager {
 	 */
 	public DBManager(DBConfig dbc, DiskManager dskm, BufferManager bm) {
 		this.listeDatabase = new HashMap<>();
+		this.listeIndex = new HashMap<>();
 		this.dbc = dbc;
 		this.dskm = dskm;
 		this.bm = bm;
@@ -72,6 +74,9 @@ public class DBManager {
 
     	// Ajoute la table à la BDD current
         current.put(tab.getRelationName(), tab);
+        
+        // Crée la liste d'index de la table
+        listeIndex.put(tab.getRelationName(), new HashMap<>());
         // Informe l'utilisateur de la réussite de l'opération
         System.out.println("Table " + tab.getRelationName() + " ajoutée à la base de données actuelle.");
     }
@@ -107,7 +112,7 @@ public class DBManager {
             case CHAR:
             case VARCHAR:
             	if(valeurs[i].startsWith("\"") && valeurs[i].endsWith("\"")) {
-        			valeurs[i] = valeurs[i].substring(1, valeurs[i].length()-2);
+        			valeurs[i] = valeurs[i].substring(1, valeurs[i].length()-1);
     			}
             	rec.add(valeurs[i], rel.getType(i));
             	break;
@@ -119,7 +124,13 @@ public class DBManager {
     		}
     	}
     	//Insère le record
-    	rel.InsertRecord(rec);
+    	RecordId rid = rel.InsertRecord(rec);
+    	// Vérifie si la relation a des index
+    	if(listeIndex.get(nomTable.toUpperCase()).size() > 0) {
+    		for(int index : listeIndex.get(nomTable.toUpperCase()).keySet()) {
+    			listeIndex.get(nomTable.toUpperCase()).get(index).addRecord(rec.get(index).getFirst(), rid);
+    		}
+    	}
     }
     
     /**
@@ -145,6 +156,78 @@ public class DBManager {
             }
             // Insert la ligne
             InsertIntoCurrentDatabase(nomTable, valeurs);
+    	}
+    	System.out.println("Les valeurs du fichier" + nomFichier + " ont été ajoutés à la table " + nomTable);
+    }
+    
+    /**
+     * Crée un nouvel index pour une colonne d'une relation
+     * 
+     * @param nomRelation Relation à laquelle appartient la colonne
+     * @param nomColonne Colonne pour laquelle on souhaite crée l'index
+     * @param ordre Ordre du BPlusTree de l'index
+     * @throws IllegalStateException Si l'index à créer existe déjà
+     */
+    public void CreateIndex(String nomRelation, String nomColonne, int ordre) throws Exception {
+    	Relation relation = GetTableFromCurrentDatabase(nomRelation);
+    	int indexRelation = relation.getNameToIndex().get(nomColonne);
+    	if(listeIndex.get(nomRelation.toUpperCase()).containsKey(indexRelation)) {
+    		throw new IllegalStateException("il existe déjà un index pour cette colonne");
+    	}
+    	ArrayList<Pair<Object, RecordId>> listeEntree = new ArrayList<>();
+    	ArrayList<Pair<MyRecord, RecordId>> listeRecord = relation.GetAllRecords();
+    	for(Pair<MyRecord, RecordId> element : listeRecord) {
+    		listeEntree.add(new Pair<Object, RecordId>(element.getFirst().get(indexRelation).getFirst(), element.getSecond()));
+    	}
+    	listeIndex.get(nomRelation.toUpperCase()).put(indexRelation, new BPlusTree(listeEntree, ordre));
+    	System.out.println("Un index d'ordre" + ordre + " a été crée sur la colonne " + nomColonne);
+    }
+    
+    /**
+     * Ecrit les enregistrements qui correspondent à la clé donnée en utilisant l'index
+     * 
+     * @param nomRelation Relation dans laquelle se trouvent les enregistrements
+     * @param nomColonne Colonne dont les valeurs doivent être comparés à la clé
+     * @param cleNonCast Clé de comparaison
+     * @throws IllegalArgumentException Si l'index demandé n'existe pas
+     */
+    public void SelectIndex(String nomRelation, String nomColonne, String cleNonCast) throws Exception {
+    	Relation relation = GetTableFromCurrentDatabase(nomRelation);
+    	int indexRelation = relation.getNameToIndex().get(nomColonne);
+    	if(listeIndex.get(nomRelation.toUpperCase()).containsKey(indexRelation)) {
+    		Object cle = null;
+        	switch(relation.getType(indexRelation)) {
+        	case INT:
+        		cle = Integer.valueOf(cleNonCast);
+                break;
+            case REAL:
+                cle = Float.valueOf(cleNonCast);
+                break;
+            case CHAR:
+            case VARCHAR:
+            	if(cleNonCast.startsWith("\"") && cleNonCast.endsWith("\"")) {
+            		cle = cleNonCast.substring(1, cleNonCast.length()-1);
+        		}else {
+        			cle = cleNonCast;
+        		}
+                break;
+            case DATE:
+                cle = Date.toDate(cleNonCast);
+                break;
+            default:
+                throw new IllegalArgumentException("Ce type de données n'est pas pris en charge par le SGBD");
+        	}
+    		ArrayList<RecordId> listeRid = listeIndex.get(nomRelation.toUpperCase()).get(indexRelation).getRecordId(cle);
+    		for(RecordId rid : listeRid) {
+    			MyRecord rec = relation.getRecordInDataPage(rid);
+    			for (int i = 0; i< relation.getNbAttribut(); i++) {
+    				System.out.print(relation.getNameAttribut(i) + "\t\t");
+    			}
+    			System.out.println(rec.printValue());
+    		}
+    		System.out.println("Total records = " + listeRid.size());
+    	}else {
+    		throw new IllegalArgumentException("Il n'y a pas d'index sur cette colonne");
     	}
     }
     

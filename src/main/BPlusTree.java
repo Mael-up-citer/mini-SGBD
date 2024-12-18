@@ -1,12 +1,9 @@
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Super classe abstraite répresentant un noeud d'un B+Tree. Un noeud peut être une feuille ou une branche (noeud intermédiaire)
  */
-abstract class BPlusTreeNode {
-	// Liste des entrées du noeud
-	private List<Object> rec;
+abstract class  BPlusTreeNode{
 	// Père du noeud
 	private BPlusTreeBranch pere;
 	
@@ -15,9 +12,7 @@ abstract class BPlusTreeNode {
 	 * 
 	 * @return la taille du noeud
 	 */
-	public int getTaille() {
-		return rec.size();
-	}
+	public abstract int getTaille();
 	
 	/**
 	 * Récupère le noeud père du noeud actuel
@@ -59,16 +54,18 @@ abstract class BPlusTreeNode {
 	 * @return Un nouveau noeud contenant une partie des entrées du précédent
 	 */
 	public abstract BPlusTreeNode split(int index);
+	
 }
 
 /**
  * Classe représentant une feuille d'un B+Tree
  */
-class BPlusTreeLeaf extends BPlusTreeNode {
+class BPlusTreeLeaf extends BPlusTreeNode{
 	// Liste des entrées de la Feuille
 	// Les entrées sont de format Alternative 3 (clé, liste de Rids)
-	private List<Pair<Comparable<Object>, ArrayList<RecordId>>> rec;
+	private ArrayList<Pair<Comparable<Object>, ArrayList<RecordId>>> rec;
 	// Père de la feuille, il s'agit d'une branche
+	@SuppressWarnings("unused")
 	private BPlusTreeBranch pere;
 	
 	/**
@@ -76,13 +73,12 @@ class BPlusTreeLeaf extends BPlusTreeNode {
 	 */
 	public BPlusTreeLeaf() {
 		rec = new ArrayList<>();
-		this.pere = null;
 	}
 	
 	/**
 	 * Constructeur d'une feuille à partir d'une liste d'entrées
 	 */
-	public BPlusTreeLeaf(List<Pair<Comparable<Object>, ArrayList<RecordId>>> rec) {
+	public BPlusTreeLeaf(ArrayList<Pair<Comparable<Object>, ArrayList<RecordId>>> rec) {
 		this.rec = rec;
 	}
 
@@ -101,7 +97,7 @@ class BPlusTreeLeaf extends BPlusTreeNode {
 		return null;
 	}
 	
-	public void addEntrees(List<Pair<Comparable<Object>, ArrayList<RecordId>>> entrees) {
+	public void addEntrees(ArrayList<Pair<Comparable<Object>, ArrayList<RecordId>>> entrees) {
 		rec.addAll(entrees);
 	}
 	
@@ -112,29 +108,29 @@ class BPlusTreeLeaf extends BPlusTreeNode {
 	 * @param reference RecordId correspondant à cette clé
 	 */
 	public void addEntree(Comparable<Object> cle, RecordId reference) {
-		int i = 0;
-		boolean insere = false;
+		int i=0, taille = rec.size();
+		boolean trouve = false;
 		// Parcourt la liste des entrée de la feuille pour trouver où placer la nouvelle entrée en respectant l'ordre croissant
-		while(!insere && i<rec.size()) {
+		while(!trouve && i<taille) {
 			// Resultat de la comparaison entre la clé de la nouvelle entrée et celle de la feuille inspectée
 			int comp = cle.compareTo(rec.get(i).getFirst());
-			// Si les clé sont égales, ajoute le RecordId à la liste de cette clé
 			if(comp == 0) {
 				rec.get(i).getSecond().add(reference);
-				insere = true;
+				trouve = true;
+			}
 			// Si la clé est plus petite que cette entrée, l'insère à sa place
 			// Si la boucle n'a pas fini à l'itération précédente, la clé est donc forcément supérieur à l'entrée précédente de la feuille
-			}else if(comp < 0) {
+			if(comp <= 0) {
 				ArrayList<RecordId> listeRef = new ArrayList<>();
 				listeRef.add(reference);
 				rec.add(i, new Pair<Comparable<Object>, ArrayList<RecordId>>(cle, listeRef));
-				insere = true;
+				trouve = true;
 			}
 			i++;
 		}
-		// Si l'emplacement pour insérer la nouvelle entrée n'a pas été trouvé alors elle plus grande que toutes les autres
-		// L'insère donc à la fin de la liste
-		if (!insere) {
+		// Si l'emplacement où insérer la clé n'a pas été trouvé alors elle est plus grande que toutes les autres
+		// L'insère donc à la fin
+		if(!trouve) {
 			ArrayList<RecordId> listeRef = new ArrayList<>();
 			listeRef.add(reference);
 			rec.add(new Pair<Comparable<Object>, ArrayList<RecordId>>(cle, listeRef));
@@ -142,9 +138,12 @@ class BPlusTreeLeaf extends BPlusTreeNode {
 	}
 	
 	//Méthodes de Node
-	public Comparable<Object> getCle(int index){
+	public Comparable<Object> getCle(int index) throws ArrayIndexOutOfBoundsException{
+		if(index > getTaille()) {
+			throw new ArrayIndexOutOfBoundsException("L'index est plus grand que la taille du noeud");
+		}
 		// Si la feuille est vide, elle ne contient pas la clé
-		if (rec.size() == 0) {
+		if(rec.size() == 0) {
 			return null;
 		}
 		return rec.get(index).getFirst();
@@ -156,22 +155,41 @@ class BPlusTreeLeaf extends BPlusTreeNode {
 	}
 	
 	public BPlusTreeLeaf split(int index) {
-		List<Pair<Comparable<Object>, ArrayList<RecordId>>> firstHalf = rec.subList(0, index);
-		List<Pair<Comparable<Object>, ArrayList<RecordId>>> lastHalf = rec.subList(index, rec.size());
+		// Initialise les deux demi-tableau
+		ArrayList<Pair<Comparable<Object>, ArrayList<RecordId>>> firstHalf = new ArrayList<>();
+		ArrayList<Pair<Comparable<Object>, ArrayList<RecordId>>> lastHalf = new ArrayList<>();
+		// Ecrit chaque moitié du tableau des clés dans le bon tableau
+		for(int i =0; i< rec.size(); i++) {
+			if(i<index) {
+				firstHalf.add(rec.get(i));
+			}else {
+				lastHalf.add(rec.get(i));
+			}
+		}
+		// La feuille garde la moitié des clés
 		rec = firstHalf;
+		// Renvoit une nouvelle feuille avec l'autre moitié des clés 
 		return new BPlusTreeLeaf(lastHalf);
+	}
+	
+	public int getTaille() {
+		if(rec == null) {
+			return 0;
+		}
+		return rec.size();
 	}
 }
 
 /**
  * Classe correspondant à une branche ou noeud intermédiaire
  */
-class BPlusTreeBranch extends BPlusTreeNode {
+class BPlusTreeBranch extends BPlusTreeNode{
 	// Liste des fils de ce noeud
-	private List<BPlusTreeNode> fils;
+	private ArrayList<BPlusTreeNode> fils;
 	// Liste des entrées du noeud
-	private List<Comparable<Object>> rec;
+	private ArrayList<Comparable<Object>> rec;
 	// Branche père de ce noeud, null si le noeud est racine
+	@SuppressWarnings("unused")
 	private BPlusTreeBranch pere;
 	
 	/**
@@ -187,6 +205,8 @@ class BPlusTreeBranch extends BPlusTreeNode {
 			throw new IllegalArgumentException("Les fils ne sont pas ordonnés");
 		}
 		fils = new ArrayList<>();
+		fils.add(fils1);
+		fils.add(fils2);
 		rec = new ArrayList<>();
 		rec.add(element);
 	}
@@ -198,12 +218,15 @@ class BPlusTreeBranch extends BPlusTreeNode {
 	 * @param rec Liste des entrées du nouveau noeud
 	 * @throws IllegalArgumentException si il n'y a pas un fils de plus qu'il n'y a d'entrées
 	 */
-	public BPlusTreeBranch(List<BPlusTreeNode> fils, List<Comparable<Object>> rec) throws IllegalArgumentException{
+	public BPlusTreeBranch(ArrayList<BPlusTreeNode> fils, ArrayList<Comparable<Object>> rec) throws IllegalArgumentException{
 		if(fils.size()!=rec.size()+1) {
 			throw new IllegalArgumentException("Les proportions de pointeurs et de clés ne sont pas respectées");
 		}
 		this.fils = fils;
 		this.rec = rec;
+		for(BPlusTreeNode noeud : fils) {
+			noeud.setPere(this);
+		}
 	}
 	
 	/**
@@ -213,10 +236,10 @@ class BPlusTreeBranch extends BPlusTreeNode {
 	 * @param noeud Noeud fils à ajouter
 	 */
 	public void addFils(Comparable<Object> cle, BPlusTreeNode noeud) {
-		int i = 0;
+		int i = 0, taille = rec.size();
 		boolean insere = false;
 		// Parcourt la liste pour trouver l'emplacement où insérer le fils en respectant l'ordre du noeu
-		while(!insere && i<rec.size()) {
+		while(!insere && i<taille) {
 			// Résultat de la comparaison entre la clé de la nouvelle entrée et celle inspectée
 			int comp = cle.compareTo(rec.get(i));
 			// Si la clé est plus petite que cette entrée, l'insère à sa place
@@ -236,24 +259,50 @@ class BPlusTreeBranch extends BPlusTreeNode {
 			fils.add(noeud);
 		}
 	}
-
+	
 	//Méthodes de Node
 	public Comparable<Object> getCle(int index){
 		return rec.get(index);
 	}
 	
 	public BPlusTreeNode getFils(int index) {
+		if(fils.size() == 0) {
+			return null;
+		}
 		return fils.get(index);
 	}
 	
 	public BPlusTreeBranch split(int index) {
-		List<Comparable<Object>> firstHalfRec = rec.subList(0, index);
-		List<Comparable<Object>> lastHalfRec = rec.subList(index + 1, rec.size());
-		List<BPlusTreeNode> firstHalfFils = fils.subList(0, index +1);
-		List<BPlusTreeNode> lastHalfFils = fils.subList(index+1, rec.size());
+		// Initialise les demi-tableaux
+		ArrayList<Comparable<Object>> firstHalfRec = new ArrayList<>();
+		ArrayList<Comparable<Object>> lastHalfRec = new ArrayList<>();
+		ArrayList<BPlusTreeNode> firstHalfFils = new ArrayList<>();
+		ArrayList<BPlusTreeNode> lastHalfFils = new ArrayList<>();
+		// Réparti les clés et les fils en deux tableaux
+		for(int i =0; i< rec.size(); i++) {
+			if(i<index) {
+				firstHalfRec.add(rec.get(i));
+				firstHalfFils.add(fils.get(i));
+			}else if(index == i){
+				firstHalfFils.add(fils.get(i));
+			}else {
+				lastHalfRec.add(rec.get(i));
+				lastHalfFils.add(fils.get(i));
+			}
+		}
+		lastHalfFils.add(fils.get(rec.size()));
+		// La branche garde la première partie des clé et des fils
 		rec = firstHalfRec;
 		fils = firstHalfFils;
+		// Renvoit une nouvelle branche avec le reste des clés et des fils
 		return new BPlusTreeBranch(lastHalfFils, lastHalfRec);
+	}
+	
+	public int getTaille() {
+		if(rec == null) {
+			return 0;
+		}
+		return rec.size();
 	}
 }
 
@@ -262,7 +311,7 @@ class BPlusTreeBranch extends BPlusTreeNode {
  */
 public class BPlusTree {
 	// Noeud racine du B+Tree, peut être une feuille
-	private BPlusTreeNode racine;
+	public BPlusTreeNode racine;
 	// Ordre du BPlusTree
 	private int ordre;
 	
@@ -282,7 +331,7 @@ public class BPlusTree {
 	 * @param listeEntree Liste des entrées du B+Tree
 	 * @param ordre Ordre du B+Tree
 	 */
-	public BPlusTree(ArrayList<Pair<Comparable<Object>, RecordId>> listeEntree, int ordre) {
+	public BPlusTree(ArrayList<Pair<Object, RecordId>> listeEntree, int ordre) {
 		this.ordre = ordre;
 		ArrayList<Pair<Comparable<Object>, ArrayList<RecordId>>> listeTriee = tri(listeEntree);
 		ajouterFeuilles(listeTriee);
@@ -293,8 +342,14 @@ public class BPlusTree {
 	 * 
 	 * @param cle Clé de l'entrée à insérer
 	 * @param reference RecordId de l'entrée à insérer
+	 * @throws IllegalArgumentException si le type de l'entrée n'est pas accepté ou ne correspond pas au type de l'arbre
 	 */
-	public void addRecord(Comparable<Object> cle, RecordId reference) {
+	@SuppressWarnings("unchecked")
+	public void addRecord(Object entree, RecordId reference) throws IllegalArgumentException {
+		if(racine.getTaille() != 0 && entree.getClass() != racine.getCle(0).getClass()) {
+			throw new IllegalArgumentException("Le type de l'arbre est : " + racine.getCle(0).getClass() + " et le type reçu est : " +entree.getClass());
+		}
+		Comparable<Object> cle = (Comparable<Object>) entree;
 		// Recherche la feuille où insérer l'entrée
 		BPlusTreeLeaf feuille = rechercherFeuille(cle, racine);
 		// Ajoute l'entrée dans la feuille
@@ -312,10 +367,12 @@ public class BPlusTree {
 	 * @param element Clé à rechercher
 	 * @return la liste des RecordId d'une clé
 	 */
-	public ArrayList<RecordId> getRecordId(Comparable<Object> element) {
+	@SuppressWarnings("unchecked")
+	public ArrayList<RecordId> getRecordId(Object entree) {
+		Comparable<Object> cle = (Comparable<Object>) entree;
 		// Recherche la feuille où se trouve la clé
-		BPlusTreeLeaf feuille = rechercherFeuille(element, racine);
-		return feuille.getRecordId(element);
+		BPlusTreeLeaf feuille = rechercherFeuille(cle, racine);
+		return feuille.getRecordId(cle);
 	}
 	
 	/**
@@ -324,24 +381,25 @@ public class BPlusTree {
 	 * @param table Liste d'entrée à trier
 	 * @return liste d'entrée triée par ordre croissant
 	 */
-	public ArrayList<Pair<Comparable<Object>, ArrayList<RecordId>>> tri(List<Pair<Comparable<Object>, RecordId>> table){
+	@SuppressWarnings("unchecked")
+	private ArrayList<Pair<Comparable<Object>, ArrayList<RecordId>>> tri(ArrayList<Pair<Object, RecordId>> table){
 		// Crée une liste avec le bon format
 		ArrayList<Pair<Comparable<Object>, ArrayList<RecordId>>> tableTrie = new ArrayList<>();
 		// Ajoute le premier élément de la liste
 		ArrayList<RecordId> nouveau = new ArrayList<>();
 		nouveau.add(table.get(0).getSecond());
-		tableTrie.add(new Pair<>(table.get(0).getFirst(), nouveau));
+		tableTrie.add(new Pair<>((Comparable<Object>) table.get(0).getFirst(), nouveau));
 		
 		boolean trouve = false;
 		int j= 0;
 		// Insère une à une les entrées de la liste
 		for(int i=1; i<table.size(); i++) {
 			// Entrée en cours d'insertion
-			Pair<Comparable<Object>, RecordId> element = table.get(i);
+			Pair<Object, RecordId> element = table.get(i);
 			// Cherche l'emplement où insérer l'entrée
 			while(!trouve && j<tableTrie.size()) {
 				// Résultat de la comparaison entre l'entrée à insérer et l'entrée inspectée
-				int comp = element.getFirst().compareTo(tableTrie.get(j).getFirst());
+				int comp = ((Comparable<Object>) element.getFirst()).compareTo(tableTrie.get(j).getFirst());
 				// Si elles sont égales, ajoute la référence de l'entrée à insérer dans la liste de références de l'entrée inspectée
 				if(comp == 0) {
 					tableTrie.get(j).getSecond().add(element.getSecond());
@@ -352,18 +410,21 @@ public class BPlusTree {
 				}else if(comp < 0) {
 					nouveau = new ArrayList<>();
 					nouveau.add(element.getSecond());
-					tableTrie.add(j, new Pair<>(element.getFirst(), nouveau));
+					tableTrie.add(j, new Pair<>((Comparable<Object>)element.getFirst(), nouveau));
 					trouve = true;
 				}
+				j++;
 			}
 			
-			// Si la clé est plus petite que cette entrée, l'insère à sa place
-			// Si la boucle n'a pas fini à l'itération précédente, la clé est donc forcément supérieur à l'entrée précédente de la feuille					
+			// Si l'emplacement de l'entrée n'est pas trouvé alors elle est plus grande que toutes les autres entrées
+			// L'insère donc à la fin
 			if(!trouve) {
 				nouveau = new ArrayList<>();
 				nouveau.add(element.getSecond());
-				tableTrie.add(new Pair<>(element.getFirst(), nouveau));
+				tableTrie.add(new Pair<>((Comparable<Object>) element.getFirst(), nouveau));
 			}
+			trouve = false;
+			j = 0;
 		}
 		return tableTrie;
 	}
@@ -375,18 +436,24 @@ public class BPlusTree {
 	 * @param depart Noeud de départ de la recherche
 	 * @return La feuille contenant ou pouvant contenir l'entrée donnée
 	 */
-	public BPlusTreeLeaf rechercherFeuille(Comparable<Object> element, BPlusTreeNode depart) {
+	private BPlusTreeLeaf rechercherFeuille(Comparable<Object> element, BPlusTreeNode depart) {
+		System.out.println("entree : " + element);
+		System.out.println(depart instanceof BPlusTreeLeaf);
+		System.out.println(depart.getCle(0));
 		// Si c'est une feuille alors cette feuille est la solution
-		if(depart.getClass() == BPlusTreeLeaf.class) {
+		if(depart instanceof BPlusTreeLeaf) {
 			return (BPlusTreeLeaf) depart;
 		}
 		// Si c'est un noeud intermédiaire, parcourt le noeud pour trouver le fils concerné par l'entrée
 		for(int i =0; i< depart.getTaille(); i++) {
+			System.out.println("Comparé to" + depart.getCle(i));
 			// Si l'entrée est inférieure à la clé, elle est contenue dans le fils avec le même indice que la clé
-			if(depart.getCle(i).compareTo(element) < 0) {
+			if(element.compareTo(depart.getCle(i)) < 0) {
+				System.out.println("plus petit");
 				return rechercherFeuille(element, depart.getFils(i));
 			}
 		}
+		System.out.println("le plus grand");
 		// Si l'entrée ne peut être trouvée dans aucun fils inspectés, elle pourra être trouvée dans le dernier fils
 		return rechercherFeuille(element, depart.getFils(depart.getTaille()));
 	}
@@ -396,7 +463,8 @@ public class BPlusTree {
 	 * 
 	 * @param feuille Feuille à scinder
 	 */
-	public void splitFeuille(BPlusTreeLeaf feuille) {
+	private void splitFeuille(BPlusTreeLeaf feuille) {
+
 		// Crée une nouvelle feuille en scindant en deux l'ancienne
 		BPlusTreeLeaf nouvelleFeuille  = feuille.split(ordre);
 		BPlusTreeBranch pere = feuille.getPere();
@@ -428,7 +496,7 @@ public class BPlusTree {
 	 * 
 	 * @param noeud Branche à scinder
 	 */
-	public void splitNode(BPlusTreeBranch noeud) {
+	private void splitNode(BPlusTreeBranch noeud) {
 		// Récupère la clé pivot du noeud
 		Comparable<Object> cle = noeud.getCle(ordre);
 		// Crée une nouvelle branche en scindant l'ancienne
@@ -460,25 +528,49 @@ public class BPlusTree {
 	/**
 	 * Ajouter une liste d'entrée dans un arbre vide
 	 * 
-	 * @param listeTrie Liste des entrées à ajouter
+	 * @param listeTrie Liste des entrées à ajouter rangées par ordre croissant
 	 */
-	public void ajouterFeuilles(List<Pair<Comparable<Object>, ArrayList<RecordId>>> listeTrie) {
+	private void ajouterFeuilles(ArrayList<Pair<Comparable<Object>, ArrayList<RecordId>>> listeTrie) {
+		// Commence à la racine
 		BPlusTreeLeaf precedente = (BPlusTreeLeaf) racine;
-		while(listeTrie.size() != 0) {
-			List<Pair<Comparable<Object>, ArrayList<RecordId>>> inserer;
+		// Tant qu'il reste des entrées à insérer dans l'arbre
+		while(listeTrie != null) {
+			ArrayList<Pair<Comparable<Object>, ArrayList<RecordId>>> inserer;
+			// Si toute la liste ne rentre pas dans une feuille, coupe la liste en deux
 			if(listeTrie.size()> ordre *2) {
-				inserer = listeTrie.subList(0, ordre*2);
-				listeTrie = listeTrie.subList(ordre*2, listeTrie.size());
+				// Initialise les deux morceaux de tableaux
+				ArrayList<Pair<Comparable<Object>, ArrayList<RecordId>>> firstHalf = new ArrayList<>();
+				ArrayList<Pair<Comparable<Object>, ArrayList<RecordId>>> lastHalf = new ArrayList<>();
+				// Réparti les entrées entre les deux tableaux
+				for(int i =0; i< listeTrie.size(); i++) {
+					if(i<ordre*2) {
+						firstHalf.add(listeTrie.get(i));
+					}else {
+						lastHalf.add(listeTrie.get(i));
+					}
+				}
+				// La première partie des entrées sera insérer
+				inserer = firstHalf;
+				// Garde l'autre partie pour l'insérer à la boucle suivante
+				listeTrie = lastHalf;
+			// Si la liste rentre dans une seule feuille, l'insère entièrement
 			}else {
 				inserer = listeTrie;
+				listeTrie = null;
 			}
 			if(racine == null) {
-				racine = new BPlusTreeLeaf(inserer);
+				// Crée une feuille qui sera la nouvelle racine contenant les entrées à insérer
+				racine = new BPlusTreeLeaf((ArrayList<Pair<Comparable<Object>, ArrayList<RecordId>>>)inserer);
+				precedente = (BPlusTreeLeaf) racine;
 			}else {
-				BPlusTreeLeaf nouvelleFeuille = new BPlusTreeLeaf(inserer);
+				// Crée une nouvelle feuille avec les entrées à insérer
+				BPlusTreeLeaf nouvelleFeuille = new BPlusTreeLeaf((ArrayList<Pair<Comparable<Object>, ArrayList<RecordId>>>)inserer);
+				// Récupère le père de la feuille crée à la boucle précédente
 				BPlusTreeBranch pere = precedente.getPere();
+				// Si elle est racine
 				if(pere == null) {
 					try {
+						// Crée une nouvelle branche qui sera la nouvelle racine
 						racine = new BPlusTreeBranch(nouvelleFeuille.getCle(0), precedente, nouvelleFeuille);
 						// Ajoute la nouvelle racine comme père des deux feuilles
 						nouvelleFeuille.setPere((BPlusTreeBranch)racine);

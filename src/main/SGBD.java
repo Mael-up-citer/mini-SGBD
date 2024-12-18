@@ -57,7 +57,10 @@ public class SGBD {
 
         COMMANDMAP.put("SELECT", this::processSELECTCommand);
         COMMANDMAP.put("INSERT INTO", this::processINSERTCommand);
-        COMMANDMAP.put("BULKINSERT INTO", this::processBULKINSERTCommand);	
+        COMMANDMAP.put("BULKINSERT INTO", this::processBULKINSERTCommand);
+        
+        COMMANDMAP.put("CREATEINDEX ON", this::processCREATEINDEXCommand);
+        COMMANDMAP.put("SELECTINDEX * FROM", this::processSELECTINDEXCommand);
 
         COMMANDMAP.put("QUIT", unused -> processQUITCommand());
     }
@@ -98,7 +101,7 @@ public class SGBD {
      * Méthode principale qui lance la boucle de lecture des requêtes SQL de l'utilisateur.
      * Elle analyse et exécute les requêtes en appelant les méthodes associées.
      */
-    private void run() {
+    public void run() {
         sc = new Scanner(System.in);  // Scanner pour interagir avec l'utilisateur
         String query;                         // Commande reçue de l'utilisateur
 
@@ -349,7 +352,7 @@ public class SGBD {
             System.out.println("Aurevoir :)");
             System.exit(0);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 
@@ -359,8 +362,9 @@ public class SGBD {
     private void processDROPDATABASESCommand(){
         try {
             dbM.RemoveDatabases();
+            System.out.println("les bases de données on toutes disparu");
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 
@@ -397,11 +401,15 @@ public class SGBD {
             }catch(Exception e){
             	e.printStackTrace();
             }
+        	System.out.println("Les valeurs " + listeValeur + " ont été ajoutés à la table " + nomTable);
     	}
         else
     		System.out.println("Format d'Insert non respecté");
     }
 
+    /**
+     * Méthode pour traiter la commande BULKINSERT
+     */
     private void processBULKINSERTCommand(String param) {
     	// Sépare la ligne de commande entre le nom de la table et le nom du fichier
     	String[] parts = param.split(" ", 2);
@@ -411,8 +419,39 @@ public class SGBD {
     	try {
         	dbM.BulkInsertIntoCurrentDatabase(nomTable, nomFichier);
     	} catch(Exception e) {
-    		//e.printStackTrace();
-            System.out.println(e.getMessage());
+            e.printStackTrace();
+    	}
+    }
+    
+    /**
+     * Méthode pour traiter la commande CREATEINDEX
+     */
+    private void processCREATEINDEXCommand(String param) {
+    	String[] parts = param.split("KEY=", 2);
+    	String nomRelation = parts[0].trim();
+    	String[] arguments = parts[1].split("ORDER=", 2);
+    	String nomColonne = arguments[0].trim();
+    	int ordre = Integer.valueOf(arguments[1].trim());
+    	try {
+        	dbM.CreateIndex(nomRelation, nomColonne, ordre);
+    	} catch(Exception e) {
+            e.printStackTrace();
+    	}
+    }
+    
+    /**
+     * Méthode pour traiter la commande SELECTINDEX
+     */
+    private void  processSELECTINDEXCommand(String param) {
+    	String[] parts = param.split("WHERE", 2);
+    	String nomRelation = parts[0].trim();
+    	String[] arguments = parts[1].split("=", 2);
+    	String nomColonne = arguments[0].trim();
+    	String cle = arguments[1].trim();
+    	try {
+        	dbM.SelectIndex(nomRelation, nomColonne, cle);
+    	} catch(Exception e) {
+            e.printStackTrace();
     	}
     }
 
@@ -422,21 +461,28 @@ public class SGBD {
      */
     private void processSELECTCommand(String param) {
         if (dbM.getCurrentDatabase() == null)
-            System.out.println("erreur aucune data base n'est défini");
+            System.out.println("Erreur aucune database n'est défini");
         else {
             String selectReg = String.join("",
-                "^(\\*|", // Sélectionne tout (*)
-                "(?:[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+", // ou une colonne sous forme alias.colonne
-                "(?:\\s*,\\s*[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+)*))", // Colonnes supplémentaires séparées par des virgules (avec gestion des espaces)
-                "\\s+FROM\\s+", // FROM obligatoire avec espaces autour
-                "([a-zA-Z0-9_]+\\s+[a-zA-Z0-9_]+", // Première table avec alias
-                "(?:\\s*,\\s*[a-zA-Z0-9_]+\\s+[a-zA-Z0-9_]+)*)", // Autres tables avec alias (optionnel)
-                "(?:\\s+WHERE\\s+", // WHERE optionnel
-                "([a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+\\s*(?:=|<|>|<=|>=|<>)\\s*", // Condition initiale : alias.colonne OP valeur
-                "(?:'[^']*'|[a-zA-Z0-9_]+)", // Valeur : chaîne ou constante
-                "(?:\\s+AND\\s+[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+\\s*(?:=|<|>|<=|>=|<>)\\s*", // Conditions supplémentaires avec AND
-                "(?:'[^']*'|[a-zA-Z0-9_]+))*)?)?$" // Fin des conditions
-            );
+            "^(\\*|", 
+            "(?:[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+", // alias.colonne
+            "(?:\\s*,\\s*[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+)*))", 
+            "\\s+FROM\\s+", 
+            "([a-zA-Z0-9_]+\\s+[a-zA-Z0-9_]+", // Table avec alias
+            "(?:\\s*,\\s*[a-zA-Z0-9_]+\\s+[a-zA0-9_]+)*)", 
+            "(?:\\s+WHERE\\s+", // Optionnel WHERE
+            "([a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+\\s*(?:=|<|>|<=|>=|<>)\\s*" + // Alias1.colonne OP
+            "(?:[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+)?" + // Alias2.colonne (optionnel)
+            "(?:\\s*(?:'[^']*'|[a-zA-Z0-9_]+))?", // Valeur ou autre colonne (optionnel)
+            
+            // Support pour plusieurs conditions avec AND
+            "(?:\\s+AND\\s+" + 
+            "[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+\\s*(?:=|<|>|<=|>=|<>)\\s*" + // Alias1.colonne OP
+            "(?:[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+)?" + // Alias2.colonne (optionnel)
+            "(?:\\s*(?:'[^']*'|[a-zA-Z0-9_]+))?" + // Valeur ou autre colonne (optionnel)
+            ")*", // Permet plusieurs répétitions du motif AND-condition
+            ")*)?$"
+        );       
             // Compiler la regex
             Pattern pattern = Pattern.compile(selectReg, Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(param);
@@ -448,9 +494,9 @@ public class SGBD {
                 String whereConditions = matcher.group(3); // Conditions dans WHERE (optionnel)
 
                 // Afficher les résultats extractions
-                System.out.println("Attributs : " + attributs);
-                System.out.println("Relation et allias : " + tables);
-                System.out.println("Conditions : " + whereConditions);
+                //System.out.println("Attributs : " + attributs);
+                //System.out.println("Relation et allias : " + tables);
+                //System.out.println("Conditions : " + whereConditions);
 
                 try {
                     // Liste qui contient les relations
@@ -513,7 +559,6 @@ public class SGBD {
                         planExec.execute();   // Exécuter la commande avec les opérateurs relationnels
                     }
                 } catch(Exception e){
-                    //e.printStackTrace();
                     System.out.println("Erreur lors de l'exécution de la commande "+e.getMessage());
                 }
             }
@@ -571,7 +616,7 @@ public class SGBD {
         ArrayList<Integer> attributesToPrint = new ArrayList<>();
         int globalOffset = 0;
         // Chaque case contient allais.attrbName
-        String[] attrbs = param.split("\\s+,\\s+");        
+        String[] attrbs = param.split("\\s*,\\s*");        
 
         // Si on a '*', on prend tous les attributs dans l'ordre des relations
         if ("*".equals(param.trim())) {
@@ -649,7 +694,7 @@ public class SGBD {
         res.setSecond(new ArrayList<>());
 
         // Regex pour capturer le patern d'une condition
-        String regex = "(?:([a-zA-Z0-9_]+)\\.)?([a-zA-Z0-9_]+)\\s*(<|>|<=|>=|=|!=)\\s*(?:([a-zA-Z0-9_]+\\.)?([a-zA-Z0-9_]+|'[a-zA-Z0-9_\\s]+'))";
+        String regex = "(?:([a-zA-Z0-9_]+)\\.)?([a-zA-Z0-9_]+)\\s*(<|>|<=|>=|=|<>)\\s*(?:([a-zA-Z0-9_]+)\\.)?([a-zA-Z0-9_]+|'[a-zA-Z0-9_\\sÀ-ÿ]+')";
         Pattern pattern = Pattern.compile(regex);
 
         // Parcour le tableau des conditions
@@ -683,11 +728,9 @@ public class SGBD {
                     Integer relativeIndex1 = relation.getNameToIndex().get(colonne1);
                     Integer relativeIndex2 = relation.getNameToIndex().get(colonne2);
                     
-                    if (relativeIndex1 == null)
-                        relativeIndex1 = -1;
+                    if (relativeIndex1 == null) relativeIndex1 = -1;
 
-                    if (relativeIndex2 == null)
-                        relativeIndex2 = -1;
+                    if (relativeIndex2 == null) relativeIndex2 = -1;
 
                     // Crée les pairs de terme
                     Pair<String, Integer> p1 = new Pair<String,Integer>(colonne1, relativeIndex1);
@@ -775,83 +818,6 @@ public class SGBD {
 
         return !reservedWords.contains(name);  // Vérifie que le nom n'est pas un mot réservé
     }
-
-    /**
-     * Valide une valeur avant de l'ajouter au tuple.
-     * Effectue les vérifications suivantes :
-     * - Si l'index est valide en fonction du nombre d'attributs de la relation
-     * - Si le type spécifié correspond au type attendu pour cet attribut
-     * - Si l'objet de la valeur correspond au type de donnée attendu (ex : chaîne pour CHAR)
-     * - Si la taille des chaînes respecte la limite spécifiée pour CHAR et VARCHAR
-     *
-     * @param value La valeur à valider.
-     * @param type Le type de la valeur spécifié dans le tuple.
-     * @param index L'index de l'attribut dans la relation, pour déterminer le type attendu.
-     * @return La valeur validée, éventuellement modifiée (ex : chaîne complétée pour CHAR).
-     * @throws IllegalArgumentException Si la validation échoue.
-     */ /*
-    private Object validateTupleAttribute(Object value, DataType type, int index, Relation relation) {
-        // Vérifie que l'index ne dépasse pas le nombre d'attributs définis dans la relation.
-        if (index >= relation.getAttribut().size())
-            throw new IllegalArgumentException("Le nombre de valeurs dépasse le nombre d'attributs dans la relation.");
-
-        // Récupère le type attendu pour l'attribut à l'index donné.
-        DataType expectedType = relation.getType(index);
-
-        // Vérifie si le type de donnée spécifié correspond au type attendu.
-        if (expectedType != type)
-            throw new IllegalArgumentException("Le type de la valeur ne correspond pas à celui de l'attribut.");
-
-        // Récupère la longueur maximale autorisée pour les chaînes si applicable.
-        int maxLength = relation.getLength(index);
-
-        // Effectue une vérification basée sur le type de donnée pour s'assurer que
-        // l'objet valeur est du type attendu et respecte les contraintes spécifiques.
-        switch (type) {
-            case CHAR:
-            case VARCHAR:
-                // Vérifie que la valeur est une instance de String.
-                if (!(value instanceof String))
-                    throw new IllegalArgumentException("La valeur doit être une chaîne pour le type CHAR ou VARCHAR.");
-
-                // Convertit la valeur en chaîne pour vérifier sa longueur.
-                String strValue = (String) value;
-
-                // Vérifie que la longueur de la chaîne ne dépasse pas la longueur maximale.
-                if (strValue.length() > maxLength)
-                    throw new IllegalArgumentException("La chaîne dépasse la taille maximale autorisée pour l'attribut.");
-
-                break;
-
-            case INT:
-                // Vérifie que la valeur est une instance d'Integer.
-                if (!(value instanceof Integer))
-                    throw new IllegalArgumentException("La valeur doit être un entier pour le type INT.");
-
-                break;
-
-            case REAL:
-                // Vérifie que la valeur est une instance de Float ou Double.
-                if (!(value instanceof Float) && !(value instanceof Double))
-                    throw new IllegalArgumentException("La valeur doit être un nombre réel pour le type REAL.");
-
-                break;
-
-            case DATE:
-                // Vérifie que la valeur est une instance de Date.
-                if (!(value instanceof Date))
-                    throw new IllegalArgumentException("La valeur doit être une date pour le type DATE.");
-
-                break;
-
-            default:
-                // Lève une exception si le type de donnée n'est pas supporté.
-                throw new IllegalArgumentException("Type de donnée non supporté.");
-        }
-        // Retourne la valeur validée ou modifiée si nécessaire (ex : chaîne complétée pour CHAR).
-        return value;
-    }
-    */
 
     /**
      * Obtient l'instance de la configuration de la base de données.

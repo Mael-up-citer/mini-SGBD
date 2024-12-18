@@ -11,7 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-public class TestDiskManager{
+public class TestDiskManager {
 
     private DiskManager dskM; // Instance de DiskManager à tester
     private DBConfig dbc; // Instance de DBConfig pour configurer les tests

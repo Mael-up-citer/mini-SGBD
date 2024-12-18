@@ -185,21 +185,18 @@ public class DiskManager {
         String cheminFichier = DBConfig.dbpath + "dm.save"; // Chemin du fichier de sauvegarde
 
         try (RandomAccessFile raf = new RandomAccessFile(cheminFichier, "rw")) {
-            if (raf.length() == 0) {
-                throw new Exception("Il n'y a pas de sauvegarde de ce Disque Manager");
-            }
+            if (raf.length() != 0) {
+                GlobalStorage = raf.readLong(); // Charger l'espace global alloué
 
-            GlobalStorage = raf.readLong(); // Charger l'espace global alloué
-
-            // Charger la liste des pages libres
-            while (raf.getFilePointer() < raf.length()) {
-                int fileIdx = raf.readInt(); // Charger FileIdx
-                int pageIdx = raf.readInt(); // Charger PageIdx
-                freePage.add(new PageId(fileIdx, pageIdx)); // Ajouter la page à la liste
+                // Charger la liste des pages libres
+                while (raf.getFilePointer() < raf.length()) {
+                    int fileIdx = raf.readInt(); // Charger FileIdx
+                    int pageIdx = raf.readInt(); // Charger PageIdx
+                    freePage.add(new PageId(fileIdx, pageIdx)); // Ajouter la page à la liste
+                }
             }
         } catch (IOException e) {
-            System.err.println("Erreur lors de la gestion du fichier : " + cheminFichier);
-            //e.printStackTrace();
+            System.err.println("Erreur lors de la gestion du fichier : " + cheminFichier+" "+e.getMessage());
         }
     }
 }

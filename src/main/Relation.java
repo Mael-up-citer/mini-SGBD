@@ -580,8 +580,8 @@ public class Relation {
      * @return Une liste de tous les enregistrements dans la base de données.
      * @throws Exception Si une erreur se produit lors de la récupération des enregistrements.
      */
-    public ArrayList<MyRecord> GetAllRecords() throws Exception {
-        ArrayList<MyRecord> allRecords = new ArrayList<>();
+    public ArrayList<Pair<MyRecord, RecordId>> GetAllRecords() throws Exception {
+        ArrayList<Pair<MyRecord, RecordId>> allRecords = new ArrayList<>();
 
         List<PageId> dataPages = getDataPages();
 
@@ -602,9 +602,9 @@ public class Relation {
      * @return Une liste d'objets MyRecord représentant les enregistrements trouvés sur la page.
      * @throws Exception Si une erreur se produit lors de la lecture des enregistrements depuis la page.
     */
-    public ArrayList<MyRecord> getRecordsInDataPage(PageId id) throws Exception {
+    public ArrayList<Pair<MyRecord, RecordId>> getRecordsInDataPage(PageId id) throws Exception {
         // Initialiser la liste de records
-        ArrayList<MyRecord> records = new ArrayList<>();
+        ArrayList<Pair<MyRecord, RecordId>> records = new ArrayList<>();
 
         try {
             // Charger la page en mémoire
@@ -621,9 +621,9 @@ public class Relation {
 
                 // Si la taille est non nulle, cela signifie que le record existe
                 if (recordSize > 0){
-                    records.add(new MyRecord());    // Initialise le tuple
+                    records.add(new Pair<MyRecord, RecordId>(new MyRecord(), new RecordId(slotOffset, id)));    // Initialise le tuple
                     // Lire le record en utilisant une méthode de lecture depuis le buffer
-                    readRecordFromBuffer(records.get(i), pageData, recordPos);
+                    readRecordFromBuffer(records.get(i).getFirst(), pageData, recordPos);
                 }
             }
         } finally {
@@ -633,6 +633,37 @@ public class Relation {
         // Retourner la liste de records
         return records;
     }
+    
+    /**
+     * Récupère l'enregistrement d'un emplacement donné
+     * 
+     * @param rid emplacement de l'enregistrement
+     * @return Un object MyRecord représentant l'enregistrement trouvé à l'emplacement
+     * @throws Exception Si une erreur se produit lors de la lecture des enregistrements depuis la page.
+     */
+    public MyRecord getRecordInDataPage(RecordId rid) throws Exception {
+        try {
+            // Charger la page en mémoire
+            ByteBuffer pageData = bm.getPage(rid.pageIdx);
+            // Lire la position et la taille du record depuis le Slot Directory
+            int recordPos = pageData.getInt(rid.slotIdx);
+            int recordSize = pageData.getInt(rid.slotIdx + 4);
+
+            // Si la taille est non nulle, cela signifie que le record existe
+            if (recordSize > 0){
+            	MyRecord rec = new MyRecord();    // Initialise le tuple
+            	// Lire le record en utilisant une méthode de lecture depuis le buffer
+                readRecordFromBuffer(rec, pageData, recordPos);
+                // Retourner le record
+                return rec;
+            }else {
+            	return null;
+            }
+        } finally {
+            // Libérer la page après la lecture
+            bm.freePage(rid.pageIdx, false); // False car pas de modification
+        }
+    }
 
     /**
      * Récupère le nom de l'attribut à l'index spécifié.
@@ -640,7 +671,7 @@ public class Relation {
      * @param index L'index de l'attribut dans la liste.
      * @return Le nom de l'attribut à l'index spécifié.
      */
-    public String getNameAttribut(int index) throws IndexOutOfBoundsException{
+     public String getNameAttribut(int index) throws IndexOutOfBoundsException{
         return attribut.get(index).getFirst();
     }
 
