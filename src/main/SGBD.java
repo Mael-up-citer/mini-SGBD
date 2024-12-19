@@ -76,7 +76,6 @@ public class SGBD {
             System.out.println("Veuillez donner 1 argument, qui sera le chemin vers la Base de Données");
             System.exit(-1);
         }
-
         DBConfig dbc = DBConfig.loadConfig(args[0]+"config.txt");  // Initialisation de la configuration de la base de données
 
         // Vérification de la validité du chemin de la base de données
@@ -419,7 +418,8 @@ public class SGBD {
         	dbM.BulkInsertIntoCurrentDatabase(nomTable, nomFichier);
             System.out.println("Les valeurs du fichier" + nomFichier + " ont été ajoutés à la table " + nomTable);
     	} catch(Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
+            System.out.println("Le bulkinsert n'a pas fonctionné");
     	}
     }
     

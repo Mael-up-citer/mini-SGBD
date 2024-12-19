@@ -139,7 +139,7 @@ public class DBManager {
      * @param nomTable nom de la table à ammender
      * @param nomFichier nom de fichier contenant les valeurs à ajouter
      */
-    public void BulkInsertIntoCurrentDatabase(String nomTable, String nomFichier) throws Exception{
+    public void BulkInsertIntoCurrentDatabase(String nomTable, String nomFichier) throws Exception {
     	// Lis le fichier contenant les données
     	String insert = readFichier(DBConfig.dbpath + nomFichier);
     	// Sépare les données en lignes
@@ -395,6 +395,8 @@ public class DBManager {
     public void loadState() throws IOException{
     	HashMap<String, Relation> DatabaseEnCours = null;
     	Relation RelationEnCours = null;
+
+
         String save = readFichier(DBConfig.dbpath + "/databases.save");
 
         if(save == null) {
@@ -459,7 +461,7 @@ public class DBManager {
      * 
      * @return Une chaîne de caractère contenant la sauvegarde
      */
-    public String readFichier(String chemin) throws IOException{
+    public String readFichier(String chemin) throws IOException {
     	// Lire tout le contenu du fichier et le retourner sous forme de chaîne
         return new String(Files.readAllBytes(Paths.get(chemin)));
     }
