@@ -1,3 +1,9 @@
+BDD = DB1
+Table = INGREDIENTS; 6; 0
+Colonne = NOM; VARCHAR; 20
+Colonne = QUANTITE; INT; 4
+Colonne = IMPORTANCE; REAL; 4
+Colonne = AVIS; CHAR; 2
 BDD = TEST
 Table = R; 3; 2
 Colonne = C1; INT; 4

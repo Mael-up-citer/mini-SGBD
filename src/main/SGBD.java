@@ -690,7 +690,7 @@ public class SGBD {
         res.setSecond(new ArrayList<>());
 
         // Regex pour capturer le patern d'une condition
-        String regex = "(?:([a-zA-Z_][a-zA-Z0-9_@-]*)\\.)?([a-zA-Z_][a-zA-Z0-9_@-]*|'[a-zA-Z0-9_\\sÀ-ÿÀ-Ÿ@-]*'|[0-9]+(?:\\.[0-9]+)?)\\s*(<|>|<=|>=|=|<>)\\s*(?:([a-zA-Z_][a-zA-Z0-9_@-]*)\\.)?([a-zA-Z_][a-zA-Z0-9_@-]*|'[a-zA-Z0-9_\\sÀ-ÿÀ-Ÿ@-]*'|[0-9]+(?:\\.[0-9]+)?)";
+        String regex = "(?:([a-zA-Z_][a-zA-Z0-9_@-]*)\\.)?([a-zA-Z_][a-zA-Z0-9_@-]*|\"[a-zA-Z0-9_\\sÀ-ÿÀ-Ÿ@-]*\"|[0-9]+(?:\\.[0-9]+)?)\\s*(<|>|<=|>=|=|<>)\\s*(?:([a-zA-Z_][a-zA-Z0-9_@-]*)\\.)?([a-zA-Z_][a-zA-Z0-9_@-]*|\"[a-zA-Z0-9_\\sÀ-ÿÀ-Ÿ@-]*\"|[0-9]+(?:\\.[0-9]+)?)";
         Pattern pattern = Pattern.compile(regex);
 
         // Parcour le tableau des conditions

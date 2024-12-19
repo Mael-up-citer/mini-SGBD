@@ -94,7 +94,7 @@ public class Condition {
      */
     private Pair<Object, DataType> parseConstant(String terme) throws IllegalArgumentException {
         // Si le terme commence et finit par des guillemets, c'est une chaîne de caractères
-        if (terme.startsWith("'") && terme.endsWith("'"))
+        if (terme.startsWith("\"") && terme.endsWith("\""))
             return new Pair<>(terme.substring(1, terme.length() - 1), DataType.VARCHAR);  // Chaîne de caractères
 
         try {
