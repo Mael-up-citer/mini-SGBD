@@ -202,11 +202,18 @@ public class MyRecord extends ArrayList<Pair<Object, DataType>> {
      */
     public String printValue() {
         StringBuilder res = new StringBuilder();
-
-        // Parcours le record et construit la chaîne
-        for (int i = 0; i < this.size(); i++)
-            res.append(getValue(i)+"\t");
-
+    
+        // Parcours du record et construction de la chaîne avec les valeurs séparées par " ; "
+        for (int i = 0; i < this.size(); i++) {
+            res.append(getValue(i));
+    
+            // Ajouter un séparateur " ; " après chaque valeur sauf la dernière
+            if (i < this.size() - 1)
+                res.append(" ; ");
+        }
+        // Ajouter un point à la fin
+        res.append(".");
+    
         return res.toString();
-    }
+    }    
 }

@@ -124,8 +124,6 @@ public class Condition {
     @SuppressWarnings("unchecked")  // Ignore les avertissements de type
     private boolean compare(Object value1, Object value2, DataType type) throws Exception {
 
-        System.out.println("comparaison de: "+value1+" "+operateur+" "+value2);
-
         // Vérifier que les deux valeurs sont non nulles
         if (value1 == null || value2 == null)
             throw new IllegalArgumentException("Les valeurs à comparer ne peuvent pas être nulles.");

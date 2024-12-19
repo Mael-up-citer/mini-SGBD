@@ -157,7 +157,6 @@ public class DBManager {
             // Insert la ligne
             InsertIntoCurrentDatabase(nomTable, valeurs);
     	}
-    	System.out.println("Les valeurs du fichier" + nomFichier + " ont été ajoutés à la table " + nomTable);
     }
     
     /**

@@ -91,7 +91,7 @@ public class SGBD {
         try {
             sgbd = new SGBD(dbc);
         } catch (Exception e) {
-            e.printStackTrace();   // Si une erreur survient, elle est imprimée
+            System.out.println(e.getMessage());
             System.exit(-3);       // Le programme se termine avec un code d'erreur
         }
         sgbd.run();  // Lancement de la boucle principale
@@ -116,8 +116,7 @@ public class SGBD {
                         assocQuery(query);      // Si valide, associer la commande à sa méthode correspondante
 
                 } catch (Exception e) {
-                    // En cas d'erreur de saisie (ex : entrée vide), afficher un message d'erreur
-                    System.out.println("Erreur dans la saisie, veuillez réessayer.");
+                    System.out.println("Erreur: "+e.getMessage());
                 }
             } while (true);
     }
@@ -418,8 +417,9 @@ public class SGBD {
     	String nomFichier = parts[1].trim();
     	try {
         	dbM.BulkInsertIntoCurrentDatabase(nomTable, nomFichier);
+            System.out.println("Les valeurs du fichier" + nomFichier + " ont été ajoutés à la table " + nomTable);
     	} catch(Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
     	}
     }
     
@@ -435,7 +435,7 @@ public class SGBD {
     	try {
         	dbM.CreateIndex(nomRelation, nomColonne, ordre);
     	} catch(Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
     	}
     }
     
@@ -451,7 +451,7 @@ public class SGBD {
     	try {
         	dbM.SelectIndex(nomRelation, nomColonne, cle);
     	} catch(Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
     	}
     }
 
@@ -469,20 +469,16 @@ public class SGBD {
             "(?:\\s*,\\s*[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+)*))", 
             "\\s+FROM\\s+", 
             "([a-zA-Z0-9_]+\\s+[a-zA-Z0-9_]+", // Table avec alias
-            "(?:\\s*,\\s*[a-zA-Z0-9_]+\\s+[a-zA0-9_]+)*)", 
-            "(?:\\s+WHERE\\s+", // Optionnel WHERE
-            "([a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+\\s*(?:=|<|>|<=|>=|<>)\\s*" + // Alias1.colonne OP
-            "(?:[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+)?" + // Alias2.colonne (optionnel)
-            "(?:\\s*(?:'[^']*'|[a-zA-Z0-9_]+))?", // Valeur ou autre colonne (optionnel)
+            "(?:\\s*,\\s*[a-zA-Z0-9_]+\\s+[a-zA-Z0-9_]+)*)", 
 
-            // Support pour plusieurs conditions avec AND
-            "(?:\\s+AND\\s+" + 
-            "[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+\\s*(?:=|<|>|<=|>=|<>)\\s*" + // Alias1.colonne OP
-            "(?:[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+)?" + // Alias2.colonne (optionnel)
-            "(?:\\s*(?:'[^']*'|[a-zA-Z0-9_]+))?" + // Valeur ou autre colonne (optionnel)
-            ")*", // Permet plusieurs répétitions du motif AND-condition
-            ")*)?$"
-        );       
+            // Support de WHERE avec des termes séparés par AND
+            "(?:\\s+WHERE\\s+(.+))?", // Capturer toute la partie WHERE, avec n'importe quelles conditions
+
+            // Permettre plusieurs répétitions de "AND"
+            "(?:\\s+AND\\s+.+)*",  // Plusieurs termes séparés par "AND"
+            "$" // Fin de la chaîne
+        );
+         
             // Compiler la regex
             Pattern pattern = Pattern.compile(selectReg, Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(param);
@@ -694,7 +690,7 @@ public class SGBD {
         res.setSecond(new ArrayList<>());
 
         // Regex pour capturer le patern d'une condition
-        String regex = "(?:([a-zA-Z_][a-zA-Z0-9_]*)\\.)?([a-zA-Z_][a-zA-Z0-9_]*|'[a-zA-Z0-9_\\sÀ-ÿÀ-Ÿ]*'|[0-9]+(?:\\.[0-9]+)?)\\s*(<|>|<=|>=|=|<>)\\s*(?:([a-zA-Z_][a-zA-Z0-9_]*)\\.)?([a-zA-Z_][a-zA-Z0-9_]*|'[a-zA-Z0-9_\\sÀ-ÿÀ-Ÿ]*'|[0-9]+(?:\\.[0-9]+)?)";
+        String regex = "(?:([a-zA-Z_][a-zA-Z0-9_@-]*)\\.)?([a-zA-Z_][a-zA-Z0-9_@-]*|'[a-zA-Z0-9_\\sÀ-ÿÀ-Ÿ@-]*'|[0-9]+(?:\\.[0-9]+)?)\\s*(<|>|<=|>=|=|<>)\\s*(?:([a-zA-Z_][a-zA-Z0-9_@-]*)\\.)?([a-zA-Z_][a-zA-Z0-9_@-]*|'[a-zA-Z0-9_\\sÀ-ÿÀ-Ÿ@-]*'|[0-9]+(?:\\.[0-9]+)?)";
         Pattern pattern = Pattern.compile(regex);
 
         // Parcour le tableau des conditions
@@ -739,11 +735,11 @@ public class SGBD {
 
                     if (relativeIndex2 == null) relativeIndex2 = -1;
 
-                    System.out.println("alias = "+alias);
-                    System.out.println("col1 = "+colonne1);
-                    System.out.println("col2 = "+colonne2);
-                    System.out.println("relativeIndex1 = "+relativeIndex1);
-                    System.out.println("relativeIndex2 = "+relativeIndex2);
+                    //System.out.println("alias = "+alias);
+                    //System.out.println("col1 = "+colonne1);
+                    //System.out.println("col2 = "+colonne2);
+                    //System.out.println("relativeIndex1 = "+relativeIndex1);
+                    //System.out.println("relativeIndex2 = "+relativeIndex2);
 
                     // Crée les pairs de terme
                     Pair<String, Integer> p1 = new Pair<String,Integer>(colonne1, relativeIndex1);
