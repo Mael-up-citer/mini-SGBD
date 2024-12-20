@@ -218,6 +218,8 @@ public class MyLinkedList<T> {
             node.setSuivant(null);
             node.setPrecedent(null);
         }
+        else
+            throw new IllegalStateException("Impossible de supprimer "+t+" car cette valeur n'est pas dans la liste");
     }
 
     /**
@@ -229,7 +231,7 @@ public class MyLinkedList<T> {
     public Cellule<T> removeFromTail() {
         if (tail == sentinelle)
             return null;  // La liste est vide, donc rien à supprimer
-    
+
         size--;
         // Récupérer le dernier élément (le noeud pointé par `tail`)
         Cellule<T> dernier = tail;
@@ -248,7 +250,7 @@ public class MyLinkedList<T> {
         // Déconnecter le dernier élément de la liste
         dernier.setSuivant(null);
         dernier.setPrecedent(null);
-    
+
         // Retourner le noeud supprimé
         return dernier;
     }

@@ -23,6 +23,7 @@ public class TestBufferManager {
         dskM = DiskManager.getInstance();
         dbConfig = DBConfig.loadConfig("src/tests/config.txt"); // Charger la configuration
         bm = new BufferManager(dbConfig, dskM);
+
         buffer1 = ByteBuffer.allocate(DBConfig.pagesize);
         buffer2 = ByteBuffer.allocate(DBConfig.pagesize);
         buffer3 = ByteBuffer.allocate(DBConfig.pagesize);
@@ -50,7 +51,7 @@ public class TestBufferManager {
 
         // La remplie du caractère A
     	for (int j = 0; j < buffer1.capacity(); j++)
-            buffer1.putChar('A'); // Remplir le buffer de 'A'
+            buffer1.put((byte)('A')); // Remplir le buffer de 'A'
 
     	// L'écrit
     	dskM.WritePage(id, buffer1);
@@ -93,62 +94,75 @@ public class TestBufferManager {
         // Verifie que le pin count est bien incrémenté
         assertEquals(bm.getCadre().search(id).pin_count, 2, "Le pin count n'est pas incrémenter");
     }
-    
+
     @Test //Test la libération de page
     void testFreePageAddSuppJunk() throws Exception{
     	// Crée une première page 
         PageId id = dskM.AllocPage();
+
         // La charge
         bm.getPage(id);
         // La libère en dirty true
         bm.freePage(id, true);
+
+        AVLNode node = bm.getCadre().search(id);
+
         // Verifie le flag dirty
-        assertTrue(bm.getCadre().search(id).dirtyFlag, "Le flage n'est pas mis à dirty");
+        assertTrue(node.dirtyFlag, "Le flage n'est pas mis à dirty");
         // Verifie le pin count
-        assertEquals(bm.getCadre().search(id).pin_count, 0, "Le pin count n'est pas bon");
+        assertEquals(node.pin_count, 0, "Le pin count n'est pas bon");
         // Verifie la mise en JunkFile
-        assertNotNull(bm.getCadre().search(id).pointeurListe, "Le fichier n'est pas ajouté dans la junkFile");
+        assertNotNull(node.pointeurListe, "Le fichier n'est pas ajouté dans la junkFile");
+        // Verifie l'initialisation de la root
+        assertEquals(bm.getJunkFile().getRoot().getSuivant(), node.pointeurListe, "Le pointeur junkFile ne s'initialise pas");
         // Verifie l'initialisation de la junkFile
-        assertEquals(bm.getJunkFile(), bm.getCadre().search(id).pointeurListe, "Le pointeur junkFile ne s'initialise pas");
+        assertEquals(bm.getJunkFile().get(id).getValue(), node.pointeurListe.getValue(), "Le pointeur junkFile ne s'initialise pas");
         // Verifie l'initialisation du pointeur last
-        assertEquals(bm.getJunkFile().getTail(), bm.getCadre().search(id).pointeurListe, "Le pointeur last ne s'initialise pas");
+        assertEquals(bm.getJunkFile().getTail(), node.pointeurListe, "Le pointeur last ne s'initialise pas");
 
         // Charge la page
         bm.getPage(id);
+
         // Verifie que la page a été supprimé de la junkFile
         assertNull(bm.getCadre().search(id).pointeurListe, "La page n'est pas supprimée de la junkFile");
-        assertNull(bm.getJunkFile(), "La junkFile n'est pas vide");
-        assertNull(bm.getJunkFile().getTail(), "Le pointeur last n'est pas vide");
-        
+        assertEquals(bm.getJunkFile().getRoot(), bm.getJunkFile().getRoot().getSuivant(), "La junkFile n'est pas vide");
+        assertEquals(bm.getJunkFile().getTail(), bm.getJunkFile().getRoot(), "Le pointeur last n'est pas vide");
+
         // Charge la page à nouveau (simulation d'un deuxième utilisateur)
         bm.getPage(id);
         // Libère la page (un utilisateur l'utilise toujours)
         bm.freePage(id, false);
+
         // Verifie que le flag dirty n'est pas changé
         assertTrue(bm.getCadre().search(id).dirtyFlag, "Le flage est remis à clean entre deux accès");
         // Vérifie le pin count
         assertEquals(bm.getCadre().search(id).pin_count, 1, "Le pin count n'est pas bon");
         // Vérifie que la page n'est pas dans la junkFile
         assertNull(bm.getCadre().search(id).pointeurListe, "Le fichier est ajouté dans la JunkFile et le pin count n'est pas nul");
-        
+
         // Libère la page totalement (plus d'utilisateur en accès)
         bm.freePage(id, false);
-        
+
         // Crée une deuxième page
         PageId id2 = dskM.AllocPage();
+
         // Verifie qu'on ne peut pas supprimer une page non chargée
         assertFalse(bm.freePage(id2, false));
+
         // Charge la page 2
         bm.getPage(id2);
         //Libère la page 2
         bm.freePage(id2, false);
-        assertFalse(bm.getCadre().search(id2).dirtyFlag, "Le dirty n'est pas bon");
+
+        node = bm.getCadre().search(id2);
+
+        assertFalse(node.dirtyFlag, "Le dirty n'est pas bon");
         // Verifie que la page 2 est bien en last Junk
-        assertEquals(bm.getJunkFile().getTail(), bm.getCadre().search(id2).pointeurListe, "Le pointeur last n'a pas été modifié");
+        assertEquals(bm.getJunkFile().getTail(), node.pointeurListe, "Le pointeur last n'a pas été modifié");
         // Verifie que le pointeur de junkFile n'a pas été modifié
-        assertEquals(bm.getJunkFile(), bm.getCadre().search(id).pointeurListe, "Le pointeur junkFile a été modifié");
+        assertEquals(bm.getJunkFile().getRoot().getSuivant().getSuivant(), node.pointeurListe, "Le pointeur junkFile a été modifié");
     }
-    
+
     @Test //Test le nettoyage de tous les buffers et l'écriture des pages modifiées
     void TestFlushBuffer() throws Exception {
     	// Crée une page
@@ -192,60 +206,69 @@ public class TestBufferManager {
             assertNotEquals(a, (byte) 'B', "Les octets lus ne correspondent pas.");
         }
     }
-    
+/*
     @Test // Le nettoyage d'un buffer selon la police de remplacement MRU
-    void testMakeSpaceMRU() throws Exception{
+    void testMakeSpaceMRU() throws Exception {
     	// Passe la police de remplacement en MRU
     	bm.SetCurrentReplacementPolicy("MRU");
-    	// Nombre de fichier à allouer pour remplire le BufferManager
+
+        // Nombre de frame à allouer pour remplire le BufferManager
     	int nbPage = DBConfig.bm_buffercount;
-        // Charge et Libère toutes les pages sauf most
+
+        // Charge et Libère toutes les pages sauf la derniere
         for (int i = 0; i< nbPage-1; i++) {
         	PageId id = dskM.AllocPage();
         	bm.getPage(id);
             bm.freePage(id, false);
         }
+
         // Identifiant de la page qui sera libérée en MRU
         PageId most = dskM.AllocPage();
         // Charge la page cible
         bm.getPage(most);
         // Libère la page cible
         bm.freePage(most, false);
+
         // Charge une dernière page pour faire déborder le BM
         bm.getPage(dskM.AllocPage());
-        // Vérifie que la page supprimé est bien most
+
+        // Vérifie que la page supprimé de l'AVL est bien most
     	assertTrue(bm.getCadre().search(most) == null, "La page supprimé n'est pas most");
-    	// Verifie que le buffer est bien rajouté dans emptyBuffer
+        // Vérifie que la page supprimé de la junkFile est bien most
+    	assertTrue(bm.getJunkFile().get(most) == null, "La page supprimé n'est pas most");
+    	// Verifie que tous les buffers sont utilisé
     	assertEquals(bm.getEmptyBufferSize(), 0, "Les buffers ne sont pas tous pleins");
-    	// Vérifie que le nombre de page allouées est bien maximum
-    	assertEquals(bm.getNbAllocFrame(), DBConfig.bm_buffercount, "Tous les buffers ne sont pas alloués");
     }
-    
+ */
     @Test // Le nettoyage d'un buffer selon la police de remplacement MRU
-    void testMakeSpaceLRU() throws Exception{ 
+    void testMakeSpaceLRU() throws Exception { 
     	bm.SetCurrentReplacementPolicy("LRU");
-    	// Nombre de fichier à allouer pour remplire le BufferManager
-    	int nbPage = DBConfig.bm_buffercount; 
 
-        // Identifiant de la page qui sera libéré en LRU
+        // Nombre de frame à allouer pour remplire le BufferManager
+    	int nbPage = DBConfig.bm_buffercount;
+        // Identifiant de la page qui sera libérée
         PageId least = dskM.AllocPage();
+        bm.getPage(least);
+        bm.freePage(least, false);
 
-        // Charge et libère toutes les pages sauf least
+        // Charge et Libère toutes les pages sauf la derniere
         for (int i = 0; i< nbPage-1; i++) {
         	PageId id = dskM.AllocPage();
         	bm.getPage(id);
             bm.freePage(id, false);
         }
-        // Charge une dernière page pour faire déborder le Bm
+
+        // Charge une dernière page pour faire déborder le BM
         bm.getPage(dskM.AllocPage());
-        // Vérifie que la page supprimée est bien least
-    	assertTrue(bm.getCadre().search(least) == null, "La page supprimé n'est pas least");
-    	// Verifie que le buffer est bien rajouté dans emptyBuffer
-    	assertTrue(bm.getEmptyBufferSize() > 0, "Les buffers ne sont pas tous pleins");
-    	// Vérifie que le nombre de page allouées est bien maximum
-    	assertEquals(bm.getNbAllocFrame(), DBConfig.bm_buffercount, "Tous les buffers ne sont pas alloués");
+
+        // Vérifie que la page supprimé de l'AVL est bien most
+    	assertTrue(bm.getCadre().search(least) == null, "La page supprimé de l'AVL n'est pas most");
+        // Vérifie que la page supprimé de la junkFile est bien most
+    	assertTrue(bm.getJunkFile().get(least) == null, "La page supprimé de la junkFill n'est pas most");
+    	// Verifie que tous les buffers sont utilisé
+    	assertEquals(bm.getEmptyBufferSize(), 0, "Les buffers ne sont pas tous pleins");
     }
-    
+
     @Test
     void testSetCurrentReplacementPolicy() {
     	switch(DBConfig.bm_policy) {

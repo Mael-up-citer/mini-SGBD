@@ -58,7 +58,7 @@ public class BufferManager {
         	// Si la page était dans junkFile, on l'enlève
             if(node.pointeurListe != null) {
                 nbAllocFrame++;
-                suppJunk(node.pointeurListe); // Retire de junkFile
+                suppJunk(node); // Retire de junkFile
             }
             return buffer;  // Retourne le buffer
         }
@@ -95,7 +95,7 @@ public class BufferManager {
      * @param node Le noeud à ajouter à la junkFile.
      */
     private void ajoutJunk(AVLNode node){
-        junkFile.add(node.id);   // Ajoute le PageId dans la junkFile
+        node.pointeurListe = junkFile.add(node.id);   // Ajoute le PageId dans la junkFile
     }
 
     /**
@@ -110,12 +110,13 @@ public class BufferManager {
     /**
      * Enlève un PageId de la liste de ceux qui peuvent être supprimés.
      * 
-     * @param l La liste des éléments à enlever.
+     * @param elmt La liste des éléments à enlever.
      * @throws Exception Si une erreur survient lors de la suppression de l'élément.
      */
-    private void suppJunk(MyLinkedList.Cellule<PageId> l) throws Exception{
+    private void suppJunk(AVLNode node) throws Exception {
         // Retirer la première cellule de la junkFile
-        junkFile.remove(l.getValue());  
+        junkFile.remove(node.pointeurListe.getValue());
+        node.pointeurListe = null;
     }
 
     /**
@@ -124,17 +125,17 @@ public class BufferManager {
     private void makeSpace() throws Exception {
         ByteBuffer buffer = null; // Pointeur vers le buffer
         PageId id = null; // Identifiant de la page à éjecter
-        AVLNode noeud = null;
+        AVLNode noeud = null;   // noeud de la page dans l'AVL
 
         switch (DBConfig.bm_policy){
             case "MRU":
-                id = junkFile.remove().getValue();  // Prendre le dernier élément de la junkFile (MRU)
+                id = junkFile.getTail().getValue();  // Prendre le dernier élément de la junkFile
                 noeud = cadre.delete(id);  // Enlève la frame associée dans le bufferPool
+                junkFile.removeFromTail();  // Supprime le premier élément
                 break;
             case "LRU":
-                id = junkFile.getRoot().getSuivant().getValue();  // Prendre le premier élément de la junkFile (LRU)
+                id = junkFile.remove().getValue();  // Prendre le premier élément de la junkFile
                 noeud = cadre.delete(id);  // Enlève la frame associée dans le bufferPool
-                junkFile.remove(junkFile.getRoot().getSuivant().getValue());  // Supprime le premier élément
                 break;
             default:
                 throw new Exception("La politique de remplacement '"+DBConfig.bm_policy+"' n'a pas d'implémentation");
