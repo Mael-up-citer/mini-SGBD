@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * Chaque noeud contient un identifiant de page (PageId), un pointeur vers un buffer, 
  * un indicateur de modification (dirtyFlag) et un compteur de référence (pin_count).
  */
-class AVLNode{
+class AVLNode {
     PageId id;  // Identifiant de la page associée au noeud
     AVLNode left;   // Pointeur vers le fils gauche
     AVLNode right;  // Pointeur vers le fils droit
@@ -14,7 +14,7 @@ class AVLNode{
     ByteBuffer buffer; // Pointeur vers un ByteBuffer pour la page
     boolean dirtyFlag = false; // Indicateur pour savoir si la page a été modifiée
     int pin_count; // Nombre d'utilisations en cours de la page
-    Liste pointeurListe;    // Pointeur vers l'adresse dans la JunkFile
+    MyLinkedList.Cellule<PageId> pointeurListe; // Pointeur vers l'emplacement dans la JunkFile (MyLinkedList)
 
     /**
      * Constructeur pour un noeud AVL.
@@ -29,7 +29,7 @@ class AVLNode{
         pin_count = 1; // Nombre d'utilisations en cours de la page
     }
 
-        /**
+    /**
      * Constructeur pour un noeud AVL.
      * 
      * @param id L'identifiant de la page associée au noeud

@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.regex.*;
@@ -26,14 +27,18 @@ public class SGBD {
      */
     SGBD(DBConfig dbc) {
         this.dbc = dbc;
-        try{
+        try {
             dskM = DiskManager.getInstance();  // Initialisation du gestionnaire de disque
-
             dskM.loadState();   // Chargement de l'état du disque
+
+            System.err.println("iciii: "+dskM.getCurrentCountAllocPages());
+
             bm = new BufferManager(dbc, dskM); // Initialisation du gestionnaire de buffers
             dbM = new DBManager(dbc, dskM, bm);  // Initialisation du gestionnaire de base de données
             dbM.loadState();    // Chargement de l'état des bases de données
-        } catch(Exception e){
+
+        } catch(Exception e) {
+            e.printStackTrace();
             System.out.println(e.getMessage());
         }
         initializeCOMMANDMAP();
@@ -77,13 +82,14 @@ public class SGBD {
             System.exit(-1);
         }
         DBConfig dbc = DBConfig.loadConfig(args[0]+"config.txt");  // Initialisation de la configuration de la base de données
+        File dossier = new File(DBConfig.dbpath+"/BinData");
+        dossier.mkdir();
 
         // Vérification de la validité du chemin de la base de données
         if (!DBConfig.testDbpath()) {
             System.out.println("Erreur: le chemin: " + DBConfig.dbpath + " n'est pas un chemin valide sur votre machine");
             System.exit(-2);
         }
-
         SGBD sgbd = null;
 
         // Tentative d'initialisation du SGBD
@@ -134,7 +140,6 @@ public class SGBD {
 
             String command = string[0];             // La commande
             String settings = string[1];            // Les arguments associés à la commande
-
             // Recherche dans la table de dispatching pour trouver la méthode correspondante
             Consumer<String> handler = COMMANDMAP.get(command);
 
@@ -246,7 +251,7 @@ public class SGBD {
             // Étape 2: Enlever les parenthèses extérieures
             if (param.startsWith("(") && param.endsWith(")"))
                 param = param.substring(1, param.length() - 1).trim();  // Supprime les parenthèses extérieures
-            
+                
             // Crée une liste d'attribut qu'on initialise avec parseRelation qui a pour but de convertir une chaine de caractère en Pair<attribut, longueur>
             ArrayList<Pair<String, Data>> attribut = parseRelation(param);
             // Instancie la relation avec les variables précédente
@@ -288,8 +293,6 @@ public class SGBD {
             
             String attName = parts[0].trim(); // Nom de l'attribut
             String typePart = parts[1].trim(); // Type de l'attribut
-            
-            System.out.println(typePart);
 
             // Extraire le type (avant la parenthèse si elle existe)
             DataType type = DataType.valueOf(typePart.split("\\(")[0].trim());
@@ -359,6 +362,8 @@ public class SGBD {
     private void processDROPDATABASESCommand(){
         try {
             dbM.RemoveDatabases();
+            //dskM.RAZ();
+            bm.flushBuffers();
             System.out.println("les bases de données on toutes disparu");
         } catch (Exception e) {
             System.out.println(e.getMessage());

@@ -31,7 +31,6 @@ public class DBConfig {
         for(Map.Entry<String, String> entry : configValues.entrySet())
             assignValue(entry.getKey(), entry.getValue());
 
-        // TOREAD
         // Assure que la taille maximum d'un fichier est un multiple de la taille d'une page
         dm_maxfilesize -= (dm_maxfilesize % pagesize);
     }
@@ -45,7 +44,7 @@ public class DBConfig {
     public static DBConfig loadConfig(String configFile){
         // Lire le contenu du fichier de configuration
         String content = readConfigFile(configFile);
-
+       
         if (content != null){
             // Analyser le contenu du fichier pour créer un Map des valeurs de configuration
             Map<String, String> configValues = parseConfig(content);
@@ -82,13 +81,13 @@ public class DBConfig {
         String[] lines = content.split("\n"); // Séparer le contenu en lignes
 
         // Itérer sur chaque ligne pour extraire les paires clé-valeur
-        for (String line : lines){
+        for (String line : lines) {
             line = line.trim(); // Enlever les espaces en début et fin de ligne
 
             if(!line.isEmpty()){ // Vérifie que la ligne n'est pas vide
                 String[] parts = line.split("=", 2); // Diviser la ligne en clé et valeur
 
-                if(parts.length == 2){
+                if(parts.length == 2) {
                     String key = parts[0].trim(); // Extraire la clé
                     String value = parts[1].trim().replace("'", "").replace("\"", ""); // Extraire et nettoyer la valeur
                     configValues.put(key, value); // Ajouter la paire clé-valeur au Map

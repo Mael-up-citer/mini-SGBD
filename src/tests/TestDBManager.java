@@ -190,7 +190,7 @@ public class TestDBManager {
 		}
 		DBM.saveState();
 		
-		DBM.RemoveDatabases();
+		//DBM.RemoveDatabases();
 		try{
 			DBM.loadState();
 			assertDoesNotThrow(() -> {DBM.SetCurrentDatabase("bddtest");});

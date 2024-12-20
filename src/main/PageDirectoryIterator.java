@@ -26,6 +26,7 @@ public class PageDirectoryIterator {
         this.bm = bm;                // Assignation du gestionnaire de buffer
 
         PageId tmp = relation.getHeaderPageId();    // Récupère l'@ de la première hearder Page
+
         currentPageId.FileIdx = tmp.FileIdx;
         currentPageId.PageIdx = tmp.PageIdx;
 

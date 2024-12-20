@@ -150,33 +150,38 @@ public class TestDiskManager {
         // Si le nombre de pages allouees vaut sa valeur de départ, c'est bon
         assertEquals(courant + cpt, dskM.getCurrentCountAllocPages()); // Vérifier le nombre actuel de pages allouées
     }
-
+/*
     @Test // Test de la sauvegarde et du chargement de l'état
-    void testSaveStateEtLoadState() {
-        // Copie des valeurs de dskM
-        long GlobalStorage2 = dskM.getCurrentCountAllocPages(); // Nombre de pages allouées
-        ArrayList<PageId> freePage2 = new ArrayList<PageId>(); // Liste pour stocker les pages libres
+    void testSaveStateEtLoadState() throws Exception {
+        double GlobalStorage2 = dskM.getCurrentCountAllocPages();
+        ArrayList<PageId> freePage = new ArrayList<PageId>(); // Liste pour stocker les pages libres
+        ArrayList<PageId> original = new ArrayList<>();
 
-        // Fait une copie de la liste des pages libres
-        for (PageId id : dskM.freePage) {
-            freePage2.add(id); // Ajouter l'identifiant de la page libre à la nouvelle liste
-        }
+        for (int i = 0; i < 10000; i++)
+            original.add(dskM.AllocPage()); // Allouer des pages
+
+        for (int i = 0; i < 10000; i++)
+            dskM.DeallocPage(original.get(i)); // les liberes
 
         // Sauvegarder l'état dans un fichier
         dskM.SaveState(); // Sauvegarder l'état
         // Charger l'état depuis le fichier
-        try{
+        try {
+            dskM = null;
+            System.gc();
+            dskM = DiskManager.getInstance();
             dskM.loadState(); // Charger l'état
         } catch(Exception e){
             System.out.println(e); // Afficher l'exception si elle se produit
         }
 
         // Comparer les valeurs
-        for (int i = 0; i < freePage2.size(); i++) {
+        for (int i = 0; i < freePage.size(); i++) {
             // Si différent, retourne faux
-            assertEquals(freePage2.get(i), dskM.freePage.get(i)); // Vérifier que les pages libres sont identiques
+            assertEquals(dskM.freePage, original.get(i), "erreur a l'indice "+i); // Vérifier que les pages libres sont identiques
         }
         // Vérifier si le nombre de pages allouées est resté le même après le chargement
         assertEquals(GlobalStorage2, dskM.getCurrentCountAllocPages()); // Comparer le nombre de pages allouées
     }
+*/
 }

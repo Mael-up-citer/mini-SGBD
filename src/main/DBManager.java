@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,14 +95,15 @@ public class DBManager {
     	}
     	// Récupère la table à modifier
     	Relation rel = GetTableFromCurrentDatabase(nomTable);
-    	// Vérifie qu'il y a le bon nombre de valeur à ajouter
+
+		// Vérifie qu'il y a le bon nombre de valeur à ajouter
     	if(valeurs.length != rel.getNbAttribut()) {
     		throw new IllegalArgumentException("Le nombre d'arguments n'est pas égal au nombre requis pour cette table : " + rel.getNbAttribut());
     	}
     	// Initialise le record à insérer
     	MyRecord rec = new MyRecord();
     	// Ajoute chaque valeur et le son type attendu dans le record
-    	for(int i = 0; i<rel.getNbAttribut(); i++) {
+    	for(int i = 0; i < rel.getNbAttribut(); i++) {
     		switch(rel.getType(i)) {
     		case INT:
                 rec.add(Integer.valueOf(valeurs[i]), rel.getType(i));
@@ -125,12 +127,14 @@ public class DBManager {
     	}
     	//Insère le record
     	RecordId rid = rel.InsertRecord(rec);
+/*
     	// Vérifie si la relation a des index
     	if(listeIndex.get(nomTable.toUpperCase()).size() > 0) {
     		for(int index : listeIndex.get(nomTable.toUpperCase()).keySet()) {
     			listeIndex.get(nomTable.toUpperCase()).get(index).addRecord(rec.get(index).getFirst(), rid);
     		}
     	}
+*/
     }
     
     /**
@@ -141,7 +145,8 @@ public class DBManager {
      */
     public void BulkInsertIntoCurrentDatabase(String nomTable, String nomFichier) throws Exception {
     	// Lis le fichier contenant les données
-    	String insert = readFichier(DBConfig.dbpath + nomFichier);
+    	String insert = readFichier(nomFichier);
+
     	// Sépare les données en lignes
     	String[] lines = insert.split("\n");
     	// Chaque ligne représente un insert
@@ -294,11 +299,25 @@ public class DBManager {
     /**
      * Supprime toutes les Bases de Données existantes
      */
-    public void RemoveDatabases(){
+    public void RemoveDatabases() throws IOException {
     	// Vide le stockage courant
     	current = null;
     	// Vide la liste des Base de Données
     	listeDatabase.clear();
+
+		// Supprime tous les fichiers
+    	Files.deleteIfExists(Paths.get(DBConfig.dbpath + "dm.save"));
+
+		int i = 0;
+		while (true) {
+			if(Files.exists(Paths.get(DBConfig.dbpath + "BinData/F"+i+".rsdb"))) {
+				Files.delete(Paths.get(DBConfig.dbpath + "BinData/F"+i+".rsdb"));
+				i++;
+			}
+			else {
+				break;
+			}
+		}
     }
 
     /**
@@ -311,7 +330,7 @@ public class DBManager {
         for(String i : listeDatabase.keySet())
         	System.out.println(i);
     }
-    
+
     /**
      * Affiche la liste des tables de la Base de Données courante
      */
@@ -395,14 +414,12 @@ public class DBManager {
     public void loadState() throws IOException{
     	HashMap<String, Relation> DatabaseEnCours = null;
     	Relation RelationEnCours = null;
+		String save = null;
 
+		if (Files.exists(Paths.get(DBConfig.dbpath + "/databases.save")))
+        	save = readFichier(DBConfig.dbpath + "/databases.save");
 
-        String save = readFichier(DBConfig.dbpath + "/databases.save");
-
-        if(save == null) {
-        	throw new IOException("La sauvegarde est vide");
-        }
-        else {
+        if(save != null) {
         	String[] lines = save.split("\n");
         	for(String line : lines) {
         		line = line.trim(); // Enlever les espaces en début et fin de ligne
@@ -424,6 +441,7 @@ public class DBManager {
         					 }else {
         						 String[] infos = parts[1].trim().split(";", 3);
         						 String nomRel = infos[0].trim();
+								 listeIndex.put(nomRel, new HashMap<>());
         						 PageId headerPage = new PageId(Integer.parseInt(infos[1].trim()), Integer.parseInt(infos[2].trim()));
         						 Relation rel = new Relation(nomRel, new ArrayList<>(), headerPage, dskm, bm);
         						 DatabaseEnCours.put(nomRel, rel);

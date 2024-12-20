@@ -7,13 +7,12 @@ import java.util.ArrayList;
  * ainsi que pour gérer les politiques de remplacement des buffers. Il utilise un arbre AVL pour stocker les 
  * pages en mémoire et une liste de junkFile pour gérer les pages à libérer lorsque le pool est plein.
  */
-public class BufferManager{
+public class BufferManager {
     private DBConfig dbc;  // Configuration de la base de données
     private DiskManager dskM;  // Gestionnaire des disques
     private AVL cadre = new AVL();  // Pool de buffers (structure de l'arbre AVL)
-    private Liste junkFile; // Liste des éléments à libérer (pages qui ne sont plus utilisées)
-    private Liste last; // Pointeur vers le premier élément de la junkFile
-    private ArrayList<ByteBuffer> emptyBuffer = new ArrayList<ByteBuffer>();  // Liste des buffers vides disponibles
+    private MyLinkedList<PageId> junkFile = new MyLinkedList<>(); // Liste des éléments à libérer (pages qui ne sont plus utilisées)
+    private ArrayList<ByteBuffer> emptyBuffer = new ArrayList<>();  // Pile des buffers vides disponibles
     private int nbAllocFrame = 0;   // Nombre de frame occupé dans l'AVL
 
     /**
@@ -45,7 +44,7 @@ public class BufferManager{
                 makeSpace();    // Libère de l'espace
 
         	// Recupere le dernier buffer vide
-            ByteBuffer tmp = emptyBuffer.remove(emptyBuffer.size() - 1);
+            ByteBuffer tmp = emptyBuffer.remove(emptyBuffer.size()-1);;  // recupère le dernier buffer vide
             dskM.ReadPage(id, tmp);
             cadre.insert(new AVLNode(id, tmp)); // Insère le nouveau noeud dans l'arbre
             nbAllocFrame++; // L'AVL à une frame de plus
@@ -96,18 +95,7 @@ public class BufferManager{
      * @param node Le noeud à ajouter à la junkFile.
      */
     private void ajoutJunk(AVLNode node){
-    	//Si la liste est vide, on crée le premier maillon
-    	if(junkFile == null) {
-    		junkFile = new Liste(node.id);
-    		//Initialise le pointeur du noeud vers son maillon de chaîne
-    		node.pointeurListe = junkFile;
-    		//Initialise le pointeur du début de la JunkFile
-    		last = junkFile;
-    	}
-        else {
-    		node.pointeurListe = junkFile.add(new Liste(node.id));   // Ajoute l'élément à enlever dans la junkFile
-    		last = node.pointeurListe;
-        }
+        junkFile.add(node.id);   // Ajoute le PageId dans la junkFile
     }
 
     /**
@@ -125,14 +113,9 @@ public class BufferManager{
      * @param l La liste des éléments à enlever.
      * @throws Exception Si une erreur survient lors de la suppression de l'élément.
      */
-    private void suppJunk(Liste l) throws Exception{
-    	cadre.search(l.id).pointeurListe = null;
-        junkFile = l.remove();   // Retire l'élément de la JunkFile
-        //Si l'élement est le premier de la liste
-    	if(l == last) {
-    		//Met le pointeur au maillon suivant
-    		last = junkFile;
-    	}
+    private void suppJunk(MyLinkedList.Cellule<PageId> l) throws Exception{
+        // Retirer la première cellule de la junkFile
+        junkFile.remove(l.getValue());  
     }
 
     /**
@@ -145,14 +128,13 @@ public class BufferManager{
 
         switch (DBConfig.bm_policy){
             case "MRU":
-                id = last.id;
+                id = junkFile.remove().getValue();  // Prendre le dernier élément de la junkFile (MRU)
                 noeud = cadre.delete(id);  // Enlève la frame associée dans le bufferPool
-                last = last.remove();  // Supprime le dernier élément
                 break;
             case "LRU":
-                id = junkFile.id;
-                noeud = cadre.delete(id); // Enlève la frame associée dans le bufferPool
-                junkFile = junkFile.remove();  // Supprime le premier élément
+                id = junkFile.getRoot().getSuivant().getValue();  // Prendre le premier élément de la junkFile (LRU)
+                noeud = cadre.delete(id);  // Enlève la frame associée dans le bufferPool
+                junkFile.remove(junkFile.getRoot().getSuivant().getValue());  // Supprime le premier élément
                 break;
             default:
                 throw new Exception("La politique de remplacement '"+DBConfig.bm_policy+"' n'a pas d'implémentation");
@@ -174,9 +156,9 @@ public class BufferManager{
      * Alloue un certain nombre de buffers.
      */
     private void initBufferPool(){
-        // Alloue n buffers dans la liste
+        // Alloue n buffers dans la pile
         for(int i = 0; i < DBConfig.bm_buffercount; i++)
-            emptyBuffer.add(ByteBuffer.allocate(DBConfig.pagesize));    // Ajoute dans la liste un buffer de la taille d'une page
+            emptyBuffer.add(ByteBuffer.allocate(DBConfig.pagesize));    // Ajoute dans la pile un buffer de la taille d'une page
     }
 
     /**
@@ -220,16 +202,7 @@ public class BufferManager{
      * 
      * @return le pointeur vers le premier élément de la JunkFile
      */
-    public Liste getJunkFile() {
+    public MyLinkedList<PageId> getJunkFile() {
     	return junkFile;
-    }
-    
-    /**
-     * Répère le pointeur vers le dernier élément de la JunkFile
-     * 
-     * @return le pointeur vers le dernier élément de la JunkFile
-     */
-    public Liste getLast() {
-    	return last;
     }
 }

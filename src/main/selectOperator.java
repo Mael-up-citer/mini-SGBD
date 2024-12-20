@@ -1,3 +1,4 @@
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 /**
@@ -33,8 +34,24 @@ public class selectOperator implements IRecordIterator {
         this.bm = bm;
         this.conditions = conditions;
 
-        // Réinitialise les itérateurs pour démarrer la lecture.
-        Reset();
+        // Initialise les itérateurs pour démarrer la lecture.
+        // Charge la première page et initialise un itérateur pour ses enregistrements.
+        PageId id = pageIterator.GetNextDataPageId();
+
+        // Si la relation est vide
+        if (id == null)
+            tupleIterator = null;   // Pas d'iterateur de tuple sur une relation vide
+        else {
+            try {
+                // Crée un nouvel itérateur pour les enregistrements de la première page.
+                tupleIterator = new DataPageHoldRecordIterator(relation, bm.getPage(id), bm, id);
+            } catch (Exception e) {
+                e.printStackTrace();
+                // Si une erreur survient, l'itérateur de tuples est nul.
+                tupleIterator = null;
+                throw new RuntimeException("Erreur lors de la création de l'itérateur de tuple: " + e.getMessage());
+            }
+        }
     }
 
     /**

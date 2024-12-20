@@ -424,7 +424,6 @@ public class Relation {
 
         // offset de l'espace libre d'une data page dans sa header Page
         int offset = 12;
-
         try {
             // Charge la 1er Header Page en mémoire
             ByteBuffer buffer = bm.getPage(headerPageId);
@@ -791,8 +790,8 @@ public class Relation {
     /**
      * @return l'@ de la 1er header Page
      */
-    public PageId getHeaderPageId(){
-        return headerPageId;
+    public PageId getHeaderPageId() {
+        return new PageId(headerPageId.FileIdx, headerPageId.PageIdx);
     }
 
     public HashMap<String, Integer> getNameToIndex() {

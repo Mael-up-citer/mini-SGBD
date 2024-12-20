@@ -16,7 +16,8 @@ public class DiskManager {
     private static boolean instanceable = true;
 
     public ArrayList<PageId> freePage = new ArrayList<PageId>(); // Liste des pages libres
-    private long GlobalStorage = 0; // Espace global utilisé par les pages
+    private long indexFile = 0; // Espace global utilisé par les pages
+    private int cpt_page = 0; // indique dans quelle page écrire
 
     /**
      * Constructeur privé pour empêcher l'instanciation externe.
@@ -45,7 +46,9 @@ public class DiskManager {
     }
 
     public void RAZ() {
-        GlobalStorage = 0;
+        indexFile = 0;
+        cpt_page = 0;
+        freePage = new ArrayList<PageId>(); // Liste des pages libres
     }
 
     /**
@@ -64,16 +67,17 @@ public class DiskManager {
         }
         else {
             // Calculer l'index du fichier en fonction de l'espace global alloué
-            id.FileIdx = (int) (GlobalStorage / DBConfig.dm_maxfilesize);
+            id.FileIdx = (int) (indexFile / DBConfig.dm_maxfilesize);
             ByteBuffer buffer = ByteBuffer.allocate(DBConfig.pagesize); // Créer un buffer pour la nouvelle page
 
             // Calculer l'index de la page en fonction de l'espace global
-            id.PageIdx = (int) (GlobalStorage / DBConfig.pagesize) - (id.FileIdx * (DBConfig.dm_maxfilesize / DBConfig.pagesize));
+            id.PageIdx = (int) (indexFile / DBConfig.pagesize) - (id.FileIdx * (DBConfig.dm_maxfilesize / DBConfig.pagesize));
 
             // Écrire la page dans le fichier
             WritePage(id, buffer); // L'exception sera propagée à l'appelant
         }
-        GlobalStorage += DBConfig.pagesize; // Mettre à jour l'espace global
+        indexFile += DBConfig.pagesize; // Mettre à jour l'espace global
+        cpt_page ++; // Mettre à jour l'espace global
         return id;
     }
 
@@ -141,7 +145,7 @@ public class DiskManager {
      */
     public void DeallocPage(PageId id) {
         freePage.add(id); // Ajouter l'ID de la page à la liste des pages libres
-        GlobalStorage -= DBConfig.pagesize; // Mettre à jour l'espace global
+        cpt_page --; // Mettre à jour l'espace global
     }
 
     /**
@@ -150,7 +154,7 @@ public class DiskManager {
      * @return Le nombre de pages allouées.
      */
     public int getCurrentCountAllocPages() {
-        return (int) (GlobalStorage / DBConfig.pagesize);
+        return cpt_page;
     }
 
     /**
@@ -163,7 +167,8 @@ public class DiskManager {
         try (RandomAccessFile raf = new RandomAccessFile(cheminFichier, "rw");
              FileChannel channel = raf.getChannel()) {
 
-            raf.writeLong(GlobalStorage); // Sauvegarder l'espace global alloué
+                raf.writeLong(indexFile); // Sauvegarder l'espace global alloué
+                raf.writeInt(cpt_page); // Sauvegarder l'espace global alloué
 
             // Sauvegarder la liste des pages libres
             for (PageId pageId : freePage) {
@@ -186,7 +191,8 @@ public class DiskManager {
 
         try (RandomAccessFile raf = new RandomAccessFile(cheminFichier, "rw")) {
             if (raf.length() != 0) {
-                GlobalStorage = raf.readLong(); // Charger l'espace global alloué
+                indexFile = raf.readLong(); // Charger l'espace global alloué
+                cpt_page = raf.readInt(); // Charger l'espace global alloué
 
                 // Charger la liste des pages libres
                 while (raf.getFilePointer() < raf.length()) {

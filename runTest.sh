@@ -2,7 +2,7 @@
 #!/bin/bash
 
 # Défini la variable du nom de la classe de test
-nom="TestDiskManager"
+nom="TestBufferManager"
 
 # Défini si on lance tout les tests ensemble ou non: oui si: "--scan-class-path" non si: "--select-class""$nom"
 # option="--scan-class-path"

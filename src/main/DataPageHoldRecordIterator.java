@@ -35,9 +35,7 @@ public class DataPageHoldRecordIterator implements IRecordIterator {
     DataPageHoldRecordIterator(Relation relation, ByteBuffer buffer, BufferManager bm, PageId dataPageId) throws Exception {
         this.relation = relation;  // Initialisation de la relation
         this.bm = bm;  // Initialisation du gestionnaire de buffer
-
         this.dataPageId = dataPageId;  // Initialisation de l'identifiant de la page de données
-
         this.buffer = buffer;
 
         // Extrait le nombre de records dans la page

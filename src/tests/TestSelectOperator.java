@@ -71,7 +71,7 @@ public class TestSelectOperator {
         // Récupérer les enregistrements qui satisfont les conditions
         ArrayList<MyRecord> selectedRecords = new ArrayList<>();
         MyRecord record;
-        
+  
         while ((record = selectOperator.GetNextRecord()) != null)
             selectedRecords.add(record);
 
