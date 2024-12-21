@@ -104,7 +104,8 @@ public class DBManager {
     	MyRecord rec = new MyRecord();
     	// Ajoute chaque valeur et le son type attendu dans le record
     	for(int i = 0; i < rel.getNbAttribut(); i++) {
-    		valeurs[i] = valeurs[i].trim(); // Enlever les espaces superflus autour de chaque attribut
+    		valeurs[i] = valeurs[i].trim(); // Enlever les espaces superflus autour de chaque valeurs
+    		// Retire les guillements
             while(valeurs[i].startsWith("\"") || valeurs[i].endsWith("\"")) {
             	if(valeurs[i].startsWith("\"")) {
             		valeurs[i] = valeurs[i].substring(1, valeurs[i].length());
@@ -135,13 +136,13 @@ public class DBManager {
     	}
     	//Insère le record
     	RecordId rid = rel.InsertRecord(rec);
-/*
+    	
     	// Vérifie si la relation a des index
     	if(listeIndex.get(nomTable.toUpperCase()).size() > 0) {
     		for(int index : listeIndex.get(nomTable.toUpperCase()).keySet()) {
     			listeIndex.get(nomTable.toUpperCase()).get(index).addRecord(rec.get(index).getFirst(), rid);
     		}
-    	}*/
+    	}
     }
     
     /**
