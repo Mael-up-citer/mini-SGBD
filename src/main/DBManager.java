@@ -113,9 +113,7 @@ public class DBManager {
                 break;
             case CHAR:
             case VARCHAR:
-            	if(valeurs[i].startsWith("\"") && valeurs[i].endsWith("\"")) {
-        			valeurs[i] = valeurs[i].substring(1, valeurs[i].length()-1);
-    			}
+            	
             	rec.add(valeurs[i], rel.getType(i));
             	break;
             case DATE:
@@ -133,8 +131,7 @@ public class DBManager {
     		for(int index : listeIndex.get(nomTable.toUpperCase()).keySet()) {
     			listeIndex.get(nomTable.toUpperCase()).get(index).addRecord(rec.get(index).getFirst(), rid);
     		}
-    	}
-*/
+    	}*/
     }
     
     /**
@@ -149,6 +146,7 @@ public class DBManager {
 
     	// Sépare les données en lignes
     	String[] lines = insert.split("\n");
+    	int it =1;
     	// Chaque ligne représente un insert
     	for(String line : lines) {
     		// Retire les espaces en trop 
@@ -156,11 +154,20 @@ public class DBManager {
     		// Extrait les valeurs séparées par des virgules
     		String[] valeurs = line.split("\\s*,\\s*");
     		// Traite les valeurs à insérer une par une
-            for (String valeur : valeurs) {
-                valeur = valeur.trim(); // Enlever les espaces superflus autour de chaque attribut
+            for (int i =0; i< valeurs.length; i++) {
+                valeurs[i] = valeurs[i].trim(); // Enlever les espaces superflus autour de chaque attribut
+            	while(valeurs[i].startsWith("\"") || valeurs[i].endsWith("\"")) {
+            		if(valeurs[i].startsWith("\"")) {
+            			valeurs[i] = valeurs[i].substring(1, valeurs[i].length());
+            		}
+            		if(valeurs[i].endsWith("\"")) {
+            			valeurs[i] = valeurs[i].substring(0, valeurs[i].length()-1);
+            		}
+    			}
             }
             // Insert la ligne
             InsertIntoCurrentDatabase(nomTable, valeurs);
+            it++;
     	}
     }
     
@@ -304,20 +311,6 @@ public class DBManager {
     	current = null;
     	// Vide la liste des Base de Données
     	listeDatabase.clear();
-
-		// Supprime tous les fichiers
-    	Files.deleteIfExists(Paths.get(DBConfig.dbpath + "dm.save"));
-
-		int i = 0;
-		while (true) {
-			if(Files.exists(Paths.get(DBConfig.dbpath + "BinData/F"+i+".rsdb"))) {
-				Files.delete(Paths.get(DBConfig.dbpath + "BinData/F"+i+".rsdb"));
-				i++;
-			}
-			else {
-				break;
-			}
-		}
     }
 
     /**

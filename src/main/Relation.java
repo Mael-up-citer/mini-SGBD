@@ -358,8 +358,6 @@ public class Relation {
             // tantqu'on a pas toutes les data Page
             while (pageIds.size() < nbDataPage) {
 
-                //System.out.println("offset = "+offset);
-
                 // Parcourir chaque entrée d'une header Page pour lire les PageId
                 while ((pageIds.size() < nbDataPage) && (offset <= DBConfig.pagesize-(8+12))) {
                     // Lire le fileIdx et le pageIdx de l'entrée actuelle
@@ -410,7 +408,7 @@ public class Relation {
         // Calculer la taille du record son offset compris
         int recordSize = record.getSizeOctet(this) + ((attribut.size()+1) * 4);   // taille du record + la taille de son l'offset directory
 
-        //System.out.println("le record à inserer occupe "+recordSize+" octets");
+        System.out.println("le record à inserer occupe "+recordSize+" octets");
 
         // Contient la header Page courante
         PageId currentPage = new PageId();
@@ -431,28 +429,19 @@ public class Relation {
             int nbDataPage = buffer.getInt(0);
             int cpt = 0;    // Compte combien de data Page on été essayé
 
-            //System.out.println("nombre de data Page =  "+nbDataPage);
-            //System.out.println("1rst header Page =  "+headerPageId);
-            //System.out.println("last header Page =  "+LastHeaderPageId+"\n");
-
             // Label pour quitter la boucle en la nommant
             outerLoop:
             // tant qu'il reste des header Page à explorer
             while (cpt < nbDataPage) {
                 // Parcourir chaque entrée d'une header Page
                 while ((offset < DBConfig.pagesize - 8) && (cpt < nbDataPage)) {
-
-                    //System.out.println("offset = "+offset+" in header Page = "+currentPage);
-                    //System.out.println(buffer.getInt(offset)+" >= "+(recordSize + 8)+" "+((buffer.getInt(offset)) >= (recordSize + 8)));
-
+                	
                     // Si l'espace libre >= à la taille du record + son offset directory
                     if ((buffer.getInt(offset)) >= (recordSize + 8)) {
                         // Récupère l'@ de la data Page
                         dataPageId = new PageId();
                         dataPageId.FileIdx = buffer.getInt(offset-8);
                         dataPageId.PageIdx = buffer.getInt(offset-4);
-
-                        //System.out.println("data Page: "+dataPageId);
                         
                         // Quitte la boucle nommé
                         break outerLoop;
@@ -467,7 +456,7 @@ public class Relation {
                     buffer.getInt(DBConfig.pagesize - 8),
                     buffer.getInt(DBConfig.pagesize - 4)
                 );
-
+                
                 // Si il y a du chainage
                 if (tempNextPage.PageIdx != -1) {
                     // Libère la header Page courante
@@ -476,14 +465,11 @@ public class Relation {
                     buffer = bm.getPage(tempNextPage);
                     currentPage = tempNextPage;
 
-                    //System.out.println("switch header Page: "+currentPage);
-
                     offset = 8; // RAZ l'offset
                 }
             }
             // Si aucune data page n'a suffisamment d'espace, en ajouter une nouvelle
             if (dataPageId == null) {
-                //System.out.println("add new data Page");
 
                 // Met de coter l'ancienne derniere header Page
                 PageId tmp = new PageId(
@@ -492,11 +478,8 @@ public class Relation {
                 );
                 // Ajoute une nouvelle data page APRES la dernière header Page !
                 dataPageId = addDataPage();
-
                 // Si on a une nouvelle header Page
                 if (! tmp.equals(LastHeaderPageId)) {
-
-                    //System.out.println("new hp");
 
                     bm.freePage(tmp, false);  // Libère l'ancienne header Page
                     currentPage = LastHeaderPageId; // Met a jour current
@@ -514,13 +497,9 @@ public class Relation {
             int freeSpace = buffer.getInt(offset) - (recordSize+8);
             buffer.putInt(offset, freeSpace);
 
-            //System.out.println("pos ou ecrire l'espace libre dans la header Page = "+offset);
-            //System.out.println("espace libre après ecriture = "+freeSpace);
-            //System.out.println("id "+dataPageId);
-
             // Libere la header Page dans laquelle on va écrire
             bm.freePage(currentPage, true);
-
+            
             // 2. Modifie la data Page
             // Charge la data Page en mémoir
             buffer = bm.getPage(dataPageId);
@@ -528,12 +507,7 @@ public class Relation {
             // Insére le record dans la page sélectionnée
             int recordPos = buffer.getInt(DBConfig.pagesize - 4); // Position de l'espace libre
 
-            //System.out.println("\npage d'écriture = "+dataPageId);
-            //System.out.println("pos ecriture = "+recordPos);
-
             int writeSize = writeRecordToBuffer(record, buffer, recordPos);
-
-            //System.out.println(writeSize+"/"+recordSize);
 
             // Écrire le record dans le buffer et si on écrit pas exactement la taille du record c'est un échec
             if (writeSize != recordSize)
@@ -548,17 +522,15 @@ public class Relation {
             // récupere la position d'écriture du slotOffset
             int slotOffset = DBConfig.pagesize - 8 - (nbSlots * 8);
 
-            //System.out.println("slotOffset = "+slotOffset);
-
             buffer.putInt(slotOffset, recordPos); // Position du record
             buffer.putInt(slotOffset + 4, recordSize); // Taille du record
 
             // Actualise l'espace libre et le nombre de slots
             buffer.putInt(DBConfig.pagesize - 4, recordPos + recordSize);
-
             // Libére la page après modification
             bm.freePage(dataPageId, true); // True car la page a été modifiée
-
+           
+            bm.freePage(getHeaderPageId(), false);
             // Retourne le RecordId du record composé d'un Page ID et l'index du slot
             return new RecordId(nbSlots, dataPageId);
 

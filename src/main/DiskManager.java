@@ -2,6 +2,8 @@ import java.util.ArrayList;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.io.RandomAccessFile;
 
 /**
@@ -93,7 +95,6 @@ public class DiskManager {
 
         try (RandomAccessFile raf = new RandomAccessFile(cheminFichier, "r");
              FileChannel channel = raf.getChannel()) {
-
             // Positionner le curseur à la position de la page dans le fichier
             channel.position(id.PageIdx * DBConfig.pagesize);
 
@@ -188,7 +189,6 @@ public class DiskManager {
      */
     public void loadState() throws Exception {
         String cheminFichier = DBConfig.dbpath + "dm.save"; // Chemin du fichier de sauvegarde
-
         try (RandomAccessFile raf = new RandomAccessFile(cheminFichier, "rw")) {
             if (raf.length() != 0) {
                 indexFile = raf.readLong(); // Charger l'espace global alloué
