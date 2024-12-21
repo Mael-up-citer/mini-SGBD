@@ -34,6 +34,7 @@ public class PageOrientedJoinOperator implements IRecordIterator {
         this.bm = innerPageIt.getBm();
 
         Reset();
+        System.out.println("nb frame alloc "+bm.getNbAllocFrame());
     }
 
     /**
@@ -47,11 +48,11 @@ public class PageOrientedJoinOperator implements IRecordIterator {
      */
     @Override
     public MyRecord GetNextRecord() {
-        MyRecord res = new MyRecord();
-
+        MyRecord res;
         try {
             // Boucle principale pour trouver le prochain enregistrement qui satisfait les conditions
             do {
+                res = new MyRecord();   // Réinitialise res
                 MyRecord innRecord = innerTupleIt.GetNextRecord();
 
                 // Si on est au bout d'une data Page de la relation interne

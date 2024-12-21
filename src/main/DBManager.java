@@ -226,13 +226,13 @@ public class DBManager {
                 throw new IllegalArgumentException("Ce type de données n'est pas pris en charge par le SGBD");
         	}
     		ArrayList<RecordId> listeRid = listeIndex.get(nomRelation.toUpperCase()).get(indexRelation).getRecordId(cle);
+			for (int i = 0; i< relation.getNbAttribut(); i++) {
+				System.out.print(relation.getNameAttribut(i) + "\t");
+			}
     		for(RecordId rid : listeRid) {
     			MyRecord rec = relation.getRecordInDataPage(rid);
-    			for (int i = 0; i< relation.getNbAttribut(); i++) {
-    				System.out.print(relation.getNameAttribut(i));
-    			}
-    			System.out.println(rec.printValue());
     			System.out.println("");
+    			System.out.println(rec.printValue());
     		}
     		System.out.println("Total records = " + listeRid.size());
     	}else {
