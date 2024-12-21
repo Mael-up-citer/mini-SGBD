@@ -38,7 +38,6 @@ public class SGBD {
             dbM.loadState();    // Chargement de l'état des bases de données
 
         } catch(Exception e) {
-            e.printStackTrace();
             System.out.println(e.getMessage());
         }
         initializeCOMMANDMAP();
@@ -265,7 +264,8 @@ public class SGBD {
 
         } catch(Exception e){
             System.out.println("erreur dans la création de la table "+param);
-        }
+            e.printStackTrace();
+            }
     }
 
     /**
@@ -440,7 +440,6 @@ public class SGBD {
         	dbM.BulkInsertIntoCurrentDatabase(nomTable, nomFichier);
             System.out.println("Les valeurs du fichier" + nomFichier + " ont été ajoutés à la table " + nomTable);
     	} catch(Exception e) {
-            e.printStackTrace();
             System.out.println("Le bulkinsert n'a pas fonctionné");
     	}
     }

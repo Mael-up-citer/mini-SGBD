@@ -408,8 +408,6 @@ public class Relation {
         // Calculer la taille du record son offset compris
         int recordSize = record.getSizeOctet(this) + ((attribut.size()+1) * 4);   // taille du record + la taille de son l'offset directory
 
-        //System.out.println("le record à inserer occupe "+recordSize+" octets");
-
         // Contient la header Page courante
         PageId currentPage = new PageId();
 
@@ -503,7 +501,7 @@ public class Relation {
             // 2. Modifie la data Page
             // Charge la data Page en mémoir
             buffer = bm.getPage(dataPageId);
-
+            
             // Insére le record dans la page sélectionnée
             int recordPos = buffer.getInt(DBConfig.pagesize - 4); // Position de l'espace libre
 
