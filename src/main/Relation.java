@@ -408,7 +408,7 @@ public class Relation {
         // Calculer la taille du record son offset compris
         int recordSize = record.getSizeOctet(this) + ((attribut.size()+1) * 4);   // taille du record + la taille de son l'offset directory
 
-        System.out.println("le record à inserer occupe "+recordSize+" octets");
+        //System.out.println("le record à inserer occupe "+recordSize+" octets");
 
         // Contient la header Page courante
         PageId currentPage = new PageId();

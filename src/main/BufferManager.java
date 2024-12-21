@@ -37,6 +37,11 @@ public class BufferManager {
     public ByteBuffer getPage(PageId id) throws Exception {
         AVLNode node = cadre.search(id); // Recherche si la pageId est présente dans le buffer pool
 
+        System.out.println("\n\n---Get---");
+        System.out.println(id);
+        System.out.println(node);
+        System.out.println("junkFile = "+junkFile);
+
         // Si la page n'est pas dans le buffer pool
         if (node == null) {
         	// Si le cadre est plein, on doit libérer de l'espace selon la politique de remplacement
@@ -94,17 +99,8 @@ public class BufferManager {
      * 
      * @param node Le noeud à ajouter à la junkFile.
      */
-    private void ajoutJunk(AVLNode node){
+    private void ajoutJunk(AVLNode node) {
         node.pointeurListe = junkFile.add(node.id);   // Ajoute le PageId dans la junkFile
-    }
-
-    /**
-     * Vide les buffers et les écrit en mémoire si "dirty" est vrai.
-     * 
-     * @throws Exception Si une erreur survient lors de l'écriture des buffers.
-     */
-    public void flushBuffers() throws Exception{
-        cadre.dump(dskM, emptyBuffer);  // Écrit les buffers en mémoire
     }
 
     /**
@@ -117,6 +113,15 @@ public class BufferManager {
         // Retirer la première cellule de la junkFile
         junkFile.remove(node.pointeurListe.getValue());
         node.pointeurListe = null;
+    }
+
+    /**
+     * Vide les buffers et les écrit en mémoire si "dirty" est vrai.
+     * 
+     * @throws Exception Si une erreur survient lors de l'écriture des buffers.
+     */
+    public void flushBuffers() throws Exception{
+        cadre.dump(dskM, emptyBuffer);  // Écrit les buffers en mémoire
     }
 
     /**
@@ -135,20 +140,21 @@ public class BufferManager {
                 break;
             case "LRU":
                 id = junkFile.remove().getValue();  // Prendre le premier élément de la junkFile
+                System.out.println("enlever: "+id);
                 noeud = cadre.delete(id);  // Enlève la frame associée dans le bufferPool
                 break;
             default:
                 throw new Exception("La politique de remplacement '"+DBConfig.bm_policy+"' n'a pas d'implémentation");
         }
         // Si on ne trouve aucun noeud libérable
-        if (noeud == null) 
+        if (noeud == null)
             throw new IllegalStateException("erreur critique, plus d'espace disponible dans la buffer pool: occupation = "+nbAllocFrame+"/"+DBConfig.bm_buffercount);
 
         buffer = noeud.buffer;
         // Si la page a été modifié
-        if(noeud.dirtyFlag) {
+        if(noeud.dirtyFlag)
             dskM.WritePage(id, buffer); // L'écrit en mémoire
-        }
+
         buffer.clear(); // Réinitialise le buffer
         emptyBuffer.add(buffer); // Récupère le buffer vide ici
     }

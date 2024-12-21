@@ -41,6 +41,44 @@ class AVLNode {
         this.dirtyFlag = dirtyFlag; // Assigner le dirtyFlag
         height = 0; // Initialiser la hauteur du noeud à 0
     }
+
+    /**
+     * Constructeur pour un noeud AVL.
+     * 
+     * @param id L'identifiant de la page associée au noeud
+     * @param buffer Le buffer associé à cette page
+     */
+    AVLNode(PageId id, ByteBuffer buffer, boolean dirtyFlag, MyLinkedList.Cellule<PageId> pointeurListe){
+        this.id = id; // Assigner l'identifiant de la page
+        this.buffer = buffer; // Assigner le ByteBuffer
+        this.dirtyFlag = dirtyFlag; // Assigner le dirtyFlag
+        height = 0; // Initialiser la hauteur du noeud à 0
+        this.pointeurListe = pointeurListe;
+    }
+
+    /**
+     * Retourne une représentation sous forme de chaîne des informations du nœud AVL.
+     *
+     * @return Une chaîne contenant :
+     *         - l'identifiant de la page (id),
+     *         - la hauteur du nœud (height),
+     *         - l'indicateur de modification (dirtyFlag),
+     *         - le compteur de références (pin_count),
+     *         - la position actuelle du buffer (bufferPosition, ou -1 si le buffer est nul),
+     *         - le pointeur vers la cellule de liste (pointeurListe, ou "null" si inexistant).
+     */
+    @Override
+    public String toString() {
+        return String.format(
+            "AVLNode[id=%s, height=%d, dirtyFlag=%s, pin_count=%d, bufferPosition=%d, pointeurListe=%s]",
+            id != null ? id.toString() : "null",
+            height,
+            dirtyFlag,
+            pin_count,
+            buffer != null ? buffer.position() : -1,
+            pointeurListe != null ? pointeurListe.getValue() : "null"
+        );
+    }
 }
 
 /**
@@ -69,9 +107,8 @@ public class AVL{
      */
     private AVLNode searchNode(AVLNode node, PageId id){
         // Si le noeud est nul, la page n'a pas été trouvée
-        if(node == null) {
+        if(node == null)
             return null;
-        }
         
         // Comparaison sur FileIdx, puis sur PageIdx si nécessaire
         if(id.FileIdx < node.id.FileIdx) {
@@ -190,7 +227,8 @@ public class AVL{
             else {
                 // Le noeud à supprimer a été trouvé !
                 if (deletedNode[0] == null) {
-                    deletedNode[0] = new AVLNode(node.id, node.buffer, node.dirtyFlag); // Capture le noeud supprimé (et son buffer associé)
+                    deletedNode[0] = new AVLNode(node.id, node.buffer, node.dirtyFlag, node.pointeurListe); // Capture le noeud supprimé (et son buffer associé)
+                    node.pointeurListe = null;
                 }
                 // Si le noeud a un seul enfant ou aucun enfant
                 if (node.left == null) {
@@ -204,10 +242,10 @@ public class AVL{
                 AVLNode temp = minValueNode(node.right);
                 node.id = temp.id; // Copier les valeurs du successeur
                 node.buffer = temp.buffer; // Copier le buffer du successeur
+                node.pointeurListe = temp.pointeurListe; // Copier le buffer du successeur
                 node.right = deleteNode(node.right, temp.id, deletedNode); // Suppression récursive du successeur
             }
         }
-
         // Met à jour la hauteur du noeud actuel
         node.height = Math.max(getHeight(node.left), getHeight(node.right)) + 1;
 
