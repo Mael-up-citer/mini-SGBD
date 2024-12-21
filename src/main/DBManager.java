@@ -104,6 +104,16 @@ public class DBManager {
     	MyRecord rec = new MyRecord();
     	// Ajoute chaque valeur et le son type attendu dans le record
     	for(int i = 0; i < rel.getNbAttribut(); i++) {
+    		valeurs[i] = valeurs[i].trim(); // Enlever les espaces superflus autour de chaque attribut
+            while(valeurs[i].startsWith("\"") || valeurs[i].endsWith("\"")) {
+            	if(valeurs[i].startsWith("\"")) {
+            		valeurs[i] = valeurs[i].substring(1, valeurs[i].length());
+            	}
+            	if(valeurs[i].endsWith("\"")) {
+            		valeurs[i] = valeurs[i].substring(0, valeurs[i].length()-1);
+            	}
+    			
+            }
     		switch(rel.getType(i)) {
     		case INT:
                 rec.add(Integer.valueOf(valeurs[i]), rel.getType(i));
@@ -146,28 +156,14 @@ public class DBManager {
 
     	// Sépare les données en lignes
     	String[] lines = insert.split("\n");
-    	int it =1;
     	// Chaque ligne représente un insert
     	for(String line : lines) {
     		// Retire les espaces en trop 
     		line = line.trim();
     		// Extrait les valeurs séparées par des virgules
     		String[] valeurs = line.split("\\s*,\\s*");
-    		// Traite les valeurs à insérer une par une
-            for (int i =0; i< valeurs.length; i++) {
-                valeurs[i] = valeurs[i].trim(); // Enlever les espaces superflus autour de chaque attribut
-            	while(valeurs[i].startsWith("\"") || valeurs[i].endsWith("\"")) {
-            		if(valeurs[i].startsWith("\"")) {
-            			valeurs[i] = valeurs[i].substring(1, valeurs[i].length());
-            		}
-            		if(valeurs[i].endsWith("\"")) {
-            			valeurs[i] = valeurs[i].substring(0, valeurs[i].length()-1);
-            		}
-    			}
-            }
             // Insert la ligne
             InsertIntoCurrentDatabase(nomTable, valeurs);
-            it++;
     	}
     }
     
