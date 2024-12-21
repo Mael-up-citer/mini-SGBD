@@ -83,12 +83,14 @@ public class BufferManager {
             return false; // retourne faux pour signaler que la liberation ne c'est pas faite
 
         noeud.dirtyFlag = (valdirty || noeud.dirtyFlag); // Déclare si la page a été modifiée et si elle a déjà été modifié on laisse à true
-        noeud.pin_count--;   // Décrémenter le compteur d'utilisation
 
         // Si plus personne ne l'utilise, on l'ajoute à la junkFile
-        if(noeud.pin_count == 0) {
-            nbAllocFrame--; // Une frame de moins qui ne peut pas etre enlevé
-            ajoutJunk(noeud);   // L'ajoute à la junkFile
+        if (noeud.pin_count > 0) {
+            noeud.pin_count--;
+            if(noeud.pin_count == 0) {
+                nbAllocFrame--; // Une frame de moins qui ne peut pas etre enlevé
+                ajoutJunk(noeud);   // L'ajoute à la junkFile
+            }
         }
         // Si tout c'est bien passé return true
         return true;
