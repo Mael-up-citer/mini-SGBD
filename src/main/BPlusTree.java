@@ -437,23 +437,17 @@ public class BPlusTree {
 	 * @return La feuille contenant ou pouvant contenir l'entrée donnée
 	 */
 	private BPlusTreeLeaf rechercherFeuille(Comparable<Object> element, BPlusTreeNode depart) {
-		System.out.println("entree : " + element);
-		System.out.println(depart instanceof BPlusTreeLeaf);
-		System.out.println(depart.getCle(0));
 		// Si c'est une feuille alors cette feuille est la solution
 		if(depart instanceof BPlusTreeLeaf) {
 			return (BPlusTreeLeaf) depart;
 		}
 		// Si c'est un noeud intermédiaire, parcourt le noeud pour trouver le fils concerné par l'entrée
 		for(int i =0; i< depart.getTaille(); i++) {
-			System.out.println("Comparé to" + depart.getCle(i));
 			// Si l'entrée est inférieure à la clé, elle est contenue dans le fils avec le même indice que la clé
 			if(element.compareTo(depart.getCle(i)) < 0) {
-				System.out.println("plus petit");
 				return rechercherFeuille(element, depart.getFils(i));
 			}
 		}
-		System.out.println("le plus grand");
 		// Si l'entrée ne peut être trouvée dans aucun fils inspectés, elle pourra être trouvée dans le dernier fils
 		return rechercherFeuille(element, depart.getFils(depart.getTaille()));
 	}

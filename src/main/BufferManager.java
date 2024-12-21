@@ -37,11 +37,6 @@ public class BufferManager {
     public ByteBuffer getPage(PageId id) throws Exception {
         AVLNode node = cadre.search(id); // Recherche si la pageId est présente dans le buffer pool
 
-        System.out.println("\n\n---Get---");
-        System.out.println(id);
-        System.out.println(node);
-        System.out.println("junkFile = "+junkFile);
-
         // Si la page n'est pas dans le buffer pool
         if (node == null) {
         	// Si le cadre est plein, on doit libérer de l'espace selon la politique de remplacement
@@ -142,7 +137,6 @@ public class BufferManager {
                 break;
             case "LRU":
                 id = junkFile.remove().getValue();  // Prendre le premier élément de la junkFile
-                System.out.println("enlever: "+id);
                 noeud = cadre.delete(id);  // Enlève la frame associée dans le bufferPool
                 break;
             default:

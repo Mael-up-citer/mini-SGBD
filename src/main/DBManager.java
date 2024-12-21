@@ -229,9 +229,10 @@ public class DBManager {
     		for(RecordId rid : listeRid) {
     			MyRecord rec = relation.getRecordInDataPage(rid);
     			for (int i = 0; i< relation.getNbAttribut(); i++) {
-    				System.out.print(relation.getNameAttribut(i) + "\t\t");
+    				System.out.print(relation.getNameAttribut(i));
     			}
     			System.out.println(rec.printValue());
+    			System.out.println("");
     		}
     		System.out.println("Total records = " + listeRid.size());
     	}else {
