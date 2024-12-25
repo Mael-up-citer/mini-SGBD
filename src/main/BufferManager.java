@@ -6,6 +6,8 @@ import java.util.ArrayList;
  * Le BufferManager gère un pool de buffers, fournit des méthodes pour récupérer et libérer des pages, 
  * ainsi que pour gérer les politiques de remplacement des buffers. Il utilise un arbre AVL pour stocker les 
  * pages en mémoire et une liste de junkFile pour gérer les pages à libérer lorsque le pool est plein.
+ * @author Mael Lecene
+ * @author Maëlys Adamczak
  */
 public class BufferManager {
     private DBConfig dbc;  // Configuration de la base de données

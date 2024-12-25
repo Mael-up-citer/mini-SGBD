@@ -35,6 +35,8 @@ import java.util.List;
  *
  * <p>En cas de problème lors de la construction de l'arbre (comme une liste de relations vide), 
  * une exception est levée. Toutes les erreurs d'exécution sont capturées et affichées.</p>
+ * 
+ * @author Mael Lecene
  */
 public class TreeAlgebra {
     private RecordPrinter root; // L'opérateur en haut de l'arbre, chargé d'afficher les résultats.

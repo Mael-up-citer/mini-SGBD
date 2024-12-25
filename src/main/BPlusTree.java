@@ -2,8 +2,9 @@ import java.util.ArrayList;
 
 /**
  * Super classe abstraite répresentant un noeud d'un B+Tree. Un noeud peut être une feuille ou une branche (noeud intermédiaire)
+ * @author Maëlys Adamczak
  */
-abstract class  BPlusTreeNode{
+abstract class  BPlusTreeNode {
 	// Père du noeud
 	private BPlusTreeBranch pere;
 	
@@ -59,6 +60,7 @@ abstract class  BPlusTreeNode{
 
 /**
  * Classe représentant une feuille d'un B+Tree
+ * @author Maëlys Adamczak
  */
 class BPlusTreeLeaf extends BPlusTreeNode{
 	// Liste des entrées de la Feuille
@@ -182,6 +184,7 @@ class BPlusTreeLeaf extends BPlusTreeNode{
 
 /**
  * Classe correspondant à une branche ou noeud intermédiaire
+ * @author Maëlys Adamczak
  */
 class BPlusTreeBranch extends BPlusTreeNode{
 	// Liste des fils de ce noeud
@@ -308,6 +311,7 @@ class BPlusTreeBranch extends BPlusTreeNode{
 
 /**
  * Classe Représentant un B+Tree
+ * @author Maëlys Adamczak
  */
 public class BPlusTree {
 	// Noeud racine du B+Tree, peut être une feuille

@@ -2,6 +2,7 @@
  * Enumération représentant les différents types de données pris en charge.
  * Chaque type de données correspond à une représentation spécifique d'un élément 
  * dans la base de données ou dans une structure de données en mémoire.
+ * @author Mael Lecene
  */
 public enum DataType{
     /**

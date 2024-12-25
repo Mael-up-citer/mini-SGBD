@@ -7,7 +7,8 @@ import java.util.Objects;
  *
  * Cette classe est utilisée pour identifier de manière unique une page dans un fichier,
  * permettant une gestion efficace des pages dans des systèmes de gestion de base de données.
- *
+ * 
+ * @author Mael Lecene
  */
 public class PageId {
     // Numéro du fichier où la page est stockée

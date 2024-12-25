@@ -2,6 +2,7 @@
  * Classe représentant un type de données avec un type spécifique et une longueur associée.
  * Cette classe est utilisée pour stocker les informations sur des types de données comme INT, REAL, DATE, CHAR et VARCHAR,
  * en tenant compte de la taille associée à chaque type.
+ * @author Mael Lecene
  */
 public class Data{
     private DataType type;    // Contient le type de données (par exemple, INT, REAL, DATE, CHAR, VARCHAR)

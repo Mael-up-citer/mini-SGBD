@@ -6,6 +6,8 @@ import java.nio.ByteBuffer;
 /**
  * Représente une relation dans une base de données, gérant ses attributs (colonnes), 
  * l'écriture et la lecture d'enregistrements, ainsi que la gestion des pages de données.
+ * 
+ * @author Mael Lecene
  */
 public class Relation {
     

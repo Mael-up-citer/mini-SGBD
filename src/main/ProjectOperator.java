@@ -3,6 +3,8 @@ import java.util.ArrayList;
 /**
  * Cette classe est un opérateur de projection qui permet de filtrer les attributs d'un record 
  * pour ne conserver que ceux que l'on souhaite afficher.
+ * 
+ * @author Mael Lecene
  */
 public class ProjectOperator implements IRecordIterator {
 

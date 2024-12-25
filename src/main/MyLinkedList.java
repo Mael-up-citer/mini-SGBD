@@ -6,6 +6,8 @@
  * à la fin de la liste en utilisant un pointeur vers le dernier élément (`tail`).
  * 
  * @param <T> Le type des éléments de la liste. La liste est générique et peut contenir n'importe quel type d'élément.
+ * 
+ * @author Mael Lecene
  */
 public class MyLinkedList<T> {
 

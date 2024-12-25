@@ -7,6 +7,8 @@ import java.util.Objects;
  *
  * @param <T1> Le type de la première valeur du couple.
  * @param <T2> Le type de la deuxième valeur du couple.
+ * 
+ * @author Mael Lecene
  */
 public class Pair<T1, T2> {
 

@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
  * les records présents dans cette page en utilisant l'offset pour accéder aux données.
  * 
  * @see IRecordIterator
+ * @author Mael Lecene
  */
 public class DataPageHoldRecordIterator implements IRecordIterator {
     // Variable de décalage pour accéder à l'offset des records dans la page de données

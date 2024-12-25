@@ -6,6 +6,8 @@ import java.util.Objects;
 /**
  * Classe MyRecord qui représente un enregistrement de paires (valeur, type).
  * Elle hérite d'ArrayList et stocke des objets de type Pair<Object, DataType>.
+ * 
+ * @author Mael Lecene
  */
 public class MyRecord extends ArrayList<Pair<Object, DataType>> {
 

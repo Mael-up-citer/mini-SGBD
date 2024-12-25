@@ -12,6 +12,7 @@ import java.util.HashMap;
  * Classe représentant un gestionnaire de Base de données.
  * Le DBManager gère une liste de Bases de Donées, réalise ou redirige les actions demandées par l'utilisateur sur une ou plusieurs base de données.
  * Il stocke une base de Données courante sur laquelle travaille l'utilisateur.
+ * @author Maëlys Adamczak
  */
 public class DBManager {
 	private HashMap<String, HashMap<String, Relation>> listeDatabase;

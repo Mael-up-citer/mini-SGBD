@@ -6,6 +6,8 @@ import java.util.List;
  * Classe RelationScanner implémente IRecordIterator.
  * Permet de parcourir les pages de données d'une relation et de récupérer les enregistrements (records)
  * qui respectent les conditions spécifiées.
+ * 
+ * @author Mael Lecene
  */
 public class RelationScanner implements IRecordIterator {
     private Relation relation; // Référence vers l'objet Relation.

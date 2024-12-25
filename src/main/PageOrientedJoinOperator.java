@@ -5,6 +5,8 @@ import java.util.ArrayList;
  * une jointure entre deux relations (une externe et une interne), en parcourant les pages
  * et les tuples à l'aide d'itérateurs de pages et de tuples.
  * Cet opérateur est conçu pour supporter des conditions de jointure sur les tuples.
+ * 
+ * @author Mael Lecene
  */
 public class PageOrientedJoinOperator implements IRecordIterator {
     BufferManager bm;

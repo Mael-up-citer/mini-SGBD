@@ -9,6 +9,9 @@ import java.util.regex.*;
  * La classe SGBD représente un système de gestion de base de données. 
  * Elle permet de créer, supprimer, lister des bases de données et des tables, ainsi que de définir la base de données courante.
  * Elle gère aussi l'interaction avec l'utilisateur via des commandes SQL basiques.
+ * 
+ * @author Mael Lecene
+ * @author Maëlys Adamczak
  */
 public class SGBD {
     private DBConfig dbc;               // Instance de la configuration de la base de données

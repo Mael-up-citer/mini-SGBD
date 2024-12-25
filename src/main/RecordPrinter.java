@@ -3,6 +3,8 @@ import java.util.ArrayList;
 /**
  * La classe RecordPrinter permet d'imprimer tous les enregistrements (tuples) 
  * d'un itérateur d'enregistrements donné en affichant les attributs spécifiés.
+ * 
+ * @author Mael Lecene
  */
 public class RecordPrinter {
     

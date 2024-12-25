@@ -1,10 +1,11 @@
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 /**
  * Opérateur de sélection implémentant les interfaces {@link Operateur} et {@link IRecordIterator}.
  * Cette classe permet d'itérer sur des enregistrements d'une relation en filtrant ceux qui satisfont
  * certaines conditions spécifiées.
+ * 
+ *  @author Mael Lecene
  */
 public class selectOperator implements IRecordIterator {
 

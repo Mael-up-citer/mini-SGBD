@@ -7,6 +7,7 @@ import java.util.Objects;
  * Cette classe permet de manipuler des dates tout en validant leur format
  * et en vérifiant leur validité (y compris pour les années bissextiles).
  * Elle implémente l'interface {@link Comparable} pour permettre la comparaison entre deux dates.
+ * @author Mael Lecene
  */
 public class Date implements Comparable<Date> {
     private int day;   // Jour de la date

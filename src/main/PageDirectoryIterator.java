@@ -3,6 +3,8 @@ import java.nio.ByteBuffer;
 /**
  * Cette classe permet d'itérer sur les pages de données d'une relation dans une base de données
  * en parcourant les pages d'entêtes et en extrayant les identifiants des pages de données.
+ * 
+ * @author Mael Lecene
  */
 public class PageDirectoryIterator {
     private Relation relation;              // Instance de la relation pour laquelle on parcourt les pages

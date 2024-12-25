@@ -1,6 +1,7 @@
 /**
  * L'interface IRecordIterator fournit des méthodes pour parcourir un ensemble de tuples (enregistrements).
  * Elle permet d'accéder aux enregistrements un par un, de réinitialiser l'itérateur et de le fermer.
+ * @author Mael Lecene
  */
 public interface IRecordIterator {
 

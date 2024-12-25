@@ -1,6 +1,7 @@
 /**
  * Classe représentant une condition dans une requête SQL, par exemple : 
  * "age > 30" ou "nom = 'John'".
+ * @author Mael Lecene
  */
 public class Condition {
 

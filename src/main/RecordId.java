@@ -2,6 +2,8 @@
  * Représente un identifiant de record dans une page de la base de données.
  * Il contient un index de slot ainsi qu'un identifiant de page, permettant de localiser
  * un enregistrement précis dans une page spécifique.
+ * 
+ * @author Maëlys Adamczak
  */
 public class RecordId {
     // L'index du slot dans la page (identifie un enregistrement dans une page)

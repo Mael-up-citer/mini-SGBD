@@ -1,5 +1,12 @@
 import java.util.ArrayList;
 
+/**
+ * L'opérateur de jointure représente une opération de jointure entre deux relations en utilisant des conditions spécifiées.
+ * Il produit un produit cartésien entre deux ensembles de tuples et vérifie ensuite si les conditions de jointure sont satisfaites.
+ * Cette classe implémente l'interface {@link IRecordIterator} pour itérer sur les enregistrements résultants.
+ * 
+ * @author Mael Lecene
+ */
 public class JoinOperator implements IRecordIterator {
     private Pair<IRecordIterator, IRecordIterator> operateurs; // Les deux relations à joindre représenté par lurs select
     private ArrayList<Condition> joinConditions;

@@ -9,6 +9,7 @@ import java.io.RandomAccessFile;
 /**
  * Cette classe gère l'allocation, la lecture, l'écriture et la désallocation des pages dans un système de gestion de base de données.
  * Elle garantit que les pages sont allouées et libérées correctement en fonction de l'espace disponible sur le disque.
+ * @author Mael Lecene
  */
 public class DiskManager {
 

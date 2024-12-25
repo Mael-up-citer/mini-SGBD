@@ -12,6 +12,7 @@ import java.nio.channels.FileChannel;
  * Classe représentant la configuration d'une base de données.
  * Elle permet de charger, modifier et sauvegarder la configuration,
  * ainsi que de tester la validité du chemin de la base de données.
+ * @author Mael Lecene
  */
 public class DBConfig {
     public static String dbpath; // Le chemin de la base de données

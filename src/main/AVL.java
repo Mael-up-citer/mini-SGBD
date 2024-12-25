@@ -5,6 +5,7 @@ import java.util.ArrayList;
  * Classe représentant un noeud dans un arbre AVL.
  * Chaque noeud contient un identifiant de page (PageId), un pointeur vers un buffer, 
  * un indicateur de modification (dirtyFlag) et un compteur de référence (pin_count).
+ * @author Mael Lecene
  */
 class AVLNode {
     PageId id;  // Identifiant de la page associée au noeud
